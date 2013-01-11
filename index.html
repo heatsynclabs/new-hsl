@@ -15,6 +15,21 @@
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+
+    <script>
+      var dojoConfig = {
+        baseUrl: './',
+        has: {
+          'dojo-requirejs-api': true
+        },
+        packages: [
+          { name: 'dojo', location: 'deps/dojo' },
+          { name: 'app', location: 'js' }
+        ],
+        async: true
+      };
+    </script>
+    <script src="deps/dojo/dojo.js" data-main="app/main"></script>
   </head>
   <body>
     <div class="container">
