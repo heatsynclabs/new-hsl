@@ -9,3 +9,13 @@ body {
 .cameras > li {
   margin-left: 0;
 }
+
+.social {
+  list-style: none;
+  margin-bottom: 0;
+}
+
+.social > li {
+  border: 1px solid black;
+  margin-left: 0;
+}
