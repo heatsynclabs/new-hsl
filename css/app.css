@@ -11,3 +11,12 @@ body {
 .cameras > li {
   margin-left: 0;
 }
+
+.socials{
+	list-style-type:none;
+}
+
+.social-logo{
+	height:40px;
+	float:right;
+}
