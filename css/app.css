@@ -1,5 +1,7 @@
 body {
-  background-color: transparent; /*bootstrap has this as white*/
+	background-image: url("/images/light_checkered.png");
+	background-repeat: repeat;
+
 }
 
 .cameras {
