@@ -12,6 +12,22 @@ body {
   margin-left: 0;
 }
 
+.logo{
+	max-width:467px;
+}
+
+.social-container{
+	padding-top: 10%;
+	float:right;
+}
+
+@media (max-width: 767px) {
+	.social-container{
+		padding-top:0;
+	}
+}
+
+
 .socials{
 	list-style-type:none;
 }
