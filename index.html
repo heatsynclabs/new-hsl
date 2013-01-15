@@ -10,6 +10,7 @@
     <link href="deps/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="deps/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="css/app.css" rel="stylesheet">
+    <link href="css/app-responsive.css" rel="stylesheet">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -38,22 +39,20 @@
   <body>
     <div class="container">
       <div class="row">
-		<div class="span8">
-        <img src="img/logo.png">
-		</div>
-		<div class="span4 social-container">
-			<ul class="socials">
-				<li><a href="http://www.youtube.com/heatsynclabs"><img src="img/youtube.png" class="social-logo"></a></li>
-				<li><a href="http://www.facebook.com/groups/493579133986393/?fref=ts"><img src="img/facebook.png" class="social-logo"></a></li>
-				<li><a href="http://www.twitter.com/heatsynclabs"><img src="img/twitterbird.png" class="social-logo"></a></li>
-				<li><a href="http://www.flickr.com/groups/heatsynclabs/"><img src="img/flickr.png" class="social-logo"></a></li>
-			</ul>
-		</div>
+        <div class="span8">
+          <img class="logo" src="img/logo.png">
+        </div>
+        <div class="social-container span4">
+          <a href="http://www.youtube.com/heatsynclabs" class="social-logo youtube"></a>
+          <a href="http://www.facebook.com/groups/493579133986393" class="social-logo facebook"></a>
+          <a href="http://www.twitter.com/heatsynclabs" class="social-logo twitter"></a>
+          <a href="http://www.flickr.com/groups/heatsynclabs/" class="social-logo flickr"></a>
+        </div>
       </div>
       <div class="row">
         <div class="span3 sidebar-nav">
           <div class="left-info">
-			<h3>We are..</h3>
+            <h3>We are..</h3>
             <ul>
               <li>a community workshop</li>
               <li>open FREE to the public M-F 7p-10p</li>
@@ -62,59 +61,53 @@
             </ul>
             <p>Bring your projects and your passion and JOIN US!</p>
           </div>
-			<div id="google-calendar">
-			        <div>
-						<h3>Calendar</h3>
-					</div>
-					<div id="calendar-refresh">
+          <div id="google-calendar">
+            <div>
+              <h3>Calendar</h3>
+            </div>
+            <div id="calendar-refresh">
 
-					</div>
-			        <div class="calendar-noverflow">
-			          <div id="calendar-animation">
-			            <div id="calendar-entries">
-							<strong>Tuesday, January 15</strong>
-							<ul>
-							<li> 7:00<span class="PM">PM</span> Business and Marketing Plan Help</li>
-							<li> 7:00<span class="PM">PM</span> Open Hack!</li>
-							</ul>
-							<strong>Wednesday, January 16</strong>
-							<ul>
-							<li> 7:00<span class="PM">PM</span> 3D Printing with Makerbot and RepRap</li>
-							</ul>
-							<strong>Thursday, January 17</strong>
-							<ul>
-							<li> 7:00<span class="PM">PM</span> Open Hack</li>
-							</ul>
-							<strong>Friday, January 18</strong>
-							<ul>
-							<li> 7:00<span class="PM">PM</span> Young Makers</li>
-							</ul>
-							<strong>Sunday, January 20</strong>
-							<ul>
-							<li> 12:00<span class="PM">PM</span> AZ Haunters</li>
-							</ul>
-							<strong>Monday, January 21</strong>
-							<ul>
-							<li> 6:00<span class="PM">PM</span> Bylaws Hacknight</li>
-							</ul>
-							<strong>Tuesday, January 22</strong>
-							<ul>
-							<li> 7:00<span class="PM">PM</span> Open Hack!</li>
-							</ul>
-						</div>
-			          </div>
-			        </div>
-			      </div>
-        </div>
-        <div class="span9">
-          <div class="row">
-            <div class="span9">
-              <img src="http://farm8.staticflickr.com/7247/7601761394_2841f4b715_b.jpg">
+            </div>
+            <div class="calendar-noverflow">
+              <div id="calendar-animation">
+                <div id="calendar-entries">
+                  <strong>Tuesday, January 15</strong>
+                  <ul>
+                    <li> 7:00<span class="PM">PM</span> Business and Marketing Plan Help</li>
+                    <li> 7:00<span class="PM">PM</span> Open Hack!</li>
+                  </ul>
+                  <strong>Wednesday, January 16</strong>
+                  <ul>
+                    <li> 7:00<span class="PM">PM</span> 3D Printing with Makerbot and RepRap</li>
+                  </ul>
+                  <strong>Thursday, January 17</strong>
+                  <ul>
+                    <li> 7:00<span class="PM">PM</span> Open Hack</li>
+                  </ul>
+                  <strong>Friday, January 18</strong>
+                  <ul>
+                    <li> 7:00<span class="PM">PM</span> Young Makers</li>
+                  </ul>
+                  <strong>Sunday, January 20</strong>
+                  <ul>
+                    <li> 12:00<span class="PM">PM</span> AZ Haunters</li>
+                  </ul>
+                  <strong>Monday, January 21</strong>
+                  <ul>
+                    <li> 6:00<span class="PM">PM</span> Bylaws Hacknight</li>
+                  </ul>
+                  <strong>Tuesday, January 22</strong>
+                  <ul>
+                    <li> 7:00<span class="PM">PM</span> Open Hack!</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="row">
+        <div class="span9">
+          <img src="http://farm8.staticflickr.com/7247/7601761394_2841f4b715_b.jpg">
+        </div>
         <ul class="cameras pull-right">
           <li class="span2">
             <img id="cam1" src="http://live.heatsynclabs.org/snapshot.php?camera=1" />
@@ -126,6 +119,8 @@
             <img id="cam3" src="http://live.heatsynclabs.org/snapshot.php?camera=3" />
           </li>
         </ul>
+      </div>
+      <div class="row">
       </div>
 
       <footer>

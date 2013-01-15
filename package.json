@@ -7,5 +7,8 @@
       "lodash": "https://raw.github.com/bestiejs/lodash/v1.0.0-rc.3/lodash.js",
       "requirejs-plugins": "github:millermedeiros/requirejs-plugins/master"
     }
+  },
+  "devDependencies": {
+    "grunt-reload": "~0.2.0"
   }
 }
