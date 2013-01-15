@@ -23,6 +23,10 @@ body {
 	background-size: 40px 40px;
 }
 
+.logo{
+	padding-top:17px;
+}
+
 .youtube {
 	background-image: url(../img/youtube.png);
 }
