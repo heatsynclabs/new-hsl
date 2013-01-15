@@ -25,6 +25,9 @@
         packages: [
           { name: 'dojo', location: 'deps/dojo' },
           { name: 'lodash', location: 'deps', main: 'lodash'},
+          { name: 'goog', location: 'deps/requirejs-plugins/src', main: 'goog' },
+          { name: 'async', location: 'deps/requirejs-plugins/src', main: 'async' },
+          { name: 'propertyParser', location: 'deps/requirejs-plugins/src', main: 'propertyParser' },
           { name: 'app', location: 'js' }
         ],
         async: true
@@ -64,7 +67,7 @@
 						<h3>Calendar</h3>
 					</div>
 					<div id="calendar-refresh">
-						
+
 					</div>
 			        <div class="calendar-noverflow">
 			          <div id="calendar-animation">

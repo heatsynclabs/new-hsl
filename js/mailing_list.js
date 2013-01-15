@@ -1,19 +1,24 @@
-console.log("Mailing list.js is loading...");
+define([
+  'goog!feeds,1'
+], function(){
 
-google.load("feeds", "1");
+  'use strict';
 
-var list_topics = [];
+  console.log("Mailing list.js is loading...");
 
-function initialize() {
+  var list_topics = [];
+
   var feed = new google.feeds.Feed("https://groups.google.com/group/heatsynclabs/feed/rss_v2_0_topics.xml");
   feed.setNumEntries(10);
   feed.load(function(result) {
     if (!result.error) {
       console.log(result.feed.entries);
       for (var i = 0; i < result.feed.entries.length; i++) {
-	list_topics[i] = result.feed.entries[i];
+        list_topics[i] = result.feed.entries[i];
       }
     }
   });
-}
-google.setOnLoadCallback(initialize);
+
+  return list_topics;
+
+});
