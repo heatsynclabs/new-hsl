@@ -36,3 +36,9 @@ body {
 	height:40px;
 	float:right;
 }
+
+.cams {
+	display:block;
+	margin-left:auto;
+	margin-right:auto;
+	}
