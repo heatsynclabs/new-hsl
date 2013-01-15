@@ -41,4 +41,16 @@ body {
 
 .door_status_container {
 	text-align:right;
-	}
+}
+
+.cams {
+	display:block;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+footer {
+	padding-bottom:40px;
+	margin-bottom:40px;
+	padding-left:20px;
+}
