@@ -4,7 +4,7 @@ define([
 	console.log("Loading google analytics...");
 
 	var _gaq = _gaq || [];
-	_gaq.push(['_setAccount', 'UA-12598372-1']);
+	_gaq.push(['_setAccount', 'UA-12598372-2']);
 	_gaq.push(['_trackPageview']);
 
 	(function() {
