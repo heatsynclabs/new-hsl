@@ -38,3 +38,7 @@ body {
 .flickr {
 	background-image: url(../img/flickr.png);
 }
+
+.door_status_container {
+	text-align:right;
+	}
