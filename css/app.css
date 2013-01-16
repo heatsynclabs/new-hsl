@@ -38,6 +38,9 @@ body {
 .flickr {
 	background-image: url(../img/flickr.png);
 }
+.github{
+	background-image: url(../img/github.png);
+}
 
 .door_status_container {
 	text-align:right;
