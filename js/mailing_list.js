@@ -8,7 +8,7 @@ define([
   'use strict';
 
   var feed = new google.feeds.Feed('https://groups.google.com/group/heatsynclabs/feed/rss_v2_0_topics.xml');
-  feed.setNumEntries(10);
+  feed.setNumEntries(7);
   feed.load(function(result) {
     if (!result.error) {
       console.log('Mailing List Entries: ', result.feed.entries);
