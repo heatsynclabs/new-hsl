@@ -4,14 +4,6 @@ body {
 
 }
 
-.cameras {
-  list-style: none;
-}
-
-.cameras > li {
-  margin-left: 0;
-}
-
 .social-container {
 	padding-top: 10%;
 }
@@ -51,6 +43,10 @@ body {
 	display:block;
 	margin-left:auto;
 	margin-right:auto;
+}
+
+.discussion-title {
+	text-transform: capitalize;
 }
 
 footer {
