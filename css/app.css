@@ -43,9 +43,14 @@ body {
 }
 
 .cams {
+	max-width:90%;
 	display:block;
 	margin-left:auto;
 	margin-right:auto;
+}
+
+.footer {
+	background-color:white;
 }
 
 .discussion-title {
