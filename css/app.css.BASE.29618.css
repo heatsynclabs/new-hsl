@@ -1,0 +1,11 @@
+body {
+  background-color: transparent; /*bootstrap has this as white*/
+}
+
+.cameras {
+  list-style: none;
+}
+
+.cameras > li {
+  margin-left: 0;
+}
