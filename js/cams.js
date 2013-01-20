@@ -4,6 +4,8 @@ define([
   'dojo/dom'
 ], function(_, on, dom){
 
+  'use strict';
+
   var start = Date.now();
 
   var cams = [new Image(), new Image(), new Image()];
