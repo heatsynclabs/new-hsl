@@ -38,12 +38,23 @@ body {
 	background-image: url(../img/github.png);
 }
 
-.door_status_container {
-	text-align:right;
+.signs {
+	height: 80px;
+	width: 114px;
+	background-size: 114px 80px;
+	display:none;
+	margin: 0 auto;
+}
+
+.open{
+	background-image: url(../img/open.png);
+}
+
+.closed{
+	background-image: url(../img/closed.png);
 }
 
 .cams {
-	max-width:90%;
 	display:block;
 	margin-left:auto;
 	margin-right:auto;
