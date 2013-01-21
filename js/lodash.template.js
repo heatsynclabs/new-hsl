@@ -13,7 +13,7 @@
     ((__t = (entry.link)) == null ? '' : __t) +
     '" class="title">' +
     ((__t = (entry.title)) == null ? '' : __t) +
-    '</a> -\n  <p>\n    ' +
+    '</a> - ' +
     ((__t = (entry.contentSnippet)) == null ? '' : __t) +
     '\n  </p>\n';
     });;
@@ -34,7 +34,7 @@
     ((__t = (entry.link)) == null ? '' : __t) +
     '" class="title">' +
     ((__t = (entry.title)) == null ? '' : __t) +
-    '</a> -\n  <p>\n    ' +
+    '</a> - ' +
     ((__t = (entry.snippet)) == null ? '' : __t) +
     '\n  </p>\n';
      }); ;
