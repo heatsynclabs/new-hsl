@@ -9,11 +9,11 @@
     with (obj) {
     
      _.forEach(entries, function(entry){ ;
-    __p += '\n  <a href="' +
+    __p += '\n  <p>\n    <a href="' +
     ((__t = (entry.link)) == null ? '' : __t) +
     '" class="title">' +
     ((__t = (entry.title)) == null ? '' : __t) +
-    '</a> -\n  <p>\n    ' +
+    '</a> - ' +
     ((__t = (entry.contentSnippet)) == null ? '' : __t) +
     '\n  </p>\n';
     });;
@@ -30,11 +30,11 @@
     with (obj) {
     
      _.forEach(entries, function(entry){ ;
-    __p += '\n  <a href="' +
+    __p += '\n  <p>\n    <a href="' +
     ((__t = (entry.link)) == null ? '' : __t) +
     '" class="title">' +
     ((__t = (entry.title)) == null ? '' : __t) +
-    '</a> -\n  <p>\n    ' +
+    '</a> - ' +
     ((__t = (entry.snippet)) == null ? '' : __t) +
     '\n  </p>\n';
      }); ;

@@ -1,6 +1,5 @@
 <% _.forEach(entries, function(entry){ %>
-  <a href="${entry.link}" class="title">${entry.title}</a> -
   <p>
-    ${entry.contentSnippet}
+    <a href="${entry.link}" class="title">${entry.title}</a> - ${entry.contentSnippet}
   </p>
 <%});%>
