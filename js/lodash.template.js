@@ -11,13 +11,34 @@
      _.forEach(entries, function(entry){ ;
     __p += '\n  <a href="' +
     ((__t = (entry.link)) == null ? '' : __t) +
-    '" class="discussion-title">' +
+    '" class="title">' +
     ((__t = (entry.title)) == null ? '' : __t) +
     '</a> -\n  <p>\n    ' +
     ((__t = (entry.contentSnippet)) == null ? '' : __t) +
     '\n  </p>\n';
     });;
     __p += '\n';
+    
+    }
+    return __p
+  };
+
+  templates['blogs'] = function(obj) {
+    obj || (obj = {});
+    var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
+    function print() { __p += __j.call(arguments, '') }
+    with (obj) {
+    
+     _.forEach(entries, function(entry){ ;
+    __p += '\n  <a href="' +
+    ((__t = (entry.link)) == null ? '' : __t) +
+    '" class="title">' +
+    ((__t = (entry.title)) == null ? '' : __t) +
+    '</a> -\n  <p>\n    ' +
+    ((__t = (entry.snippet)) == null ? '' : __t) +
+    '\n  </p>\n';
+     }); ;
+    
     
     }
     return __p
