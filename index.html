@@ -10,6 +10,7 @@
     <meta name="author" content="">
     <link href="deps/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
     <link href="deps/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="deps/Font-Awesome/css/font-awesome.min.css">
     <link href="css/app.css" rel="stylesheet" type="text/css">
     <link href="css/app-responsive.css" rel="stylesheet" type="text/css"><!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -52,7 +53,7 @@
     <div class="container">
       <div class="row">
         <div class="span8 logo">
-          <img src="img/logo-updatedtagline.png">
+          <a href="/"><img src="img/logo-updatedtagline.png"></a>
         </div>
         <div class="social-container span4">
           <a href="http://www.youtube.com/heatsynclabs" class="social-logo youtube"></a> <a href="http://www.facebook.com/groups/493579133986393" class="social-logo facebook"></a> <a href="http://www.twitter.com/heatsynclabs" class="social-logo twitter"></a> <a href="http://www.flickr.com/groups/heatsynclabs/" class="social-logo flickr"></a> <a href="http://www.github.com/heatsynclabs" class="social-logo github"></a>
@@ -69,8 +70,11 @@
               <li>made up entirely of volunteers--no staff!</li>
               <li>open <strong>FREE</strong> to the public <strong>Mon-Fri 7p-10p</strong> (and whenever a member unlocks the doors)</li>
             </ul>
-            <div class="signs open" id="door_status_open"></div>
-            <div class="signs closed" id="door_status_closed"></div>
+            <div id="door_status">
+              <div class="spinner">
+                <div><i class="icon-spinner icon-spin"></i></div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="span9">
@@ -82,7 +86,11 @@
           <h3 class="hide-link">
             <a href="http://www.google.com/calendar/feeds/heatsynclabs.org_p9rcn09d64q56m7rg07jptmrqc@group.calendar.google.com/public/full">Calendar</a>
           </h3>
-          <div id="calendar-entries"></div>
+          <div id="calendar-entries">
+            <div class="spinner">
+              <i class="icon-spinner icon-spin"></i>
+            </div>
+          </div>
         </div>
         <div class="span6" id="feed">
           <div class="row">
@@ -90,13 +98,21 @@
               <h3 class="hide-link">
                 <a href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs">Discussion Groups</a>
               </h3>
-              <div id="discussion-container"></div>
+              <div id="discussion-container">
+                <div class="spinner">
+                  <i class="icon-spinner icon-spin"></i>
+                </div>
+              </div>
             </div>
             <div class="span6">
               <h3 class="hide-link">
                 <a href="http://pipes.yahoo.com/pipes/pipe.run?_id=eb41a075801cf56d9a76ea48deea1612&_render=rss">Community Blogs</a>
               </h3>
-              <div id="blog-container"></div>
+              <div id="blog-container">
+                <div class="spinner">
+                  <i class="icon-spinner icon-spin"></i> 
+                </div>
+              </div>
             </div>
           </div>
         </div>
