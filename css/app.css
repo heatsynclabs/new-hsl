@@ -72,8 +72,16 @@ body {
 }
 
 .hide-link a {
-	color: #000000;
+	color: #333333;
 	text-decoration:underline;
+}
+
+.orange-button a {
+	color: #000000;
+}
+
+.orange-button a:hover {
+	text-decoration:none;
 }
 
 .spinner{
