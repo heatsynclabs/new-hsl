@@ -1,8 +1,8 @@
 define([
-  'lodash',
   'dojo/on',
-  'dojo/dom-construct'
-], function(_, on, domConstruct){
+  'dojo/dom-construct',
+  './RAF'
+], function(on, domConstruct){
 
   'use strict';
 
@@ -17,7 +17,7 @@ define([
     domConstruct.place(e.target,"cam","replace");
   });
 
-  var currentCam=2;
+  var currentCam = 2; // Start at cam2 because we default load cam1
 
   var loadCams = function(){
     var progress = Date.now() - start;
@@ -27,12 +27,12 @@ define([
 
       cam.src = camBaseUrl + currentCam++;
 
-      if(currentCam>3)
-        currentCam=1;
-
+      if(currentCam > 3){
+        currentCam = 1;
+      }
     }
-    webkitRequestAnimationFrame(loadCams);
+    requestAnimationFrame(loadCams);
   };
 
-  webkitRequestAnimationFrame(loadCams);
+  requestAnimationFrame(loadCams);
 });
