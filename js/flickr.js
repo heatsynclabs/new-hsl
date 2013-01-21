@@ -1,7 +1,8 @@
 define([
   	'dojo/dom',
+	'dojo/dom-attr',
 	'dojo/request'
-], function(dom,request){
+], function(dom,attr,request){
 	console.log("Flickr init...");
 
 	var photos = [];
@@ -25,6 +26,15 @@ define([
 			description = "";
 			photos[i] = {"title":title,"description":description,"image_url":image_url,"link":link};
 		}
-		console.log(photos);
+		//For Debug
+		//console.log(photos);
+		//
+		//For Debugging purposes use a placekitten.
+		//image_url = "http://placekitten.com/800/800";
+		
+		//for now just use the first image we got back from flickr
+		image_url = photos[0]["image_url"];
+		title = photos[0]["title"];
+		attr.set("main_image","src",image_url);
 	});
 })
