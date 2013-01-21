@@ -36,5 +36,6 @@ define([
 		image_url = photos[0]["image_url"];
 		title = photos[0]["title"];
 		attr.set("main_image","src",image_url);
+		dom.byId('main_image_caption').innerHTML=title;
 	});
 })

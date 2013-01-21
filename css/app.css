@@ -84,6 +84,14 @@ body {
 	text-decoration:none;
 }
 
+.caption{
+	font-size: 29px;
+	text-align: right;
+	position: relative;
+	top: -29px;
+	text-shadow: -2px 0 white, 0 2px white, 2px 0 white, 0 -2px white;
+}
+
 .spinner{
 	text-align:center;
 }
