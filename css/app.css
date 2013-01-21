@@ -42,7 +42,6 @@ body {
 	height: 80px;
 	width: 114px;
 	background-size: 114px 80px;
-	display:none;
 	margin: 0 auto;
 }
 
@@ -72,8 +71,17 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
-.orange-button a {
+.hide-link a {
 	color: #000000;
+	text-decoration:underline;
+}
+
+.spinner{
+	text-align:center;
+}
+
+.camera-container{
+	padding-bottom:20px;
 }
 
 .cams {
@@ -86,7 +94,7 @@ body {
 	background-color:white;
 }
 
-.discussion-title {
+.title {
 	text-transform: capitalize;
 }
 

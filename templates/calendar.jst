@@ -1,0 +1,10 @@
+<% _(dates).unique().forEach(function(date){ %>
+  <h4>${date}</h4>
+  <ul>
+    <% _(entries).where({ date: date }).forEach(function(entry){ %>
+      <li>
+        ${entry.time} <a href="${entry.link}">${entry.title}</a>
+      </li>
+    <% }); %>
+  </ul>
+<% }); %>

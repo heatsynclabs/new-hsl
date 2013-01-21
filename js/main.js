@@ -1,9 +1,10 @@
 define([
   // Dependencies here
-  'app/analytics',
+  'app/cams',
   'app/mailing_list',
-  'app/door_status',
-  'app/cams'
+  'app/calendar',
+  'app/blogs',
+  'app/door_status'
 ], function(){
 
 
