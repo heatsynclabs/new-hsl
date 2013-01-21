@@ -1,11 +1,12 @@
 define([
   'lodash',
   'dojo/dom',
+  'dojo/date',
   'dojo/date/locale',
   'dojo/request/script',
   './lodash.template',
   'dojo/domReady!'
-], function(_, dom, date, request){
+], function(_, dom, date, locale, request){
 
   'use strict';
 
@@ -24,25 +25,32 @@ define([
       futureevents: true
     }
   }).then(function(data){
-    var entries = _.map(data.feed.entry, function(entry){
-      var importantProps = _.pick(entry, 'content', 'gd$when', 'link', 'title');
+    var entries = _(data.feed.entry)
+      .map(function(entry){
+        var importantProps = _.pick(entry, 'content', 'gd$when', 'link', 'title');
 
-      var eventDate = new Date(importantProps.gd$when[0].startTime);
+        var eventDate = new Date(importantProps.gd$when[0].startTime);
 
-      return {
-        content: importantProps.content.$t,
-        date: date.format(eventDate, {
-          selector: 'date',
-          datePattern: 'EEEE, MMMM d'
-        }),
-        time: date.format(eventDate, {
-          selector: 'time',
-          timePattern: 'K:mm a'
-        }),
-        link: _.find(importantProps.link, { type: 'text/html' }).href,
-        title: importantProps.title.$t
-      };
-    });
+        return {
+          content: importantProps.content.$t,
+          timestamp: eventDate,
+          date: locale.format(eventDate, {
+            selector: 'date',
+            datePattern: 'EEE, MMM d'
+          }),
+          time: locale.format(eventDate, {
+            selector: 'time',
+            timePattern: 'K:mm a'
+          }),
+          link: _.find(importantProps.link, { type: 'text/html' }).href,
+          title: importantProps.title.$t
+        };
+      })
+      .filter(function(entry, idx, entries){
+        var sevenDays = date.add(_.first(entries).timestamp, 'day', 6); // Inclusive
+        return date.compare(entry.timestamp, sevenDays) < 0;
+      })
+      .value();
 
     calendarEntries.innerHTML = _.templates.calendar({
       dates: _.pluck(entries, 'date'),
