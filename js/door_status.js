@@ -4,7 +4,6 @@ require([
   'dojo/domReady!'
 ], function(request, dom){
 
-  //set the door status to something while we query space API
   'use strict';
 
   var url = 'http://intranet.heatsynclabs.org/~access/cgi-bin/spaceapi.rb';
