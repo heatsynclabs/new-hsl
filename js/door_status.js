@@ -11,14 +11,10 @@ require([
 	{handleAs: "json", headers: {"X-Requested-With":null}}
 	).then(function(data){
 		if (data["open"] == false) {
-			//dom.byId("door_status").innerHTML = "We are currently closed";
-			dom.byId("door_status_open").style.display="none";
-			dom.byId("door_status_closed").style.display="block";
+				dom.byId("door_status").innerHTML = '<div class="signs closed"></div>';                
 			}
 		if (data["open"] == true) {
-			//dom.byId("door_status").innerHTML = "Come in, we're open!";
-			dom.byId("door_status_open").style.display="block";
-			dom.byId("door_status_closed").style.display="none";
+				dom.byId("door_status").innerHTML = '<div class="signs open"></div>';
 			}
   	}, function(err){
 		console.log("Did not get door data.");

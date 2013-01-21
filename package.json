@@ -5,7 +5,8 @@
       "bootstrap": "http://twitter.github.com/bootstrap/assets/bootstrap.zip",
       "dojo": "github:dojo/dojo/master",
       "lodash": "https://raw.github.com/bestiejs/lodash/master/lodash.js",
-      "requirejs-plugins": "github:millermedeiros/requirejs-plugins/master"
+      "requirejs-plugins": "github:millermedeiros/requirejs-plugins/master",
+      "Font-Awesome": "github:FortAwesome/Font-Awesome/v3.0.2"
     }
   },
   "devDependencies": {

@@ -42,7 +42,6 @@ body {
 	height: 80px;
 	width: 114px;
 	background-size: 114px 80px;
-	display:none;
 	margin: 0 auto;
 }
 
@@ -74,6 +73,11 @@ body {
 
 .hide-link a {
 	color: #000000;
+}
+
+.spinner{
+	text-align:center;
+	font-size:25px;
 }
 
 .cams {
