@@ -1,0 +1,26 @@
+body {
+	background-image: url("/images/light_checkered.png");
+	background-repeat: repeat;
+
+}
+
+.cameras {
+  list-style: none;
+}
+
+.cameras > li {
+  margin-left: 0;
+}
+<<<<<<< HEAD
+=======
+
+.social {
+  list-style: none;
+  margin-bottom: 0;
+}
+
+.social > li {
+  border: 1px solid black;
+  margin-left: 0;
+}
+>>>>>>> 0ff5ef4c258a5b93b3baf0f34087b089d8f152a7
