@@ -80,6 +80,10 @@ body {
 	font-size:25px;
 }
 
+.camera-container{
+	padding-bottom:20px;
+}
+
 .cams {
 	display:block;
 	margin-left:auto;
