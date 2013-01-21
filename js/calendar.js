@@ -27,12 +27,10 @@ define([
   }).then(function(data){
     var entries = _(data.feed.entry)
       .map(function(entry){
-        var importantProps = _.pick(entry, 'content', 'gd$when', 'link', 'title');
-
-        var eventDate = new Date(importantProps.gd$when[0].startTime);
+        var eventDate = new Date(entry.gd$when[0].startTime);
 
         return {
-          content: importantProps.content.$t,
+          content: entry.content.$t,
           timestamp: eventDate,
           date: locale.format(eventDate, {
             selector: 'date',
@@ -42,8 +40,8 @@ define([
             selector: 'time',
             timePattern: 'K:mm a'
           }),
-          link: _.find(importantProps.link, { type: 'text/html' }).href,
-          title: importantProps.title.$t
+          link: _.find(entry.link, { type: 'text/html' }).href,
+          title: entry.title.$t
         };
       })
       .filter(function(entry, idx, entries){
