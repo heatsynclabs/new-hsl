@@ -17,7 +17,19 @@
     <![endif]-->
 
     <script type="text/javascript">
-  var dojoConfig = {
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-12598372-2']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+
+    <script type="text/javascript">
+      var dojoConfig = {
         baseUrl: './',
         has: {
           'dojo-requirejs-api': true
@@ -178,8 +190,8 @@
                   Want to send us money? Help us create more amazing things? HeatSync Labs is a 501(c)3 non-profit. Your help enables us to fulfill our educational mission, enhance our space, and any help is greatly appreciated!
                 </p>
                 <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-                  <input type="hidden" name="cmd" value="_s-xclick"> 
-                  <input type="hidden" name="hosted_button_id" value="6W4F9X4BDRYVS"> 
+                  <input type="hidden" name="cmd" value="_s-xclick">
+                  <input type="hidden" name="hosted_button_id" value="6W4F9X4BDRYVS">
                   <button type="submit" name="submit" value="x=40&#38;y=32" class="btn btn-primary btn-large orange-button" alt="PayPal - The safer, easier way to pay online!">Donate</button>
                 </form>
               </div>
@@ -189,15 +201,15 @@
                 </h3>
                 <p>Membership offers onsite storage, <a href="http://wiki.heatsynclabs.org/wiki/Hack_Your_Hackerspace">voting privileges</a> and, when the community decides, 24/7 keycard access. To learn more about the resposibilities of membership, check out the <a href="http://wiki.heatsynclabs.org/wiki/Rules">rules</a>.
                 </p>
-                
+
                 <div class="btn btn-primary btn-large orange-button"><a href="http://www.heatsynclabs.org/get-involved/membership/membership-application/">I'm ready</a>
                 </div>
-              </div>              
+              </div>
               <div class="span4">
                 <h3>
                   Live
                 </h3>
-                <img id="cam" src="http://live.heatsynclabs.org/snapshot.php?camera=1" class="cams"> 
+                <img id="cam" src="http://live.heatsynclabs.org/snapshot.php?camera=1" class="cams">
               </div>
             </div>
           </div>
