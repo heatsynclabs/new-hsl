@@ -3,8 +3,8 @@
     "baseUrl": "deps",
     "dependencies": {
       "bootstrap": "http://twitter.github.com/bootstrap/assets/bootstrap.zip",
-      "dojo": "github:dojo/dojo/1.8.3",
-      "lodash": "https://raw.github.com/bestiejs/lodash/v1.0.0-rc.3/lodash.js",
+      "dojo": "github:dojo/dojo/master",
+      "lodash": "https://raw.github.com/bestiejs/lodash/master/lodash.js",
       "requirejs-plugins": "github:millermedeiros/requirejs-plugins/master"
     }
   },
