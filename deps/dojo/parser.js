@@ -1,13 +1,15 @@
 define(
-	["require", "./_base/kernel", "./_base/lang", "./_base/array", "./_base/config", "./_base/html", "./_base/window",
-		"./_base/url", "./_base/json", "./aspect", "./date/stamp", "./Deferred", "./has", "./query", "./on", "./ready"],
-	function(require, dojo, dlang, darray, config, dhtml, dwindow, _Url, djson, aspect, dates, Deferred, has, query, don, ready){
+	["require", "./_base/kernel", "./_base/lang", "./_base/array", "./_base/config", "./dom", "./_base/window",
+		"./_base/url", "./aspect", "./date/stamp", "./Deferred", "./has", "./query", "./on", "./ready"],
+	function(require, dojo, dlang, darray, config, dom, dwindow, _Url, aspect, dates, Deferred, has, query, don, ready){
 
 	// module:
 	//		dojo/parser
 
 	new Date("X"); // workaround for #11279, new Date("") == NaN
 
+	// data-dojo-props etc. is not restricted to JSON, it can be any javascript
+	function myEval(text){ return eval("(" + text + ")"); }
 
 	// Widgets like BorderContainer add properties to _Widget via dojo.extend().
 	// If BorderContainer is loaded after _Widget's parameter list has been cached,
@@ -343,7 +345,7 @@ define(
 										value == "now" ? new Date() :	// current date
 										dates.fromISOString(value)) :
 								(pVal instanceof _Url) ? (dojo.baseUrl + value) :
-								djson.fromJson(value);
+								myEval(value);
 						}
 					}else{
 						params[name] = value;
@@ -362,7 +364,7 @@ define(
 			// Mix things found in data-dojo-props into the params, overriding any direct settings
 			if(extra){
 				try{
-					extra = djson.fromJson.call(options.propsThis, "{" + extra + "}");
+					extra = myEval.call(options.propsThis, "{" + extra + "}");
 					dlang.mixin(params, extra);
 				}catch(e){
 					// give the user a pointer to their invalid parameters. FIXME: can we kill this in production?
@@ -379,10 +381,11 @@ define(
 			}
 
 			// Process <script type="dojo/*"> script tags
-			// <script type="dojo/method" event="foo"> tags are added to params, and passed to
+			// <script type="dojo/method" data-dojo-event="foo"> tags are added to params, and passed to
 			// the widget on instantiation.
 			// <script type="dojo/method"> tags (with no event) are executed after instantiation
-			// <script type="dojo/connect" data-dojo-event="foo"> tags are dojo.connected after instantiation
+			// <script type="dojo/connect" data-dojo-event="foo"> tags are dojo.connected after instantiation,
+			// and likewise with <script type="dojo/aspect" data-dojo-method="foo">
 			// <script type="dojo/watch" data-dojo-prop="foo"> tags are dojo.watch after instantiation
 			// <script type="dojo/on" data-dojo-event="foo"> tags are dojo.on after instantiation
 			// note: dojo/* script tags cannot exist in self closing widgets, like <input />
@@ -408,6 +411,8 @@ define(
 						}else if(scriptType == "dojo/on"){
 							ons.push({ event: event, func: nf });
 						}else{
+							// <script type="dojo/method" data-dojo-event="foo">
+							// TODO for 2.0: use data-dojo-method="foo" instead (also affects dijit/Declaration)
 							params[event] = nf;
 						}
 					}else if(scriptType == "dojo/aspect"){
@@ -694,7 +699,7 @@ define(
 			//
 			//		In the example above, it is effectively doing a require(["acme/bar", ...], function(a){ bar = a; }).
 
-			var hash = djson.fromJson("{" + script.innerHTML + "}"),
+			var hash = myEval("{" + script.innerHTML + "}"), // can't use dojo/json::parse() because maybe no quotes
 				vars = [],
 				mids = [],
 				d = new Deferred();
@@ -821,7 +826,7 @@ define(
 			}else{
 				root = rootNode;
 			}
-			root = root ? dhtml.byId(root) : dwindow.body();
+			root = root ? dom.byId(root) : dwindow.body();
 
 			options = options || {};
 
