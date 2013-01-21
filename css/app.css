@@ -73,6 +73,7 @@ body {
 
 .hide-link a {
 	color: #000000;
+	text-decoration:underline;
 }
 
 .spinner{
