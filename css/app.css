@@ -1,5 +1,5 @@
 body {
-	background-image: url("../img/light_checkered.png");
+	background-image: url("/new-hsl/img/light_checkered.png");
 	background-repeat: repeat;
 
 }
@@ -20,22 +20,22 @@ body {
 }
 
 .youtube {
-	background-image: url(../img/youtube.png);
+	background-image: url(/new-hsl/img/youtube.png);
 }
 
 .facebook {
-	background-image: url(../img/facebook.png);
+	background-image: url(/new-hsl/img/facebook.png);
 }
 
 .twitter {
-	background-image: url(../img/twitterbird.png);
+	background-image: url(/new-hsl/img/twitterbird.png);
 }
 
 .flickr {
-	background-image: url(../img/flickr.png);
+	background-image: url(/new-hsl/img/flickr.png);
 }
 .github{
-	background-image: url(../img/github.png);
+	background-image: url(/new-hsl/img/github.png);
 }
 
 .open{
