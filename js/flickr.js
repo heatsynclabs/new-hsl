@@ -36,9 +36,12 @@ define([
 		image_url = photos[0]["image_url"];
 		title = photos[0]["title"];
 		link = photos[0]["link"];
-		attr.set("main_image","src",image_url);
-		attr.set("main_image_link","href",link);
-		dom.byId('main_image_caption').innerHTML=title;
+
+		dom.byId('main_image').innerHTML = "<a href='" + link + "'> <img id='main_image' src='" + image_url + "'></a><div class='caption' id='main_image_caption'>" + title + "</div>";
+
+		//attr.set("main_image","src",image_url);
+		//attr.set("main_image_link","href",link);
+		//dom.byId('main_image_caption').innerHTML=title;
 
 	});
 })
