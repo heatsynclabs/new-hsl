@@ -38,19 +38,23 @@ body {
 	background-image: url(../img/github.png);
 }
 
-.signs {
-	height: 80px;
-	width: 114px;
-	background-size: 114px 80px;
-	margin: 0 auto;
+.open{
+	display:inline;
 }
 
-.open{
-	background-image: url(../img/open.png);
+.inline{
+	color:green;
+	display:inline;
 }
+
+.articles{
+	line-height:18px;
+}
+
 
 .closed{
-	background-image: url(../img/closed.png);
+	color:red;
+	display:inline;
 }
 
 .orange-button, .orange-button:hover{
@@ -84,12 +88,26 @@ body {
 	text-decoration:none;
 }
 
+.left-info li{
+	line-height: 17px;
+	margin-top: 7px;
+}
+
+.calendar-info li{
+	line-height: 17px;
+}
+
+.calendar-info h4{
+	margin-bottom:5px;
+}
+
+.italics{
+	font-style:italic;
+}
+
 .caption{
 	font-size: 29px;
 	text-align: right;
-	position: relative;
-	top: -29px;
-	text-shadow: -2px 0 white, 0 2px white, 2px 0 white, 0 -2px white;
 }
 
 .spinner{
