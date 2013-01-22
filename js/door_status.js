@@ -17,10 +17,10 @@ require([
     }
   }).then(function(data){
     if(!data.open){
-      doorStatus.innerHTML = '<div class="signs closed"></div>';
+      doorStatus.innerHTML = '<div class="closed">closed</div>';
     }
     if(data.open){
-      doorStatus.innerHTML = '<div class="signs open"></div>';
+      doorStatus.innerHTML = '<div class="open">open</div>';
     }
   }, function(err){
     console.log('Did not get door data.', err);
