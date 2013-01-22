@@ -35,7 +35,10 @@ define([
 		//for now just use the first image we got back from flickr
 		image_url = photos[0]["image_url"];
 		title = photos[0]["title"];
+		link = photos[0]["link"];
 		attr.set("main_image","src",image_url);
+		attr.set("main_image_link","href",link);
 		dom.byId('main_image_caption').innerHTML=title;
+
 	});
 })
