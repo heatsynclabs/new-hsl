@@ -3,30 +3,29 @@ module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    pkg: '<json:package.json>',
-    meta: {
-      banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
-        '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
-        '<%= pkg.homepage ? "* " + pkg.homepage + "\n" : "" %>' +
-        '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
-        ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */'
-    },
-    lint: {
-      files: ['grunt.js', 'lib/**/*.js', 'test/**/*.js']
-    },
-    qunit: {
-      files: ['test/**/*.html']
-    },
-    concat: {
-      dist: {
-        src: ['<banner:meta.banner>', '<file_strip_banner:lib/<%= pkg.name %>.js>'],
-        dest: 'dist/<%= pkg.name %>.js'
+    mincss: {
+      compress: {
+        files: {
+          'css/hsl.css': ['deps/bootstrap/css/bootstrap.css', 'deps/bootstrap/css/bootstrap-responsive.css', 'deps/Font-Awesome/css/font-awesome.css', 'css/app.css', 'css/app-responsive.css']
+        }
       }
     },
-    min: {
-      dist: {
-        src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
-        dest: 'dist/<%= pkg.name %>.min.js'
+    lint: {
+      files: ['new-hsl/grunt.js', 'new-hsl/js/**/*.js']
+    },
+    dojo: {
+      hsl: {
+        dojo: 'deps/dojo/dojo.js',
+        profile: 'hsl.profile.js',
+        'package': './',
+        cwd: './'
+      }
+    },
+    sprites: {
+      social: {
+        src: ['img/social/40x40/*.png'],
+        css: '',
+        map: 'img/social.png'
       }
     },
     reload: {
@@ -34,8 +33,8 @@ module.exports = function(grunt) {
       liveReload: {}
     },
     watch: {
-      files: ['index.html', 'js/**/*', 'css/**/*'],
-      tasks: 'lint reload'
+      files: ['new-hsl/index.html', 'new-hsl/js/**/*', 'new-hsl/css/**/*', 'new-hsl/dist/*.js'],
+      tasks: 'reload'
     },
     jshint: {
       options: {
@@ -57,6 +56,8 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-reload');
+  grunt.loadNpmTasks('grunt-dojo');
+  grunt.loadNpmTasks('grunt-contrib-mincss');
 
   // Default task.
   grunt.registerTask('default', 'lint qunit concat min');

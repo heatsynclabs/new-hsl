@@ -1,4 +1,4 @@
-require([
+define([
   'dojo/request',
   'dojo/dom',
   'dojo/domReady!'
@@ -10,18 +10,20 @@ require([
 
   var doorStatus = dom.byId('door_status');
 
-  request.get(url, {
+  return request.get(url, {
     handleAs: 'json',
     headers: {
       'X-Requested-With': null
     }
   }).then(function(data){
     if(!data.open){
-      doorStatus.innerHTML = '<div class="closed">closed</div>';
+      doorStatus.innerHTML = '<span class="closed">closed</span>';
     }
     if(data.open){
-      doorStatus.innerHTML = '<div class="open">open</div>';
+      doorStatus.innerHTML = '<span class="open">open</span>';
     }
+
+    return data;
   }, function(err){
     console.log('Did not get door data.', err);
     doorStatus.innerHTML = 'Error occurred while fetching status, please refresh.';

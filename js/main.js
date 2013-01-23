@@ -1,12 +1,32 @@
 define([
-  // Dependencies here
-  'app/cams',
-  'app/flickr',
-  'app/mailing_list',
-  'app/calendar',
-  'app/blogs',
-  'app/door_status'
-], function(){
+  './calendar',
+  './flickr',
+  './door_status',
+  './blogs',
+  './mailing_list',
+  'dojo/promise/all',
+  'require',
+  'dojo/domReady!'
+], function(calendar, flickr, door_status, blogs, mailing_list, all, require){
 
+  'use strict';
+
+  all({
+    calendar: calendar,
+    flickr: flickr,
+    door_status: door_status,
+    blogs: blogs,
+    mailing_list: mailing_list
+  }).then(function(results){
+    // Debugging
+    console.log('calendar', results.calendar);
+    console.log('flickr', results.flickr);
+    console.log('door_status', results.door_status);
+    console.log('blogs', results.blogs);
+    console.log('mailing_list', results.mailing_list);
+
+    // Wait until everything else is done before loading cams
+    require(['hsl/cams']);
+  });
 
 });

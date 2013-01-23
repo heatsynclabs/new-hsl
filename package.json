@@ -1,4 +1,6 @@
 {
+  "name": "hsl",
+  "version": "0.1.0",
   "volo": {
     "baseUrl": "deps",
     "dependencies": {
@@ -10,6 +12,9 @@
     }
   },
   "devDependencies": {
-    "grunt-reload": "~0.2.0"
-  }
+    "grunt-reload": "~0.2.0",
+    "grunt-dojo": "~0.1.1",
+    "grunt-contrib-mincss": "~0.3.2"
+  },
+  "dojoBuild": "hsl.profile.js"
 }
