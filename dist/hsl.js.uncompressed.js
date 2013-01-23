@@ -17849,7 +17849,7 @@ define([
 
   on(cam, 'load', function(e){
     if(camElement){
-      domConstruct.place(e.target, camElement, 'replace');
+      domConstruct.place(e.target, 'cam', 'replace');
     } else {
       cancelAnimationFrame(animationFrame);
     }
