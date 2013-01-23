@@ -1,9 +1,10 @@
 define([
+  './replaceTags',
   'lodash',
   'dojo/dom',
-  './lodash.template',
+  './lodash.templates',
   'goog!feeds,1'
-], function(_, dom){
+], function(replaceTags, _, dom){
 
   'use strict';
 

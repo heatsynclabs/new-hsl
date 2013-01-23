@@ -1,47 +1,42 @@
 define([
-  	'dojo/dom',
-	'dojo/dom-attr',
-	'dojo/request'
-], function(dom,attr,request){
-	console.log("Flickr init...");
+  'lodash',
+  'dojo/dom',
+  'dojo/request/script',
+  './lodash.templates'
+], function(_, dom, request){
 
-	var photos = [];
+  'use strict';
 
-	var url = 'http://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818%40N07&tags=publish&format=json&nojsoncallback=1';
+  console.log("Flickr init...");
 
-	request.get(url, {
-		handleAs: 'json',
-		headers: {
-			'X-Requested-With': null
-		}
-	}).then(function(data){
-		//console.log(data.photos.photo);
-		for(i = 0; i< data.photos.photo.length; i++) {
+  var url = 'http://api.flickr.com/services/rest/';
 
-			photo = data.photos.photo[i];
+  return request.get(url, {
+    jsonp: 'jsoncallback',
+    query: {
+      method: 'flickr.photos.search',
+      api_key: 'bec64c9c0f28889dc6e0c5ef7be3511f',
+      user_id: '60827818@N07',
+      tags: 'publish',
+      format: 'json'
+    }
+  }).then(function(data){
+    console.log('Flickr loaded: ', data.photos.photo);
 
-			image_url = "http://farm" + photo['farm'] + ".staticflickr.com/" + photo["server"] + "/" + photo["id"] + "_" + photo["secret"] + "_b.jpg"
-			title = photo['title'];
-			link = "http://www.flickr.com/photos/hslphotosync/" + photo["id"] + "/in/photostream";
-			description = "";
-			photos[i] = {"title":title,"description":description,"image_url":image_url,"link":link};
-		}
-		//For Debug
-		//console.log(photos);
-		//
-		//For Debugging purposes use a placekitten.
-		//image_url = "http://placekitten.com/800/800";
-		
-		//for now just use the first image we got back from flickr
-		image_url = photos[0]["image_url"];
-		title = photos[0]["title"];
-		link = photos[0]["link"];
+    var photos = _.map(data.photos.photo, function(photo){
+      return {
+        image_url: _.templates.flickr_img_url(photo),
+        title: photo.title,
+        link: _.templates.flickr_link(photo),
+        description: ""
+      };
+    });
 
-		dom.byId('main_image').innerHTML = "<a href='" + link + "'> <img id='main_image' src='" + image_url + "'></a><div class='caption' id='main_image_caption'>" + title + "</div>";
+    //for now just use the first image we got back from flickr
 
-		//attr.set("main_image","src",image_url);
-		//attr.set("main_image_link","href",link);
-		//dom.byId('main_image_caption').innerHTML=title;
+    dom.byId('main_image').innerHTML = _.templates.flickr(photos[0]);
 
-	});
-})
+    return photos;
+  });
+
+});

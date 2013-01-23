@@ -1,12 +1,13 @@
 define([
+  './replaceTags',
   'lodash',
   'dojo/dom',
   'dojo/date',
   'dojo/date/locale',
   'dojo/request/script',
-  './lodash.template',
+  './lodash.templates',
   'dojo/domReady!'
-], function(_, dom, date, locale, request){
+], function(replaceTags, _, dom, date, locale, request){
 
   'use strict';
 
@@ -14,7 +15,7 @@ define([
 
   var calendarEntries = dom.byId('calendar-entries');
 
-  request.get(url, {
+  return request.get(url, {
     jsonp: 'callback',
     query: {
       alt: 'json',
@@ -30,7 +31,7 @@ define([
         var eventDate = new Date(entry.gd$when[0].startTime);
 
         return {
-          content: entry.content.$t,
+          content: replaceTags(entry.content.$t),
           timestamp: eventDate,
           date: locale.format(eventDate, {
             selector: 'date',
@@ -41,7 +42,7 @@ define([
             timePattern: 'K:mm a'
           }),
           link: _.find(entry.link, { type: 'text/html' }).href,
-          title: entry.title.$t
+          title: replaceTags(entry.title.$t)
         };
       })
       .filter(function(entry, idx, entries){
@@ -54,6 +55,8 @@ define([
       dates: _.pluck(entries, 'date'),
       entries: entries
     });
+
+    return entries;
   }, function(err){
     console.log('Error in Calendar', err);
     // TODO: template an error message

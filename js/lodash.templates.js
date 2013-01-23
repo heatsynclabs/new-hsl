@@ -2,6 +2,43 @@
   var templates = {},
       _ = window._;
 
+  templates['flickr_img_url'] = function(obj) {
+    obj || (obj = {});
+    var __t, __p = '', __e = _.escape, __d = obj.obj || obj;
+    __p += 'http://farm' +
+    ((__t = (obj.farm)) == null ? '' : __t) +
+    '.staticflickr.com/' +
+    ((__t = (obj.server)) == null ? '' : __t) +
+    '/' +
+    ((__t = (obj.id)) == null ? '' : __t) +
+    '_' +
+    ((__t = (obj.secret)) == null ? '' : __t) +
+    '_b.jpg';
+    return __p
+  };
+
+  templates['flickr_link'] = function(obj) {
+    obj || (obj = {});
+    var __t, __p = '', __e = _.escape, __d = obj.obj || obj;
+    __p += 'http://www.flickr.com/photos/hslphotosync/' +
+    ((__t = (obj.id)) == null ? '' : __t) +
+    '/in/photostream';
+    return __p
+  };
+
+  templates['flickr'] = function(obj) {
+    obj || (obj = {});
+    var __t, __p = '', __e = _.escape, __d = obj.obj || obj;
+    __p += '<a href="' +
+    ((__t = (obj.link)) == null ? '' : __t) +
+    '">\n  <img id=\'main_image\' src="' +
+    ((__t = (obj.image_url)) == null ? '' : __t) +
+    '">\n</a>\n<div class=\'caption\' id=\'main_image_caption\'>' +
+    ((__t = (obj.title)) == null ? '' : __t) +
+    '</div>';
+    return __p
+  };
+
   templates['discussion'] = function(obj) {
     obj || (obj = {});
     var __t, __p = '', __e = _.escape, __j = Array.prototype.join;
