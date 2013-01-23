@@ -1,7 +1,6 @@
 body {
 	background-image: url("/new-hsl/img/light_checkered.png");
 	background-repeat: repeat;
-
 }
 
 .social-container {
@@ -12,7 +11,7 @@ body {
 	height: 40px;
 	width: 40px;
 	float: right;
-	background-size: 40px 40px;
+	background: url(/new-hsl/img/social.png) no-repeat;
 }
 
 .logo{
@@ -20,41 +19,37 @@ body {
 }
 
 .youtube {
-	background-image: url(/new-hsl/img/youtube.png);
+	background-position: 0 -200px;
 }
 
 .facebook {
-	background-image: url(/new-hsl/img/facebook.png);
+	background-position: 0 0;
 }
 
 .twitter {
-	background-image: url(/new-hsl/img/twitterbird.png);
+	background-position: 0 -160px;
 }
 
 .flickr {
-	background-image: url(/new-hsl/img/flickr.png);
+	background-position: 0 -40px;
 }
-.github{
-	background-image: url(/new-hsl/img/github.png);
+
+.github {
+	background-position: 0 -120px;
 }
 
 .open{
+	color: green;
 	display:inline;
 }
 
-.inline{
-	color:green;
+.closed{
+	color:red;
 	display:inline;
 }
 
 .articles{
 	line-height:18px;
-}
-
-
-.closed{
-	color:red;
-	display:inline;
 }
 
 .orange-button, .orange-button:hover{
