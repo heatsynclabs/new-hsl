@@ -1,4 +1,5 @@
 .DS_STORE
 node_modules/
+libs/
 *~
 *.log
