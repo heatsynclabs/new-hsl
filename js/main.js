@@ -4,26 +4,29 @@ define([
   './door_status',
   './blogs',
   './mailing_list',
-  './cams'
-], function(calendar, flickr, door_status, blogs){
+  'dojo/promise/all',
+  'require',
+  'dojo/domReady!'
+], function(calendar, flickr, door_status, blogs, mailing_list, all, require){
 
   'use strict';
 
-  // Debugging
-  // calendar.then(function(data){
-  //   console.log('calendar', data);
-  // });
+  all({
+    calendar: calendar,
+    flickr: flickr,
+    door_status: door_status,
+    blogs: blogs,
+    mailing_list: mailing_list
+  }).then(function(results){
+    // Debugging
+    console.log('calendar', results.calendar);
+    console.log('flickr', results.flickr);
+    console.log('door_status', results.door_status);
+    console.log('blogs', results.blogs);
+    console.log('mailing_list', results.mailing_list);
 
-  // flickr.then(function(data){
-  //   console.log('flickr', data);
-  // });
-
-  // door_status.then(function(data){
-  //   console.log('door_status', data);
-  // });
-
-  // blogs.then(function(data){
-  //   console.log('blogs', data);
-  // });
+    // Wait until everything else is done before loading cams
+    require(['hsl/cams']);
+  });
 
 });

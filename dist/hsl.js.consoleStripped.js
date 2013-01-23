@@ -1944,27 +1944,30 @@ define([
   './door_status',
   './blogs',
   './mailing_list',
-  './cams'
-], function(calendar, flickr, door_status, blogs){
+  'dojo/promise/all',
+  'require',
+  'dojo/domReady!'
+], function(calendar, flickr, door_status, blogs, mailing_list, all, require){
 
   'use strict';
 
-  // Debugging
-  // calendar.then(function(data){
-  //   0 && console.log('calendar', data);
-  // });
+  all({
+    calendar: calendar,
+    flickr: flickr,
+    door_status: door_status,
+    blogs: blogs,
+    mailing_list: mailing_list
+  }).then(function(results){
+    // Debugging
+    0 && console.log('calendar', results.calendar);
+    0 && console.log('flickr', results.flickr);
+    0 && console.log('door_status', results.door_status);
+    0 && console.log('blogs', results.blogs);
+    0 && console.log('mailing_list', results.mailing_list);
 
-  // flickr.then(function(data){
-  //   0 && console.log('flickr', data);
-  // });
-
-  // door_status.then(function(data){
-  //   0 && console.log('door_status', data);
-  // });
-
-  // blogs.then(function(data){
-  //   0 && console.log('blogs', data);
-  // });
+    // Wait until everything else is done before loading cams
+    require(['hsl/cams']);
+  });
 
 });
 
@@ -17562,11 +17565,14 @@ define([
   './replaceTags',
   'lodash',
   'dojo/dom',
+  'dojo/Deferred',
   './lodash.templates',
   'goog!feeds,1'
-], function(replaceTags, _, dom){
+], function(replaceTags, _, dom, Deferred){
 
   'use strict';
+
+  var defer = new Deferred();
 
   var feed = new google.feeds.Feed('https://groups.google.com/group/heatsynclabs/feed/rss_v2_0_topics.xml');
   feed.setNumEntries(3);
@@ -17574,8 +17580,11 @@ define([
     if (!result.error) {
       0 && console.log('Mailing List Entries: ', result.feed.entries);
       dom.byId('discussion-container').innerHTML = _.templates.discussion(result.feed);
+      defer.resolve(result.feed);
     }
   });
+
+  return defer;
 
 });
 
@@ -17712,76 +17721,84 @@ define(function(){
 });
 
 },
-'hsl/cams':function(){
+'dojo/promise/all':function(){
 define([
-  'dojo/on',
-  'dojo/dom-construct',
-  './RAF'
-], function(on, domConstruct){
+	"../_base/array",
+	"../Deferred",
+	"../when"
+], function(array, Deferred, when){
+	"use strict";
 
-  'use strict';
+	// module:
+	//		dojo/promise/all
 
-  var start = Date.now();
+	var some = array.some;
 
-  var cam = new Image();
-  var camBaseUrl = 'http://live.heatsynclabs.org/snapshot.php?camera=';
+	return function all(objectOrArray){
+		// summary:
+		//		Takes multiple promises and returns a new promise that is fulfilled
+		//		when all promises have been fulfilled.
+		// description:
+		//		Takes multiple promises and returns a new promise that is fulfilled
+		//		when all promises have been fulfilled. If one of the promises is rejected,
+		//		the returned promise is also rejected. Canceling the returned promise will
+		//		*not* cancel any passed promises.
+		// objectOrArray: Object|Array?
+		//		The promise will be fulfilled with a list of results if invoked with an
+		//		array, or an object of results when passed an object (using the same
+		//		keys). If passed neither an object or array it is resolved with an
+		//		undefined value.
+		// returns: dojo/promise/Promise
 
-  cam.setAttribute("id","cam");
+		var object, array;
+		if(objectOrArray instanceof Array){
+			array = objectOrArray;
+		}else if(objectOrArray && typeof objectOrArray === "object"){
+			object = objectOrArray;
+		}
 
-  on(cam, 'load', function(e){
-    domConstruct.place(e.target,"cam","replace");
-  });
+		var results;
+		var keyLookup = [];
+		if(object){
+			array = [];
+			for(var key in object){
+				if(Object.hasOwnProperty.call(object, key)){
+					keyLookup.push(key);
+					array.push(object[key]);
+				}
+			}
+			results = {};
+		}else if(array){
+			results = [];
+		}
 
-  var currentCam = 2; // Start at cam2 because we default load cam1
+		if(!array || !array.length){
+			return new Deferred().resolve(results);
+		}
 
-  var loadCams = function(){
-    var progress = Date.now() - start;
-    if(4e3 /* 5 seconds - maybe tweak */ - progress < 0){
-      0 && console.log('load cams', progress);
-      start = Date.now();
-
-      cam.src = camBaseUrl + currentCam++;
-
-      if(currentCam > 3){
-        currentCam = 1;
-      }
-    }
-    requestAnimationFrame(loadCams);
-  };
-
-  requestAnimationFrame(loadCams);
+		var deferred = new Deferred();
+		deferred.promise.always(function(){
+			results = keyLookup = null;
+		});
+		var waiting = array.length;
+		some(array, function(valueOrPromise, index){
+			if(!object){
+				keyLookup.push(index);
+			}
+			when(valueOrPromise, function(value){
+				if(!deferred.isFulfilled()){
+					results[keyLookup[index]] = value;
+					if(--waiting === 0){
+						deferred.resolve(results);
+					}
+				}
+			}, deferred.reject);
+			return deferred.isFulfilled();
+		});
+		return deferred.promise;	// dojo/promise/Promise
+	};
 });
-},
-'hsl/RAF':function(){
-define(function(){
 
-  'use strict';
-
-  var lastTime = 0;
-  var vendors = ['ms', 'moz', 'webkit', 'o'];
-
-  for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-    window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-    window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
-  }
-
-  if (!window.requestAnimationFrame){
-    window.requestAnimationFrame = function(callback, element) {
-      var currTime = new Date().getTime();
-      var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-      var id = window.setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
-      lastTime = currTime + timeToCall;
-      return id;
-    };
-  }
-
-  if (!window.cancelAnimationFrame){
-    window.cancelAnimationFrame = function(id) {
-      clearTimeout(id);
-    };
-  }
-
-});
 },
 '*now':function(r){r(['dojo/i18n!*preload*dist/nls/hsl*["ar","ca","cs","da","de","el","en-gb","en-us","es-es","fi-fi","fr-fr","he-il","hu","it-it","ja-jp","ko-kr","nl-nl","nb","pl","pt-br","pt-pt","ru","sk","sl","sv","th","tr","zh-tw","zh-cn","ROOT"]']);}
 }});
