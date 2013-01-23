@@ -2026,10 +2026,12 @@ define([
       })
       .value();
 
-    calendarEntries.innerHTML = _.templates.calendar({
-      dates: _.pluck(entries, 'date'),
-      entries: entries
-    });
+    if(calendarEntries){
+      calendarEntries.innerHTML = _.templates.calendar({
+        dates: _.pluck(entries, 'date'),
+        entries: entries
+      });
+    }
 
     return entries;
   }, function(err){
@@ -17084,6 +17086,17 @@ define("dojo/keys", ["./_base/kernel", "./sniff"], function(dojo, has){
     return __p
   };
 
+  templates['open_status'] = function(obj) {
+    obj || (obj = {});
+    var __t, __p = '', __e = _.escape, __d = obj.obj || obj;
+    __p += '<span class="' +
+    ((__t = (obj.status)) == null ? '' : __t) +
+    '">' +
+    ((__t = (obj.status)) == null ? '' : __t) +
+    '</span>';
+    return __p
+  };
+
   templates['flickr_link'] = function(obj) {
     obj || (obj = {});
     var __t, __p = '', __e = _.escape, __d = obj.obj || obj;
@@ -17346,8 +17359,10 @@ define([
     });
 
     //for now just use the first image we got back from flickr
-
-    dom.byId('main_image').innerHTML = _.templates.flickr(photos[0]);
+    var flickrImage = dom.byId('main_image');
+    if(flickrImage){
+      flickrImage.innerHTML = _.templates.flickr(photos[0]);
+    }
 
     return photos;
   });
@@ -17357,10 +17372,12 @@ define([
 },
 'hsl/door_status':function(){
 define([
+  'lodash',
   'dojo/request',
   'dojo/dom',
+  './lodash.templates',
   'dojo/domReady!'
-], function(request, dom){
+], function(_, request, dom){
 
   'use strict';
 
@@ -17374,11 +17391,10 @@ define([
       'X-Requested-With': null
     }
   }).then(function(data){
-    if(!data.open){
-      doorStatus.innerHTML = '<span class="closed">closed</span>';
-    }
-    if(data.open){
-      doorStatus.innerHTML = '<span class="open">open</span>';
+    if(doorStatus){
+      doorStatus.innerHTML = _.templates.open_status({
+        status: data.open ? 'open' : 'closed'
+      });
     }
 
     return data;
@@ -17546,9 +17562,11 @@ define([
       .first(3)
       .value();
 
-    blogEntries.innerHTML = _.templates.blogs({
-      entries: entries
-    });
+    if(blogEntries){
+      blogEntries.innerHTML = _.templates.blogs({
+        entries: entries
+      });
+    }
 
     return entries;
   }, function(err){
@@ -17579,7 +17597,10 @@ define([
   feed.load(function(result) {
     if (!result.error) {
       0 && console.log('Mailing List Entries: ', result.feed.entries);
-      dom.byId('discussion-container').innerHTML = _.templates.discussion(result.feed);
+      var discussionContainer = dom.byId('discussion-container');
+      if(discussionContainer){
+        discussionContainer.innerHTML = _.templates.discussion(result.feed);
+      }
       defer.resolve(result.feed);
     }
   });
@@ -17805,9 +17826,11 @@ define([
   'lodash',
   'dojo/on',
   'dojo/request',
+  'dojo/dom',
   'dojo/dom-construct',
-  './RAF'
-], function(_, on, request, domConstruct){
+  './RAF',
+  'dojo/domReady!'
+], function(_, on, request, dom, domConstruct){
 
   'use strict';
 
@@ -17815,15 +17838,21 @@ define([
 
   var url = 'http://heatsynclabs.org:1337/data.php';
   var pamela;
+  var animationFrame;
   var macAddressRegExp = /^([0-9A-F]{2}[:\-]){5}([0-9A-F]{2})$/i;
 
   var cam = new Image();
   var camBaseUrl = 'http://live.heatsynclabs.org/snapshot.php?camera=';
+  var camElement = dom.byId('cam');
 
   cam.setAttribute('id', 'cam');
 
   on(cam, 'load', function(e){
-    domConstruct.place(e.target, 'cam', 'replace');
+    if(camElement){
+      domConstruct.place(e.target, camElement, 'replace');
+    } else {
+      cancelAnimationFrame(animationFrame);
+    }
   });
 
   var currentCam = 1;
@@ -17840,7 +17869,7 @@ define([
         currentCam = 1;
       }
     }
-    requestAnimationFrame(loadCams);
+    animationFrame = requestAnimationFrame(loadCams);
   };
 
   return request.get(url, {
@@ -17860,7 +17889,7 @@ define([
 
     cam.setAttribute('title', pamela.join(', '));
 
-    requestAnimationFrame(loadCams);
+    animationFrame = requestAnimationFrame(loadCams);
 
     return pamela;
   }, function(err){
@@ -17868,7 +17897,7 @@ define([
 
     pamela = ['Could not get Pamela data. Please Refresh'];
 
-    requestAnimationFrame(loadCams);
+    animationFrame = requestAnimationFrame(loadCams);
   });
 
 });
