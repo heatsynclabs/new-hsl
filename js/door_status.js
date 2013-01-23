@@ -1,8 +1,10 @@
 define([
+  'lodash',
   'dojo/request',
   'dojo/dom',
+  './lodash.templates',
   'dojo/domReady!'
-], function(request, dom){
+], function(_, request, dom){
 
   'use strict';
 
@@ -16,11 +18,10 @@ define([
       'X-Requested-With': null
     }
   }).then(function(data){
-    if(!data.open){
-      doorStatus.innerHTML = '<span class="closed">closed</span>';
-    }
-    if(data.open){
-      doorStatus.innerHTML = '<span class="open">open</span>';
+    if(doorStatus){
+      doorStatus.innerHTML = _.templates.open_status({
+        status: data.open ? 'open' : 'closed'
+      });
     }
 
     return data;

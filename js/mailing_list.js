@@ -16,7 +16,10 @@ define([
   feed.load(function(result) {
     if (!result.error) {
       console.log('Mailing List Entries: ', result.feed.entries);
-      dom.byId('discussion-container').innerHTML = _.templates.discussion(result.feed);
+      var discussionContainer = dom.byId('discussion-container');
+      if(discussionContainer){
+        discussionContainer.innerHTML = _.templates.discussion(result.feed);
+      }
       defer.resolve(result.feed);
     }
   });

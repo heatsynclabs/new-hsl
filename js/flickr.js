@@ -33,8 +33,10 @@ define([
     });
 
     //for now just use the first image we got back from flickr
-
-    dom.byId('main_image').innerHTML = _.templates.flickr(photos[0]);
+    var flickrImage = dom.byId('main_image');
+    if(flickrImage){
+      flickrImage.innerHTML = _.templates.flickr(photos[0]);
+    }
 
     return photos;
   });

@@ -51,10 +51,12 @@ define([
       })
       .value();
 
-    calendarEntries.innerHTML = _.templates.calendar({
-      dates: _.pluck(entries, 'date'),
-      entries: entries
-    });
+    if(calendarEntries){
+      calendarEntries.innerHTML = _.templates.calendar({
+        dates: _.pluck(entries, 'date'),
+        entries: entries
+      });
+    }
 
     return entries;
   }, function(err){

@@ -17,6 +17,17 @@
     return __p
   };
 
+  templates['open_status'] = function(obj) {
+    obj || (obj = {});
+    var __t, __p = '', __e = _.escape, __d = obj.obj || obj;
+    __p += '<span class="' +
+    ((__t = (obj.status)) == null ? '' : __t) +
+    '">' +
+    ((__t = (obj.status)) == null ? '' : __t) +
+    '</span>';
+    return __p
+  };
+
   templates['flickr_link'] = function(obj) {
     obj || (obj = {});
     var __t, __p = '', __e = _.escape, __d = obj.obj || obj;

@@ -2,9 +2,11 @@ define([
   'lodash',
   'dojo/on',
   'dojo/request',
+  'dojo/dom',
   'dojo/dom-construct',
-  './RAF'
-], function(_, on, request, domConstruct){
+  './RAF',
+  'dojo/domReady!'
+], function(_, on, request, dom, domConstruct){
 
   'use strict';
 
@@ -12,15 +14,21 @@ define([
 
   var url = 'http://heatsynclabs.org:1337/data.php';
   var pamela;
+  var animationFrame;
   var macAddressRegExp = /^([0-9A-F]{2}[:\-]){5}([0-9A-F]{2})$/i;
 
   var cam = new Image();
   var camBaseUrl = 'http://live.heatsynclabs.org/snapshot.php?camera=';
+  var camElement = dom.byId('cam');
 
   cam.setAttribute('id', 'cam');
 
   on(cam, 'load', function(e){
-    domConstruct.place(e.target, 'cam', 'replace');
+    if(camElement){
+      domConstruct.place(e.target, camElement, 'replace');
+    } else {
+      cancelAnimationFrame(animationFrame);
+    }
   });
 
   var currentCam = 1;
@@ -37,7 +45,7 @@ define([
         currentCam = 1;
       }
     }
-    requestAnimationFrame(loadCams);
+    animationFrame = requestAnimationFrame(loadCams);
   };
 
   return request.get(url, {
@@ -57,7 +65,7 @@ define([
 
     cam.setAttribute('title', pamela.join(', '));
 
-    requestAnimationFrame(loadCams);
+    animationFrame = requestAnimationFrame(loadCams);
 
     return pamela;
   }, function(err){
@@ -65,7 +73,7 @@ define([
 
     pamela = ['Could not get Pamela data. Please Refresh'];
 
-    requestAnimationFrame(loadCams);
+    animationFrame = requestAnimationFrame(loadCams);
   });
 
 });

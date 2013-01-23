@@ -34,9 +34,11 @@ define([
       .first(3)
       .value();
 
-    blogEntries.innerHTML = _.templates.blogs({
-      entries: entries
-    });
+    if(blogEntries){
+      blogEntries.innerHTML = _.templates.blogs({
+        entries: entries
+      });
+    }
 
     return entries;
   }, function(err){
