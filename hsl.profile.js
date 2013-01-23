@@ -76,7 +76,8 @@ var profile = (function(){
       },
       "dist/hsl": {
         include: [
-          'hsl/main'
+          'hsl/main',
+          'hsl/cams'
         ],
         customBase: true,
         boot: true

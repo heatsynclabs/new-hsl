@@ -6,7 +6,7 @@ define([
 
   'use strict';
 
-  var start = Date.now();
+  var start = Date.now() - 4e3;
 
   var cam = new Image();
   var camBaseUrl = 'http://live.heatsynclabs.org/snapshot.php?camera=';
@@ -17,7 +17,7 @@ define([
     domConstruct.place(e.target,"cam","replace");
   });
 
-  var currentCam = 2; // Start at cam2 because we default load cam1
+  var currentCam = 1;
 
   var loadCams = function(){
     var progress = Date.now() - start;

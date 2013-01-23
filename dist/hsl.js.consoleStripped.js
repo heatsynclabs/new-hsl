@@ -17800,6 +17800,77 @@ define([
 });
 
 },
+'hsl/cams':function(){
+define([
+  'dojo/on',
+  'dojo/dom-construct',
+  './RAF'
+], function(on, domConstruct){
+
+  'use strict';
+
+  var start = Date.now() - 4e3;
+
+  var cam = new Image();
+  var camBaseUrl = 'http://live.heatsynclabs.org/snapshot.php?camera=';
+
+  cam.setAttribute("id","cam");
+
+  on(cam, 'load', function(e){
+    domConstruct.place(e.target,"cam","replace");
+  });
+
+  var currentCam = 1;
+
+  var loadCams = function(){
+    var progress = Date.now() - start;
+    if(4e3 /* 5 seconds - maybe tweak */ - progress < 0){
+      0 && console.log('load cams', progress);
+      start = Date.now();
+
+      cam.src = camBaseUrl + currentCam++;
+
+      if(currentCam > 3){
+        currentCam = 1;
+      }
+    }
+    requestAnimationFrame(loadCams);
+  };
+
+  requestAnimationFrame(loadCams);
+});
+},
+'hsl/RAF':function(){
+define(function(){
+
+  'use strict';
+
+  var lastTime = 0;
+  var vendors = ['ms', 'moz', 'webkit', 'o'];
+
+  for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+    window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+    window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+  }
+
+  if (!window.requestAnimationFrame){
+    window.requestAnimationFrame = function(callback, element) {
+      var currTime = new Date().getTime();
+      var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+      var id = window.setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
+      lastTime = currTime + timeToCall;
+      return id;
+    };
+  }
+
+  if (!window.cancelAnimationFrame){
+    window.cancelAnimationFrame = function(id) {
+      clearTimeout(id);
+    };
+  }
+
+});
+},
 '*now':function(r){r(['dojo/i18n!*preload*dist/nls/hsl*["ar","ca","cs","da","de","el","en-gb","en-us","es-es","fi-fi","fr-fr","he-il","hu","it-it","ja-jp","ko-kr","nl-nl","nb","pl","pt-br","pt-pt","ru","sk","sl","sv","th","tr","zh-tw","zh-cn","ROOT"]']);}
 }});
 (function(){ require({cache:{}}); require.boot && require.apply(null, require.boot); })();
