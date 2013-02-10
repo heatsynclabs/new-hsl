@@ -17836,7 +17836,7 @@ define([
 
   var start = Date.now() - 4e3;
 
-  var url = 'http://heatsynclabs.org:1337/data.php';
+  var url = 'http://members.heatsynclabs.org/macs.json';
   var pamela;
   var animationFrame;
   var macAddressRegExp = /^([0-9A-F]{2}[:\-]){5}([0-9A-F]{2})$/i;
@@ -17879,9 +17879,7 @@ define([
     }
   }).then(function(data){
     0 && console.log('Pamela Data: ', data);
-    pamela = _.filter(data, function(user){
-      return user.indexOf('.') !== 0 && !macAddressRegExp.test(user);
-    });
+    pamela = _(data).pluck('name').unique().value();
 
     if(!pamela.length){
       pamela.push('Nobody in the space.');
@@ -17896,6 +17894,8 @@ define([
     0 && console.log('Did not get pamela data.', err);
 
     pamela = ['Could not get Pamela data. Please Refresh'];
+
+    cam.setAttribute('title', pamela.join(', '));
 
     animationFrame = requestAnimationFrame(loadCams);
   });
