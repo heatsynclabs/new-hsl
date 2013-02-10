@@ -17865,7 +17865,7 @@ define([
 
       cam.src = camBaseUrl + currentCam++;
 
-      if(currentCam > 3){
+      if(currentCam > 4){
         currentCam = 1;
       }
     }
@@ -17901,6 +17901,7 @@ define([
   });
 
 });
+
 },
 'hsl/RAF':function(){
 define(function(){
