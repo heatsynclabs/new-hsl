@@ -94,13 +94,9 @@
         </div>
       </div>
       <div class="row">
-        <div id="google-calendar" class="span3 calendar-info">        
-          <div id="calendar-popup" style="display: none; z-index: 9999; background-color: #fff; border: 1px solid rgb(51, 51, 51); border-top-left-radius: 1em; border-top-right-radius: 1em; border-bottom-right-radius: 1em; border-bottom-left-radius: 1em;position: absolute;padding:  1em;float:  left;">
-            <p style="text-align: right;"><a href="#" onclick="document.getElementById('calendar-popup').style.display = 'none'; return false;">Close</a></p>
-            <iframe style="border: 0;" src="http://www.google.com/calendar/hosted/heatsynclabs.org/embed?src=heatsynclabs.org_p9rcn09d64q56m7rg07jptmrqc%40group.calendar.google.com&amp;ctz=America/Phoenix" frameborder="0" scrolling="no" width="540" height="480"></iframe>            	
-          </div>
-          <h3 class="hide-link">
-            <a href="#" id="show-calendar-popup" onclick="document.getElementById('calendar-popup').style.display = 'block'; return false;">Calendar</a>        
+        <div id="google-calendar" class="span3 calendar-info">
+          <h3 class="calendar-header">
+            Calendar
           </h3>
           <div id="calendar-entries">
             <div class="spinner">
@@ -174,7 +170,8 @@
                 <h3>
                   Memberships
                 </h3>
-                <p>You don't need to be a member to come and make stuff, but membership helps us pay the rent and can allow you onsite storage, <a href="http://wiki.heatsynclabs.org/wiki/Hack_Your_Hackerspace">voting privileges</a> and, if the community decides, 24/7 keycard access. <br/>To learn more about membership, check out the <a href="http://members.heatsynclabs.org/">Members Website</a>.
+                <p>
+                  You don't need to be a member to come and make stuff, but membership helps us pay the rent and can allow you onsite storage, <a href="http://wiki.heatsynclabs.org/wiki/Hack_Your_Hackerspace">voting privileges</a> and, if the community decides, 24/7 keycard access. <br/>To learn more about membership, check out the <a href="http://members.heatsynclabs.org/">Members Website</a>.
                 </p>
                 <div class="btn btn-primary btn-large orange-button"><a href="http://members.heatsynclabs.org/users/sign_up/">I'm ready</a>
                 </div>
@@ -190,6 +187,17 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Modals at the bottom -->
+    <div id="calendar-popup" class="modal hide">
+      <div class="modal-header">
+        <button type="button" class="close" aria-hidden="true">&times;</button>
+        <h3>Calendar</h3>
+      </div>
+      <div class="modal-body">
+        <iframe src="http://www.google.com/calendar/hosted/heatsynclabs.org/embed?src=heatsynclabs.org_p9rcn09d64q56m7rg07jptmrqc%40group.calendar.google.com&amp;ctz=America/Phoenix" frameborder="0" scrolling="no" width="530" height="480"></iframe>
       </div>
     </div>
   </body>

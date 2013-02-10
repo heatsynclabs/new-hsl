@@ -5,9 +5,12 @@ define([
   './blogs',
   './mailing_list',
   'dojo/promise/all',
+  'dojo/on',
+  'dojo/query',
   'require',
+  'dojo/NodeList-manipulate',
   'dojo/domReady!'
-], function(calendar, flickr, door_status, blogs, mailing_list, all, require){
+], function(calendar, flickr, door_status, blogs, mailing_list, all, on, query, require){
 
   'use strict';
 
@@ -27,6 +30,14 @@ define([
 
     // Wait until everything else is done before loading cams
     require(['hsl/cams']);
+  });
+
+  on(document, '.calendar-header:click', function(){
+    query('#calendar-popup').removeClass('hide');
+  });
+
+  on(document, '.close:click', function(){
+    query('.modal').addClass('hide');
   });
 
 });
