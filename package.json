@@ -8,13 +8,14 @@
       "dojo": "github:dojo/dojo/master",
       "lodash": "https://raw.github.com/bestiejs/lodash/master/lodash.js",
       "requirejs-plugins": "github:millermedeiros/requirejs-plugins/master",
-      "Font-Awesome": "github:FortAwesome/Font-Awesome/v3.0.2"
+      "Font-Awesome": "github:FortAwesome/Font-Awesome/v3.0.2",
+      "util": "github:dojo/util/1.8.3"
     }
   },
   "devDependencies": {
     "grunt-reload": "~0.2.0",
     "grunt-dojo": "~0.1.1",
-    "grunt-contrib-mincss": "~0.3.2"
+    "grunt-contrib-mincss": "~0.3.1"
   },
   "dojoBuild": "hsl.profile.js"
 }

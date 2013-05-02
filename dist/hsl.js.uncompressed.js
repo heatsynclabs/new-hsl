@@ -6951,7 +6951,7 @@ define(["./sniff", "./_base/window"],
 
 },
 'dojo/sniff':function(){
-define(["./has"], function(has){
+define("dojo/sniff", ["./has"], function(has){
 	// module:
 	//		dojo/sniff
 
@@ -7025,7 +7025,7 @@ define(["./has"], function(has){
 
 },
 'dojo/has':function(){
-define(["require", "module"], function(require, module){
+define("dojo/has", ["require", "module"], function(require, module){
 	// module:
 	//		dojo/has
 	// summary:
@@ -8438,7 +8438,7 @@ define(["./kernel", "../has", "../sniff"], function(dojo, has){
 
 },
 'dojo/date':function(){
-define(["./has", "./_base/lang"], function(has, lang){
+define("dojo/date", ["./has", "./_base/lang"], function(has, lang){
 // module:
 //		dojo/date
 
@@ -9924,7 +9924,7 @@ return supplemental;
 
 },
 'dojo/i18n':function(){
-define(["./_base/kernel", "require", "./has", "./_base/array", "./_base/config", "./_base/lang", "./_base/xhr", "./json", "module"],
+define("dojo/i18n", ["./_base/kernel", "require", "./has", "./_base/array", "./_base/config", "./_base/lang", "./_base/xhr", "./json", "module"],
 	function(dojo, require, has, array, config, lang, xhr, json, module){
 
 	// module:
@@ -11389,7 +11389,7 @@ return {
 });
 },
 'dojo/dom-form':function(){
-define(["./_base/lang", "./dom", "./io-query", "./json"], function(lang, dom, ioq, json){
+define("dojo/dom-form", ["./_base/lang", "./dom", "./io-query", "./json"], function(lang, dom, ioq, json){
 	// module:
 	//		dojo/dom-form
 
@@ -11541,7 +11541,7 @@ define(["./_base/lang", "./dom", "./io-query", "./json"], function(lang, dom, io
 
 },
 'dojo/json':function(){
-define(["./has"], function(has){
+define("dojo/json", ["./has"], function(has){
 	"use strict";
 	var hasJSON = typeof JSON != "undefined";
 	has.add("json-parse", hasJSON); // all the parsers work fine
@@ -12611,7 +12611,7 @@ define([
 
 },
 'dojo/when':function(){
-define([
+define("dojo/when", [
 	"./Deferred",
 	"./promise/Promise"
 ], function(Deferred, Promise){
@@ -12763,7 +12763,7 @@ return dojo;
 
 },
 'dojo/on':function(){
-define(["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./sniff"], function(aspect, dojo, has){
+define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./sniff"], function(aspect, dojo, has){
 
 	"use strict";
 	if( 1 ){ // check to make sure we are in a browser, this module should work anywhere
@@ -13288,7 +13288,7 @@ define(["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./sniff"], fu
 
 },
 'dojo/aspect':function(){
-define([], function(){
+define("dojo/aspect", [], function(){
 
 	// module:
 	//		dojo/aspect
@@ -14191,7 +14191,7 @@ define([
 
 },
 'dojo/regexp':function(){
-define(["./_base/kernel", "./_base/lang"], function(dojo, lang){
+define("dojo/regexp", ["./_base/kernel", "./_base/lang"], function(dojo, lang){
 
 // module:
 //		dojo/regexp
@@ -15515,7 +15515,7 @@ define("dojo/dom-style", ["./sniff", "./dom"], function(has, dom){
 
 },
 'dojo/dom-prop':function(){
-define(["exports", "./_base/kernel", "./sniff", "./_base/lang", "./dom", "./dom-style", "./dom-construct", "./_base/connect"],
+define("dojo/dom-prop", ["exports", "./_base/kernel", "./sniff", "./_base/lang", "./dom", "./dom-style", "./dom-construct", "./_base/connect"],
 		function(exports, dojo, has, lang, dom, style, ctr, conn){
 	// module:
 	//		dojo/dom-prop
@@ -16116,7 +16116,7 @@ define(["./Evented"], function(Evented){
 
 },
 'dojo/Evented':function(){
-define(["./aspect", "./on"], function(aspect, on){
+define("dojo/Evented", ["./aspect", "./on"], function(aspect, on){
 	// module:
 	//		dojo/Evented
 
@@ -16824,7 +16824,7 @@ define("dojo/dom-geometry", ["./sniff", "./_base/window","./dom", "./dom-style"]
 
 },
 'dojo/mouse':function(){
-define(["./_base/kernel", "./on", "./has", "./dom", "./_base/window"], function(dojo, on, has, dom, win){
+define("dojo/mouse", ["./_base/kernel", "./on", "./has", "./dom", "./_base/window"], function(dojo, on, has, dom, win){
 
 	// module:
 	//		dojo/mouse
@@ -16998,7 +16998,7 @@ define(["./_base/kernel", "./on", "./has", "./dom", "./_base/window"], function(
 
 },
 'dojo/keys':function(){
-define("dojo/keys", ["./_base/kernel", "./sniff"], function(dojo, has){
+define(["./_base/kernel", "./sniff"], function(dojo, has){
 
 	// module:
 	//		dojo/keys
@@ -17392,7 +17392,7 @@ define([
 
   'use strict';
 
-  var url = 'http://intranet.heatsynclabs.org/~access/cgi-bin/spaceapi.rb';
+  var url = 'http://intranet.heatsynclabs.org/cgi-bin/spaceapi.rb';
 
   var doorStatus = dom.byId('door_status');
 
@@ -17418,7 +17418,7 @@ define([
 
 },
 'dojo/request':function(){
-define([
+define("dojo/request", [
 	'./request/default!'/*=====,
 	'./_base/declare',
 	'./promise/Promise' =====*/
@@ -17833,7 +17833,7 @@ define([
 
 },
 'dojo/query':function(){
-define("dojo/query", ["./_base/kernel", "./has", "./dom", "./on", "./_base/array", "./_base/lang", "./selector/_loader", "./selector/_loader!default"],
+define(["./_base/kernel", "./has", "./dom", "./on", "./_base/array", "./_base/lang", "./selector/_loader", "./selector/_loader!default"],
 	function(dojo, has, dom, on, array, lang, loader, defaultEngine){
 
 	"use strict";
@@ -20087,7 +20087,7 @@ define([
 
 },
 'dojo/NodeList-manipulate':function(){
-define(["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeList-dom"], function(dquery, lang, array, construct){
+define("dojo/NodeList-manipulate", ["./query", "./_base/lang", "./_base/array", "./dom-construct", "./NodeList-dom"], function(dquery, lang, array, construct){
 	// module:
 	//		dojo/NodeList-manipulate
 
@@ -21331,7 +21331,7 @@ define(["./_base/kernel", "./query", "./_base/array", "./_base/lang", "./dom-cla
 
 },
 'dojo/dom-class':function(){
-define(["./_base/lang", "./_base/array", "./dom"], function(lang, array, dom){
+define("dojo/dom-class", ["./_base/lang", "./_base/array", "./dom"], function(lang, array, dom){
 	// module:
 	//		dojo/dom-class
 
