@@ -8,7 +8,7 @@ define([
 
   'use strict';
 
-  var url = 'http://intranet.heatsynclabs.org/~access/cgi-bin/spaceapi.rb';
+  var url = 'http://intranet.heatsynclabs.org/cgi-bin/spaceapi.rb';
 
   var doorStatus = dom.byId('door_status');
 
