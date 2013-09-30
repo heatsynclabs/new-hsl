@@ -92,9 +92,10 @@ body {
 	margin-top: 7px;
 }
 
-.calendar-header {
+.calendar-link {
 	text-decoration: underline;
 	cursor: pointer;
+	color: #08c;
 }
 
 .calendar-info li{
@@ -145,4 +146,49 @@ footer {
 
 .modal-body {
 	max-height: 500px;
+}
+
+
+#main_image, .camera-container {
+	position: relative;
+}
+
+#main_image .caption {
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+	box-shadow: inset 0px 0px 277px 3px #666;
+	width: 100%;
+	color: white;
+	padding-top: 0.2em;
+}
+
+.camera-container {
+	padding-bottom: 0;
+	margin-bottom: 20px;
+}
+
+.camera-container .caption {
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+	box-shadow: inset 0px 0px 277px 3px #666;
+	width: 370px;
+	color: white;
+	padding-top: 0.2em;
+	font-size: 14px;
+}
+
+.camera-container .caption a {
+	color: white;
+}
+
+.caption .arrow {
+	padding: 0 0.4em;
+}
+
+#main_image .caption .arrow {
+	display: inline-block;
+	float: right;
+	padding: 17px 15px 0;
 }

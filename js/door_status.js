@@ -20,7 +20,8 @@ define([
   }).then(function(data){
     if(doorStatus){
       doorStatus.innerHTML = _.templates.open_status({
-        status: data.open ? 'open' : 'closed'
+        status: data.open ? 'open' : 'closed',
+        status_text: data.open ? 'open, come on down!' : 'closed, check the calendar!'
       });
     }
 
