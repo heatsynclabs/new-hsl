@@ -1,8 +1,12 @@
-# New HSL Website
+# HeatSync Labs Website
 
 ## Contributing
 
 Fork this repository, clone, implement something, issue a pull request
+
+Since this site uses Node.JS, you'll probably want to install nodejs, npm, and grunt to compile assets properly.
+
+TODO: how to do this with the correct versions?
 
 ## CSS
 
