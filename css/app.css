@@ -38,6 +38,10 @@ body {
 	background-position: 0 -120px;
 }
 
+.gplus {
+	background-position: 0 -240px;
+}
+
 .open{
 	color: green;
 	display:inline;
