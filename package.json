@@ -2,7 +2,8 @@
   "name": "hsl",
   "version": "0.2.0",
   "scripts": {
-    "build": "grunt"
+    "build": "grunt",
+    "install": "volo add"
   },
   "volo": {
     "baseUrl": "deps",
@@ -23,7 +24,8 @@
     "lodash-cli": "~2.2.1",
     "grunt-lodash": "~0.3.0",
     "grunt-contrib-cssmin": "~0.6.2",
-    "grunt-contrib-jshint": "~0.7.0"
+    "grunt-contrib-jshint": "~0.7.0",
+    "volo": "~0.3.0"
   },
   "dojoBuild": "hsl.profile.js"
 }
