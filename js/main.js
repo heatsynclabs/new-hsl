@@ -32,7 +32,8 @@ define([
     require(['hsl/cams']);
   });
 
-  on(document, '.calendar-link:click', function(){
+  on(document, '.calendar-link:click', function(e){
+    e.preventDefault();
     query('#calendar-popup').removeClass('hide');
   });
 

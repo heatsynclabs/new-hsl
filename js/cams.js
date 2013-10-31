@@ -21,8 +21,6 @@ define([
   var camBaseUrl = 'http://live.heatsynclabs.org/snapshot.php?camera=';
   var camElement = dom.byId('cam');
 
-  var pamelaNamesElement = dom.byId('pamela_names');
-
   cam.setAttribute('id', 'cam');
 
   on(cam, 'load', function(e){
@@ -63,9 +61,7 @@ define([
       pamela.push('Nobody in the space.');
     }
 
-    if(pamelaNamesElement){
-      pamelaNamesElement.innerHTML = pamela.join(', ');  
-    }
+    cam.setAttribute('title', pamela.join(', '));
 
     animationFrame = requestAnimationFrame(loadCams);
 
@@ -75,9 +71,7 @@ define([
 
     pamela = ['Could not get Pamela data. Please Refresh'];
 
-    if(pamelaNamesElement){
-      pamelaNamesElement.innerHTML = pamela.join(', ');  
-    }
+    cam.setAttribute('title', pamela.join(', '));
 
     animationFrame = requestAnimationFrame(loadCams);
   });
