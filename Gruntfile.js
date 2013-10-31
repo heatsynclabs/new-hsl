@@ -54,5 +54,6 @@ module.exports = function(grunt) {
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'lodash', 'cssmin', 'dojo']);
+  grunt.registerTask('template', ['lodash', 'dojo']);
 
 };
