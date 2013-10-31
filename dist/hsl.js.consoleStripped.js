@@ -17082,7 +17082,7 @@ define(["./_base/kernel", "./sniff"], function(dojo, has){
 
 },
 'hsl/lodash.templates':function(){
-;(function(root) {
+;(function() {
   var undefined;
 
   var objectTypes = {
@@ -17090,11 +17090,18 @@ define(["./_base/kernel", "./sniff"], function(dojo, has){
     'object': true
   };
 
+  var root = (objectTypes[typeof window] && window) || this;
+
   var freeExports = objectTypes[typeof exports] && exports && !exports.nodeType && exports;
 
   var freeModule = objectTypes[typeof module] && module && !module.nodeType && module
 
   var moduleExports = freeModule && freeModule.exports === freeExports && freeExports;
+
+  var freeGlobal = objectTypes[typeof global] && global;
+  if (freeGlobal && (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal)) {
+    root = freeGlobal;
+  }
 
   var templates = {},
       _ = root._;
@@ -17235,8 +17242,9 @@ define(["./_base/kernel", "./sniff"], function(dojo, has){
     });
   } else if (freeExports && freeModule) {
     _ = require('lodash');
+
   }
-}(this));
+}.call(this));
 
 },
 'dojo/domReady':function(){

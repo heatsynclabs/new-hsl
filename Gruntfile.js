@@ -34,14 +34,25 @@ module.exports = function(grunt) {
       options: {
         jshintrc: '.jshintrc'
       }
+    },
+    lodash: {
+      hsl: {
+        dest: 'js/lodash.templates.js',
+        options: {
+          exports: ['amd'],
+          template: 'templates/*.jst',
+          flags: ['debug']
+        }
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-dojo');
+  grunt.loadNpmTasks('grunt-lodash');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'cssmin', 'dojo']);
+  grunt.registerTask('default', ['jshint', 'lodash', 'cssmin', 'dojo']);
 
 };
