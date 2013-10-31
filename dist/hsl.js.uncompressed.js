@@ -1972,7 +1972,7 @@ define([
     require(['hsl/cams']);
   });
 
-  on(document, '.calendar-header:click', function(){
+  on(document, '.calendar-link:click', function(){
     query('#calendar-popup').removeClass('hide');
   });
 
@@ -6951,7 +6951,7 @@ define(["./sniff", "./_base/window"],
 
 },
 'dojo/sniff':function(){
-define("dojo/sniff", ["./has"], function(has){
+define(["./has"], function(has){
 	// module:
 	//		dojo/sniff
 
@@ -7025,7 +7025,7 @@ define("dojo/sniff", ["./has"], function(has){
 
 },
 'dojo/has':function(){
-define("dojo/has", ["require", "module"], function(require, module){
+define(["require", "module"], function(require, module){
 	// module:
 	//		dojo/has
 	// summary:
@@ -9924,7 +9924,7 @@ return supplemental;
 
 },
 'dojo/i18n':function(){
-define("dojo/i18n", ["./_base/kernel", "require", "./has", "./_base/array", "./_base/config", "./_base/lang", "./_base/xhr", "./json", "module"],
+define(["./_base/kernel", "require", "./has", "./_base/array", "./_base/config", "./_base/lang", "./_base/xhr", "./json", "module"],
 	function(dojo, require, has, array, config, lang, xhr, json, module){
 
 	// module:
@@ -11290,7 +11290,7 @@ define(["./kernel", "./lang", "../sniff"], function(dojo, lang, has){
 
 },
 'dojo/io-query':function(){
-define("dojo/io-query", ["./_base/lang"], function(lang){
+define(["./_base/lang"], function(lang){
 
 // module:
 //		dojo/io-query
@@ -11389,7 +11389,7 @@ return {
 });
 },
 'dojo/dom-form':function(){
-define("dojo/dom-form", ["./_base/lang", "./dom", "./io-query", "./json"], function(lang, dom, ioq, json){
+define(["./_base/lang", "./dom", "./io-query", "./json"], function(lang, dom, ioq, json){
 	// module:
 	//		dojo/dom-form
 
@@ -11541,7 +11541,7 @@ define("dojo/dom-form", ["./_base/lang", "./dom", "./io-query", "./json"], funct
 
 },
 'dojo/json':function(){
-define("dojo/json", ["./has"], function(has){
+define(["./has"], function(has){
 	"use strict";
 	var hasJSON = typeof JSON != "undefined";
 	has.add("json-parse", hasJSON); // all the parsers work fine
@@ -12611,7 +12611,7 @@ define([
 
 },
 'dojo/when':function(){
-define("dojo/when", [
+define([
 	"./Deferred",
 	"./promise/Promise"
 ], function(Deferred, Promise){
@@ -12763,7 +12763,7 @@ return dojo;
 
 },
 'dojo/on':function(){
-define("dojo/on", ["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./sniff"], function(aspect, dojo, has){
+define(["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./sniff"], function(aspect, dojo, has){
 
 	"use strict";
 	if( 1 ){ // check to make sure we are in a browser, this module should work anywhere
@@ -14191,7 +14191,7 @@ define([
 
 },
 'dojo/regexp':function(){
-define("dojo/regexp", ["./_base/kernel", "./_base/lang"], function(dojo, lang){
+define(["./_base/kernel", "./_base/lang"], function(dojo, lang){
 
 // module:
 //		dojo/regexp
@@ -14264,7 +14264,7 @@ return regexp;
 
 },
 'dojo/string':function(){
-define("dojo/string", [
+define([
 	"./_base/kernel",	// kernel.global
 	"./_base/lang"
 ], function(kernel, lang){
@@ -15206,7 +15206,7 @@ define(["exports", "./sniff", "./_base/lang", "./dom", "./dom-style", "./dom-pro
 
 },
 'dojo/dom-style':function(){
-define("dojo/dom-style", ["./sniff", "./dom"], function(has, dom){
+define(["./sniff", "./dom"], function(has, dom){
 	// module:
 	//		dojo/dom-style
 
@@ -15515,7 +15515,7 @@ define("dojo/dom-style", ["./sniff", "./dom"], function(has, dom){
 
 },
 'dojo/dom-prop':function(){
-define("dojo/dom-prop", ["exports", "./_base/kernel", "./sniff", "./_base/lang", "./dom", "./dom-style", "./dom-construct", "./_base/connect"],
+define(["exports", "./_base/kernel", "./sniff", "./_base/lang", "./dom", "./dom-style", "./dom-construct", "./_base/connect"],
 		function(exports, dojo, has, lang, dom, style, ctr, conn){
 	// module:
 	//		dojo/dom-prop
@@ -16216,7 +16216,7 @@ define(["./kernel", "../on", "../has", "../dom-geometry"], function(dojo, on, ha
 
 },
 'dojo/dom-geometry':function(){
-define("dojo/dom-geometry", ["./sniff", "./_base/window","./dom", "./dom-style"],
+define(["./sniff", "./_base/window","./dom", "./dom-style"],
 		function(has, win, dom, style){
 	// module:
 	//		dojo/dom-geometry
@@ -16824,7 +16824,7 @@ define("dojo/dom-geometry", ["./sniff", "./_base/window","./dom", "./dom-style"]
 
 },
 'dojo/mouse':function(){
-define("dojo/mouse", ["./_base/kernel", "./on", "./has", "./dom", "./_base/window"], function(dojo, on, has, dom, win){
+define(["./_base/kernel", "./on", "./has", "./dom", "./_base/window"], function(dojo, on, has, dom, win){
 
 	// module:
 	//		dojo/mouse
@@ -17404,7 +17404,8 @@ define([
   }).then(function(data){
     if(doorStatus){
       doorStatus.innerHTML = _.templates.open_status({
-        status: data.open ? 'open' : 'closed'
+        status: data.open ? 'open' : 'closed',
+        status_text: data.open ? 'open, come on down!' : 'closed, check the calendar!'
       });
     }
 
@@ -17418,7 +17419,7 @@ define([
 
 },
 'dojo/request':function(){
-define("dojo/request", [
+define([
 	'./request/default!'/*=====,
 	'./_base/declare',
 	'./promise/Promise' =====*/
@@ -20814,7 +20815,7 @@ define("dojo/NodeList-manipulate", ["./query", "./_base/lang", "./_base/array", 
 
 },
 'dojo/NodeList-dom':function(){
-define(["./_base/kernel", "./query", "./_base/array", "./_base/lang", "./dom-class", "./dom-construct", "./dom-geometry", "./dom-attr", "./dom-style"], function(dojo, query, array, lang, domCls, domCtr, domGeom, domAttr, domStyle){
+define("dojo/NodeList-dom", ["./_base/kernel", "./query", "./_base/array", "./_base/lang", "./dom-class", "./dom-construct", "./dom-geometry", "./dom-attr", "./dom-style"], function(dojo, query, array, lang, domCls, domCtr, domGeom, domAttr, domStyle){
 
 	// module:
 	//		dojo/NodeList-dom.js
@@ -21331,7 +21332,7 @@ define(["./_base/kernel", "./query", "./_base/array", "./_base/lang", "./dom-cla
 
 },
 'dojo/dom-class':function(){
-define("dojo/dom-class", ["./_base/lang", "./_base/array", "./dom"], function(lang, array, dom){
+define(["./_base/lang", "./_base/array", "./dom"], function(lang, array, dom){
 	// module:
 	//		dojo/dom-class
 
@@ -21683,6 +21684,8 @@ define([
   var camBaseUrl = 'http://live.heatsynclabs.org/snapshot.php?camera=';
   var camElement = dom.byId('cam');
 
+  var pamelaNamesElement = dom.byId('pamela_names');
+
   cam.setAttribute('id', 'cam');
 
   on(cam, 'load', function(e){
@@ -21723,7 +21726,9 @@ define([
       pamela.push('Nobody in the space.');
     }
 
-    cam.setAttribute('title', pamela.join(', '));
+    if(pamelaNamesElement){
+      pamelaNamesElement.innerHTML = pamela.join(', ');  
+    }
 
     animationFrame = requestAnimationFrame(loadCams);
 
@@ -21733,7 +21738,9 @@ define([
 
     pamela = ['Could not get Pamela data. Please Refresh'];
 
-    cam.setAttribute('title', pamela.join(', '));
+    if(pamelaNamesElement){
+      pamelaNamesElement.innerHTML = pamela.join(', ');  
+    }
 
     animationFrame = requestAnimationFrame(loadCams);
   });

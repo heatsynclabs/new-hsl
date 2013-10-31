@@ -13,6 +13,7 @@
     }
   },
   "devDependencies": {
+    "grunt": "0.3.17",
     "grunt-reload": "~0.2.0",
     "grunt-dojo": "~0.1.1",
     "grunt-contrib-mincss": "~0.3.1"
