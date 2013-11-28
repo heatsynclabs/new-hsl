@@ -14,8 +14,8 @@
 		'echo $HOME',
 		'whoami',
 		'git branch -v',
-		'git checkout master',
-		'ssh-agent bash -c "ssh-add /var/www/.ssh/id_rsa; git pull origin master 2>&1"',
+                'git checkout production',
+                'ssh-agent bash -c "ssh-add /var/www/.ssh/id_rsa; git pull origin production 2>&1"',
 		'git status',
 		'git branch -v',
 	);
