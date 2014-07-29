@@ -9,7 +9,7 @@ define([
 
   console.log("Flickr init...");
 
-  var url = 'http://api.flickr.com/services/rest/';
+  var url = 'https://api.flickr.com/services/rest/';
 
   return request.get(url, {
     jsonp: 'jsoncallback',
