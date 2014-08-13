@@ -17386,7 +17386,7 @@ define([
 
   0 && console.log("Flickr init...");
 
-  var url = 'http://api.flickr.com/services/rest/';
+  var url = 'https://api.flickr.com/services/rest/';
 
   return request.get(url, {
     jsonp: 'jsoncallback',
@@ -17432,7 +17432,7 @@ define([
 
   'use strict';
 
-  var url = 'http://intranet.heatsynclabs.org/cgi-bin/spaceapi.rb';
+  var url = 'http://members.heatsynclabs.org/space_api.json';
 
   var doorStatus = dom.byId('door_status');
 
