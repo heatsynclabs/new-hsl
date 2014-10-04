@@ -2,255 +2,217 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>HeatSync Labs</title>
+    <title>
+      HeatSync Labs
+    </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-
-    <link href="deps/bootstrap/css/bootstrap.css" rel="stylesheet">
-    <link href="deps/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
-    <link href="css/app.css" rel="stylesheet">
-    <link href="css/app-responsive.css" rel="stylesheet">
-
+    <link href="/new-hsl/css/hsl.css" rel="stylesheet" type="text/css">
+    <!-- For Development, use line below and comment out line above -->
+    <!-- <link href="/new-hsl/deps/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="/new-hsl/deps/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/new-hsl/deps/Font-Awesome/css/font-awesome.min.css">
+    <link href="/new-hsl/css/app.css" rel="stylesheet" type="text/css">
+    <link href="/new-hsl/css/app-responsive.css" rel="stylesheet" type="text/css"> -->
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <script>
+    <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-12598372-1']);
+      _gaq.push(['_setDomainName', 'heatsynclabs.org']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
+
+    <script type="text/javascript">
       var dojoConfig = {
-        baseUrl: './',
-        has: {
-          'dojo-requirejs-api': true
-        },
+        baseUrl: '/new-hsl/',
         packages: [
           { name: 'dojo', location: 'deps/dojo' },
-          { name: 'lodash', location: 'deps', main: 'lodash'},
+          { name: 'lodash', location: 'deps/lodash', main: 'lodash'},
           { name: 'goog', location: 'deps/requirejs-plugins/src', main: 'goog' },
-          { name: 'async', location: 'deps/requirejs-plugins/src', main: 'async' },
-          { name: 'propertyParser', location: 'deps/requirejs-plugins/src', main: 'propertyParser' },
-          { name: 'app', location: 'js' }
+          { name: 'hsl', location: 'js' }
         ],
+        deps: ['hsl/main'],
         async: true
       };
     </script>
-    <script src="deps/dojo/dojo.js" data-main="app/main"></script>
+    <script src="/new-hsl/dist/hsl.js" type="text/javascript"></script>
+    <!-- For Development, use line below and comment out line above -->
+    <!-- <script src="/new-hsl/deps/dojo/dojo.js" type="text/javascript"></script> -->
   </head>
   <body>
     <div class="container">
       <div class="row">
-        <div class="span8">
-          <img class="logo" src="img/logo.png">
+        <div class="span8 logo">
+          <a href="/"><img src="/new-hsl/img/logo.png" title="HeatSync Labs" alt="HeatSync Labs"></a>
         </div>
-	<div class="door_status_container span4">
-		<span id='door_status'><i>Fetching door status...</i></span>
-	</div>
         <div class="social-container span4">
-          <a href="http://www.youtube.com/heatsynclabs" class="social-logo youtube"></a>
-          <a href="http://www.facebook.com/groups/493579133986393" class="social-logo facebook"></a>
-          <a href="http://www.twitter.com/heatsynclabs" class="social-logo twitter"></a>
-          <a href="http://www.flickr.com/groups/heatsynclabs/" class="social-logo flickr"></a>
-          <a href="http://www.github.com/heatsynclabs" class="social-logo github"></a>
+          <a href="https://plus.google.com/116528154868913873596" rel="publisher" class="social-logo gplus"></a>
+          <a href="http://www.youtube.com/heatsynclabs" title="YouTube Channel" alt="YouTube Channel" class="social-logo youtube"></a>
+          <a href="http://www.facebook.com/groups/493579133986393" title="Facebook Group" alt="Facebook Group" class="social-logo facebook"></a>
+          <a href="http://www.twitter.com/heatsynclabs" title="Twitter" alt="Twitter" class="social-logo twitter"></a>
+          <a href="https://www.flickr.com/photos/hslphotosync/" title="HSL PhotoSync" alt="HSL PhotoSync" class="social-logo flickr"></a>
+          <a href="http://www.github.com/heatsynclabs" title="Github" alt="Github" class="social-logo github"></a>
         </div>
       </div>
       <div class="row">
         <div class="span3 sidebar-nav">
           <div class="left-info">
-            <h3>We are..</h3>
+            <h3>
+              We are..
+            </h3>
             <ul>
-              <li>a community workshop</li>
-              <li>open FREE to the public M-F 7p-10p</li>
-              <li>a 501(c)3 not for profit</li>
-              <li>volunteers! We have no staff, only a passionate community, including you!</li>
-            </ul>
-            <p>Bring your projects and your passion and JOIN US!</p>
-            <p><center><a href="http://www.heatsynclabs.org/get-involved/membership/">Support Heatsync!</a></center></p>
+              <li>a place where you can make things. We call it a hackerspace.</li>
+              <li>a grassroots co-op of volunteers&mdash; no staff!</li>
+	    	      <li>located at:<br><a href='http://goo.gl/maps/5oo83'>140 West Main St.<br>Downtown Mesa</a></li>
+              <li>open <strong>FREE</strong> every weeknight<br>
+                <em>
+                  (see calendar for times)
+                </em></li>
+              <li>doors currently:
+                <span id="door_status">
+                  <i class="icon-spinner icon-spin"></i>
+                </span>
+              </li>
           </div>
         </div>
         <div class="span9">
-          <img src="http://farm8.staticflickr.com/7247/7601761394_2841f4b715_b.jpg">
+		      <div id="main_image">
+            <div class="spinner"><i class="icon-spinner icon-spin icon-3x"></i></div>
+	  	    </div>
         </div>
       </div>
       <div class="row">
-        <div id="google-calendar" class="span3">
-          <h3>Calendar</h3>
+        <div id="google-calendar" class="span3 calendar-info">
+          <h3 class="calendar-link">
+            Calendar
+          </h3>
           <div id="calendar-entries">
-            <h4>Tuesday, January 15</h4>
-            <ul>
-              <li> 7:00<span class="PM">PM</span> Business and Marketing Plan Help</li>
-              <li> 7:00<span class="PM">PM</span> Open Hack!</li>
-            </ul>
-            <h4>Wednesday, January 16</h4>
-            <ul>
-              <li> 7:00<span class="PM">PM</span> 3D Printing with Makerbot and RepRap</li>
-            </ul>
-            <h4>Thursday, January 17</h4>
-            <ul>
-              <li> 7:00<span class="PM">PM</span> Open Hack</li>
-            </ul>
-            <h4>Friday, January 18</h4>
-            <ul>
-              <li> 7:00<span class="PM">PM</span> Young Makers</li>
-            </ul>
-            <h4>Sunday, January 20</h4>
-            <ul>
-              <li> 12:00<span class="PM">PM</span> AZ Haunters</li>
-            </ul>
-            <h4>Monday, January 21</h4>
-            <ul>
-              <li> 6:00<span class="PM">PM</span> Bylaws Hacknight</li>
-            </ul>
-            <h4>Tuesday, January 22</h4>
-            <ul>
-              <li> 7:00<span class="PM">PM</span> Open Hack!</li>
-            </ul>
+            <div class="spinner">
+              <i class="icon-spinner icon-spin icon-3x"></i>
+            </div>
           </div>
+          <a href="#" class="calendar-link"><i class="icon-chevron-right"></i> See Full Calendar</a>
         </div>
         <div class="span6" id="feed">
-            <div class="row">
-              <div class="span6">
-                <h3>
-                  Discussion Groups
-                </h3>
-                <div id="discussion-container"></div>
+          <div class="row">
+            <div class="span6">
+              <h3 class="hide-link">
+                <a href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs">Discussion Groups</a>
+              </h3>
+              <div id="discussion-container" class="articles">
+                <div class="spinner">
+                  <i class="icon-spinner icon-spin icon-3x"></i>
+                </div>
               </div>
-              <div class="span6">
+                <a href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs" class="see-more-link"><i class="icon-chevron-right"></i> Read More</a>
+            </div>
+            <div class="span6">
+              <h3 class="hide-link">
+                <a href="http://pipes.yahoo.com/pipes/pipe.info?_id=eb41a075801cf56d9a76ea48deea1612">Community Blogs</a>
+              </h3>
+              <div id="blog-container" class="articles">
+                <div class="spinner">
+                  <i class="icon-spinner icon-spin icon-3x"></i>
+                </div>
+              </div>
+              <a href="http://pipes.yahoo.com/pipes/pipe.info?_id=eb41a075801cf56d9a76ea48deea1612"><i class="icon-chevron-right"></i> Read More</a>
+            </div>
+          </div>
+        </div>
+        <div class="span3">
+          <div>
+            <h3 class="hide-link">
+              <a href="http://www.twitter.com/heatsynclabs">Twitter</a>
+            </h3>
+          </div>
+          <a class="twitter-timeline" data-dnt="true" href="https://twitter.com/heatsynclabs" data-widget-id="291084277720944641">Tweets by @heatsynclabs</a>
+          <script type="text/javascript">
+            !function(d,s,id){
+              var js,fjs=d.getElementsByTagName(s)[0];
+              if(!d.getElementById(id)){
+                js=d.createElement(s);
+                js.id=id;js.src="//platform.twitter.com/widgets.js";
+                fjs.parentNode.insertBefore(js,fjs);
+              }
+            }(document,"script","twitter-wjs");
+          </script>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="span12">
+            <div class="row">
+              <div class="span4">
                 <h3>
-                  Community Blogs
+                  Get Involved
                 </h3>
-                <div>
-                  <p>
-                    <strong>Inductive charging on a Droid Bionic</strong> - Last weekend, I had the chance to compete in the inaugural DroneGames at Groupon’s...
-                  </p>
-                </div>
-                <div>
-                  <p>
-                    <strong>Parametric Nosecone</strong> - problem: About ten years ago, my sister and I were launching model rockets that we built together. She built a Quest Courier. After some initial trouble with getting the nosecone’s...
-                  </p>
-                </div>
-                <div>
-                  <p>
-                    <strong>Switching EL Wire</strong> - My Droid Bionic is pretty battery hungry, so I keep it plugged in most of the day while I’m at work. I’m tired of dealing with wires on...
-                  </p>
-                </div>
-                <div>
-                  <p>
-                    <strong>DroneGames 1</strong> - Last weekend, I had the chance to compete in the inaugural DroneGames at Groupon’s offices in San Francisco. The event, previously known as the DroneOlympics (But banhammered for using the word olympics...
-                  </p>
-                </div>
-                <div>
-                  <p>
-                    <strong>New GoPro, case design and website!</strong> - We picked up the Hero3 to test with our current mods. Our understanding is this is basically the Hero2 in new packaging...
-                  </p>
-                </div>
-                <div>
-                  <p>
-                    <strong>Replicator Reflections</strong> - By now you should have noticed that Makerbot has announced their new 3D printer, the Replicator, and over the...
-                  </p>
-                </div>
-                <div>
-                  <p>
-                    <strong>TIG Welding for Fun and Profit</strong> - So I recently championed the acquisition of a nice TIG welder at the Heatsync Labs hackerspace (special thanks to Karl at K-Zell Metals for getting us such a good deal). I want us to always
-                  </p>
-                </div>
-                <div>
-                  <p>
-                    <strong>Codecademy Lessons</strong> - For the past three days I've been taking Codecademy lessons. I've been taking the Python lessons so that I know how to program Raspberry Pi. It's really fun! Right
-                  </p>
-                </div>
-                <div>
-                  <p>
-                    <strong>TinyMatrix Pendants</strong> - Super tiny and super cool LED matrix pendants that display simple animations...
-                  </p>
-                </div>
-                <div>
-                  <p>
-                    <strong>Yamaha DGX-640 Phono Jack Hack And Easel Upgrade</strong> - In this video I rip into my 4 day old $700 Yamaha DGX-640 to move the phono jack from the back to the front of the keyboard. So much for my...
-                  </p>
-                </div>
+                <p>
+                  HeatSync Labs is a community-driven 501(c)3 non-profit shop and workspace where engineers, artists, students, and hobbyists come to make prototypes, art, and other creative projects.
+                </p>
+                <p>
+                  It is a workshop for mad scientists, artists and anyone creating or making! We make tools, resources, and skills available to you.
+                </p>
+                <div class="btn btn-primary btn-large orange-button"><a href="http://members.heatsynclabs.org/">Learn More</a></div>
+              </div>
+              <div class="span4">
+                <h3>
+                  Membership
+                </h3>
+                <p>
+                  You don't need to be a member to come and make stuff, but we are member-supported and member-driven so your support is appreciated! We encourage you to bring your projects during public hours so you get a feel for the place first.
+                </p>
+                <p>
+                To learn more about how we work behind the scenes, check out the <a href="http://members.heatsynclabs.org/">Members Website.</a></p>
+                <div class="btn btn-primary btn-large orange-button"><a href="http://members.heatsynclabs.org/">Be a Member</a></div>
+              </div>
+              <div class="span4 hide-link camera-container">
+                <h3>
+                  <a href="http://live.heatsynclabs.org">Live</a>
+                </h3>
+                <a href="http://live.heatsynclabs.org">
+                  <div id="cam" class="spinner">
+                    <i class="icon-spinner icon-spin icon-3x"></i>
+                  </div>
+                </a>
               </div>
             </div>
           </div>
-          <div class="span3">
-            <div>
-              <h3>Twitter</h3>
-            </div>
-            <a class="twitter-timeline" data-dnt=true href="https://twitter.com/heatsynclabs" data-widget-id="291084277720944641">Tweets by @heatsynclabs</a>
-            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-         </div>
+        </div>
       </div>
-
-      <div class="row">
-      	<div class="span10"> 
-      		<h3>Heatsync Live</h3>
-      	</div>
-      	<div class="span3 offset1">
-      		<img id="cam1" src="http://live.heatsynclabs.org/snapshot.php?camera=1" class="cams" />
-      	</div>
-      	<div class="span3">
-      		<img id="cam2" src="http://live.heatsynclabs.org/snapshot.php?camera=2" class="cams" />
-      	</div>
-      	<div class="span3">
-      		<img id="cam3" src="http://live.heatsynclabs.org/snapshot.php?camera=3" class="cams" />
-      	</div>
-        <footer class="row">
-          <div class="span3 offset1">
-            <center><h2>Memberships!</h2></center>
-            <p><b>Associate Tier - $25/mo</b></p>
-            <p><ul>
-              <li>the right to have your name on the list of members</li>
-              <li>access to the lab and shared equipment during the published hours of operation</li>
-              <li>and discounts with local manufacturers and suppliers</li>
-            </ul>
-            <p><b>Basic Tier - $50/mo</b></p>
-            <ul>
-              <li>associate tier benefits PLUS...</li>
-                <li>personal project box</li>
-                <li>the ability to vote in board elections</li>
-                <li>24/7 access to the lab (when approved by community vote)</li>
-            </ul>
-            <p><b>Plus Tier - $100/mo</b></p>
-            <ul>
-              <li>basic tier benefits PLUS...</li>
-                <li>personal locker in place of the project box</li>
-            </ul>
-            <p>To learn more about being a member, check out the<ul>
-              <li><a href="http://wiki.heatsynclabs.org/wiki/Rules">rules</a></li>
-              <li><a href="http://wiki.heatsynclabs.org/wiki/Hack_Your_Hackerspace">community voting system</a></li>
-            </ul>
-        </div>
-        <div class="span3">
-          <center><h2>Donations!</h2></center>
-          <p>Want to send us money? Help us create more amazing things? HeatSync Labs is a 501(c)3 non-profit. Your help enables us to fulfill our educational mission, enhance our space, and any help is greatly appreciated!</p>
-          <p>If you need a 501(c)3 receipt for tax purposes, please say so in the notes field or contact info@heatsynclabs.org</p>
-          <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-      <input type="hidden" name="cmd" value="_s-xclick" />
-      <input type="hidden" name="hosted_button_id" value="6W4F9X4BDRYVS" />
-      <input type="image" name="submit" src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_US/i/btn/btn_donate_LG.gif" alt="PayPal - The safer, easier way to pay online!" />
-      <img src="https://www.paypalobjects.com/WEBSCR-640-20110401-1/en_US/i/scr/pixel.gif" alt="" width="1" height="1" border="0" />
-          </form>
-        </div>
-        <div class="span3">
-          <center><h2>Recurring Donations!</h2></center>
-          <p>Sending money once is cool, but what's even better? Sending money every month! HeatSync values your sponsorship! Sponsorships are monthly recurring payments that support HeatSync Labs directly but confer no membership rights by themselves. Contact us if you would like promotion or recognition in return for your generous contribution.
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="UXWJY354EZHL4">
-<input type="hidden" name="on0" value=""><select name="os0">
-  <option value="Pico Sponsor">Pico Sponsor : $1.00USD - monthly</option>
-  <option value="Nano Sponsor">Nano Sponsor : $5.00USD - monthly</option>
-  <option value="Micro Sponsor">Micro Sponsor : $10.00USD - monthly</option>
-  <option value="Mega Sponsor">Mega Sponsor : $100.00USD - monthly</option>
-  <option value="Giga Sponsor">Giga Sponsor : $350.00USD - monthly</option>
-  <option value="Tera Sponsor">Tera Sponsor : $500.00USD - monthly</option>
-</select>
-<br>
-<input type="hidden" name="currency_code" value="USD">
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_subscribeCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-        </div>
-      </footer>
     </div>
+
+    <!-- Modals at the bottom -->
+    <div id="calendar-popup" class="modal hide">
+      <div class="modal-header">
+        <button type="button" class="close" aria-hidden="true">&times;</button>
+        <h3>Calendar</h3>
+      </div>
+      <div class="modal-body">
+        <iframe src="http://www.google.com/calendar/hosted/heatsynclabs.org/embed?src=heatsynclabs.org_p9rcn09d64q56m7rg07jptmrqc%40group.calendar.google.com&amp;ctz=America/Phoenix" frameborder="0" scrolling="no" width="530" height="480"></iframe>
+      </div>
+    </div>
+<!-- Begin ClickTale heatmapping -->
+<script type="text/javascript">
+setTimeout(function(){var a=document.createElement("script");
+var b=document.getElementsByTagName("script")[0];
+a.src=document.location.protocol+"//dnn506yrbagrg.cloudfront.net/pages/scripts/0018/8684.js?"+Math.floor(new Date().getTime()/3600000);
+a.async=true;a.type="text/javascript";b.parentNode.insertBefore(a,b)}, 1);
+</script>
+<!-- End ClickTale heatmapping -->
   </body>
 </html>

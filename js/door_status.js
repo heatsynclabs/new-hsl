@@ -1,24 +1,34 @@
-require([
-	"dojo/request",
-	"dojo/dom"
-], function(request,dom){
-	
-	//set the door status to something while we query space API
-	
-	dom.byId("door_status").innerHTML = "<i>fetching door status</i>";
+define([
+  'lodash',
+  'dojo/request',
+  'dojo/dom',
+  './lodash.templates',
+  'dojo/domReady!'
+], function(_, request, dom){
 
- 	request("http://intranet.heatsynclabs.org/~access/cgi-bin/spaceapi.rb", 
-	{handleAs: "json", headers: {"X-Requested-With":null}}
-	).then(function(data){
-		if (data["open"] == false) {
-			dom.byId("door_status").innerHTML = "We are currently closed";
-			}
-		if (data["open"] == true) {
-			dom.byId("door_status").innerHTML = "Come in, we're open!";
-			}
-  	}, function(err){
-		console.log("Did not get door data.");
-  	}, function(evt){
-	// handle a progress event
-	});
+  'use strict';
+
+  var url = 'http://members.heatsynclabs.org/space_api.json';
+
+  var doorStatus = dom.byId('door_status');
+
+  return request.get(url, {
+    handleAs: 'json',
+    headers: {
+      'X-Requested-With': null
+    }
+  }).then(function(data){
+    if(doorStatus){
+      doorStatus.innerHTML = _.templates.open_status({
+        status: data.open ? 'open' : 'closed',
+        status_text: data.open ? 'open, come on down!' : 'closed, check the calendar!'
+      });
+    }
+
+    return data;
+  }, function(err){
+    console.log('Did not get door data.', err);
+    doorStatus.innerHTML = 'Error occurred while fetching status, please refresh.';
+  });
+
 });
