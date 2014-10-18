@@ -1,7 +1,6 @@
 body {
-	background-image: url("../img/light_checkered.png");
+	background-image: url("/new-hsl/img/light_checkered.png");
 	background-repeat: repeat;
-
 }
 
 .social-container {
@@ -12,7 +11,7 @@ body {
 	height: 40px;
 	width: 40px;
 	float: right;
-	background-size: 40px 40px;
+	background: url(/new-hsl/img/social.png) no-repeat;
 }
 
 .logo{
@@ -20,37 +19,41 @@ body {
 }
 
 .youtube {
-	background-image: url(../img/youtube.png);
+	background-position: 0 -200px;
 }
 
 .facebook {
-	background-image: url(../img/facebook.png);
+	background-position: 0 0;
 }
 
 .twitter {
-	background-image: url(../img/twitterbird.png);
+	background-position: 0 -160px;
 }
 
 .flickr {
-	background-image: url(../img/flickr.png);
-}
-.github{
-	background-image: url(../img/github.png);
+	background-position: 0 -40px;
 }
 
-.signs {
-	height: 80px;
-	width: 114px;
-	background-size: 114px 80px;
-	margin: 0 auto;
+.github {
+	background-position: 0 -120px;
+}
+
+.gplus {
+	background-position: 0 -240px;
 }
 
 .open{
-	background-image: url(../img/open.png);
+	color: green;
+	display:inline;
 }
 
 .closed{
-	background-image: url(../img/closed.png);
+	color:red;
+	display:inline;
+}
+
+.articles{
+	line-height:18px;
 }
 
 .orange-button, .orange-button:hover{
@@ -72,8 +75,47 @@ body {
 }
 
 .hide-link a {
-	color: #000000;
+	color: #333333;
 	text-decoration:underline;
+}
+
+.orange-button a {
+	color: #000000;
+}
+
+.orange-button a:hover {
+	text-decoration:none;
+}
+
+.left-info li{
+	line-height: 17px;
+	margin-top: 7px;
+}
+
+h3.calendar-link {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.calendar-info li{
+	line-height: 17px;
+}
+
+.calendar-info h4{
+	margin-bottom:5px;
+}
+
+.italics{
+	font-style:italic;
+}
+
+#main_image {
+	text-align: right;
+}
+
+.caption{
+	font-size: 29px;
+	line-height: 1.2em;
 }
 
 .spinner{
@@ -102,4 +144,8 @@ footer {
 	padding-bottom:40px;
 	margin-bottom:40px;
 	padding-left:20px;
+}
+
+.modal-body {
+	max-height: 500px;
 }

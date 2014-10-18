@@ -1,27 +1,31 @@
-require([
+define([
+  'lodash',
   'dojo/request',
   'dojo/dom',
+  './lodash.templates',
   'dojo/domReady!'
-], function(request, dom){
+], function(_, request, dom){
 
   'use strict';
 
-  var url = 'http://intranet.heatsynclabs.org/~access/cgi-bin/spaceapi.rb';
+  var url = 'http://members.heatsynclabs.org/space_api.json';
 
   var doorStatus = dom.byId('door_status');
 
-  request.get(url, {
+  return request.get(url, {
     handleAs: 'json',
     headers: {
       'X-Requested-With': null
     }
   }).then(function(data){
-    if(!data.open){
-      doorStatus.innerHTML = '<div class="signs closed"></div>';
+    if(doorStatus){
+      doorStatus.innerHTML = _.templates.open_status({
+        status: data.open ? 'open' : 'closed',
+        status_text: data.open ? 'open, come on down!' : 'closed, check the calendar!'
+      });
     }
-    if(data.open){
-      doorStatus.innerHTML = '<div class="signs open"></div>';
-    }
+
+    return data;
   }, function(err){
     console.log('Did not get door data.', err);
     doorStatus.innerHTML = 'Error occurred while fetching status, please refresh.';

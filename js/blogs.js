@@ -1,10 +1,11 @@
 define([
+  './replaceTags',
   'lodash',
   'dojo/dom',
   'dojo/request/script',
-  './lodash.template',
+  './lodash.templates',
   'dojo/domReady!'
-], function(_, dom, request){
+], function(replaceTags, _, dom, request){
 
   'use strict';
 
@@ -12,7 +13,7 @@ define([
 
   var blogEntries = dom.byId('blog-container');
 
-  request.get(url, {
+  return request.get(url, {
     jsonp: '_callback',
     query: {
       _id: 'eb41a075801cf56d9a76ea48deea1612',
@@ -25,17 +26,21 @@ define([
       })
       .map(function(entry){
         return {
-          title: entry.title,
+          title: replaceTags(entry.title),
           link: entry.link,
-          snippet: entry.description.substring(0, 150) + '...'
+          snippet: replaceTags(entry.description).substring(0, 150) + '...'
         };
       })
       .first(3)
       .value();
 
-    blogEntries.innerHTML = _.templates.blogs({
-      entries: entries
-    });
+    if(blogEntries){
+      blogEntries.innerHTML = _.templates.blogs({
+        entries: entries
+      });
+    }
+
+    return entries;
   }, function(err){
     console.log('Error in Blogs', err);
     // TODO: template an error message
