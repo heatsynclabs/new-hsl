@@ -11,7 +11,7 @@ define([
 
   'use strict';
 
-  var url = 'http://www.google.com/calendar/feeds/heatsynclabs.org_p9rcn09d64q56m7rg07jptmrqc@group.calendar.google.com/public/full';
+  var url = 'http://www.google.com/calendar/feeds/heatsynclabs.org_p9rcn09d64q56m7rg07jptmrqc@group.calendar.google.com/public/basic';
 
   var calendarEntries = dom.byId('calendar-entries');
 
