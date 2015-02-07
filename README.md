@@ -15,6 +15,10 @@ In the project directory, run `npm install` to get development dependencies.
 
 To build the assets for the site, run `npm run-script build` in the project directory.
 
+## Deploying
+
+Merge your changes into the gh-pages branch and push to Github. This site is hosted using Github Pages. The production branch is no longer used.
+
 # Specifics
 
 ## CSS

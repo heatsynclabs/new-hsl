@@ -1,5 +1,5 @@
 body {
-	background-image: url("/new-hsl/img/light_checkered.png");
+	background-image: url("/img/light_checkered.png");
 	background-repeat: repeat;
 }
 
@@ -11,7 +11,7 @@ body {
 	height: 40px;
 	width: 40px;
 	float: right;
-	background: url(/new-hsl/img/social.png) no-repeat;
+	background: url(/img/social.png) no-repeat;
 }
 
 .logo{
