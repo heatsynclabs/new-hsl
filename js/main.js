@@ -15,7 +15,7 @@ define([
   'use strict';
 
   all({
-    calendar: calendar,
+//    calendar: calendar,
     flickr: flickr,
     door_status: door_status,
     blogs: blogs,
