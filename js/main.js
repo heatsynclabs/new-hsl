@@ -1,8 +1,8 @@
 define([
-  './calendar',
+  // './calendar',
   './flickr',
   './door_status',
-  './blogs',
+  // './blogs',
   './mailing_list',
   'dojo/promise/all',
   'dojo/on',
@@ -10,18 +10,21 @@ define([
   'require',
   'dojo/NodeList-manipulate',
   'dojo/domReady!'
-], function(calendar, flickr, door_status, blogs, mailing_list, all, on, query, require){
+], function(flickr, door_status, mailing_list, all, on, query, require){
 
   'use strict';
+
+    console.log('dog2s');
 
   all({
 //    calendar: calendar,
     flickr: flickr,
     door_status: door_status,
-    blogs: blogs,
+    // blogs: blogs,
     mailing_list: mailing_list
   }).then(function(results){
     // Debugging
+    console.log('dogs');
     console.log('calendar', results.calendar);
     console.log('flickr', results.flickr);
     console.log('door_status', results.door_status);
