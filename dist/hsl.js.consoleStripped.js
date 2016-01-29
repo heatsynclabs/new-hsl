@@ -1939,10 +1939,10 @@ define([], 1);
 },
 'hsl/main':function(){
 define([
-  './calendar',
+  // './calendar',
   './flickr',
   './door_status',
-  './blogs',
+  // './blogs',
   './mailing_list',
   'dojo/promise/all',
   'dojo/on',
@@ -1950,18 +1950,21 @@ define([
   'require',
   'dojo/NodeList-manipulate',
   'dojo/domReady!'
-], function(calendar, flickr, door_status, blogs, mailing_list, all, on, query, require){
+], function(flickr, door_status, mailing_list, all, on, query, require){
 
   'use strict';
+
+    0 && console.log('dog2s');
 
   all({
 //    calendar: calendar,
     flickr: flickr,
     door_status: door_status,
-    blogs: blogs,
+    // blogs: blogs,
     mailing_list: mailing_list
   }).then(function(results){
     // Debugging
+    0 && console.log('dogs');
     0 && console.log('calendar', results.calendar);
     0 && console.log('flickr', results.flickr);
     0 && console.log('door_status', results.door_status);
@@ -1984,86 +1987,49 @@ define([
 });
 
 },
-'hsl/calendar':function(){
+'hsl/flickr':function(){
 define([
-  './replaceTags',
   'lodash',
   'dojo/dom',
-  'dojo/date',
-  'dojo/date/locale',
   'dojo/request/script',
-  './lodash.templates',
-  'dojo/domReady!'
-], function(replaceTags, _, dom, date, locale, request){
+  './lodash.templates'
+], function(_, dom, request){
 
   'use strict';
 
-  var url = 'http://www.google.com/calendar/feeds/heatsynclabs.org_p9rcn09d64q56m7rg07jptmrqc@group.calendar.google.com/public/basic';
+  0 && console.log("Flickr init...");
 
-  var calendarEntries = dom.byId('calendar-entries');
+  var url = 'https://api.flickr.com/services/rest/';
 
   return request.get(url, {
-    jsonp: 'callback',
+    jsonp: 'jsoncallback',
     query: {
-      alt: 'json',
-      orderby: 'starttime',
-      'max-results': 10,
-      singleevents: true,
-      sortorder: 'ascending',
-      futureevents: true
+      method: 'flickr.photos.search',
+      api_key: 'bec64c9c0f28889dc6e0c5ef7be3511f',
+      user_id: '60827818@N07',
+      tags: 'publish',
+      format: 'json'
     }
   }).then(function(data){
-    var entries = _(data.feed.entry)
-      .map(function(entry){
-        var eventDate = new Date(entry.gd$when[0].startTime);
+    0 && console.log('Flickr loaded: ', data.photos.photo);
 
-        return {
-          content: replaceTags(entry.content.$t),
-          timestamp: eventDate,
-          date: locale.format(eventDate, {
-            selector: 'date',
-            datePattern: 'EEE, MMM d'
-          }),
-          time: locale.format(eventDate, {
-            selector: 'time',
-            timePattern: 'K:mm a'
-          }),
-          link: _.find(entry.link, { type: 'text/html' }).href,
-          title: replaceTags(entry.title.$t)
-        };
-      })
-      .filter(function(entry, idx, entries){
-        var sevenDays = date.add(_.first(entries).timestamp, 'day', 6); // Inclusive
-        return date.compare(entry.timestamp, sevenDays) < 0;
-      })
-      .value();
+    var photos = _.map(data.photos.photo, function(photo){
+      return {
+        image_url: _.templates.flickr_img_url(photo),
+        title: photo.title,
+        link: _.templates.flickr_link(photo),
+        description: ""
+      };
+    });
 
-    if(calendarEntries){
-      calendarEntries.innerHTML = _.templates.calendar({
-        dates: _.pluck(entries, 'date'),
-        entries: entries
-      });
+    //for now just use the first image we got back from flickr
+    var flickrImage = dom.byId('main_image');
+    if(flickrImage){
+      flickrImage.innerHTML = _.templates.flickr(photos[0]);
     }
 
-    return entries;
-  }, function(err){
-    0 && console.log('Error in Calendar', err);
-    // TODO: template an error message
-    calendarEntries.innerHTML = 'Error Loading Calendar - Please Refresh the Page';
+    return photos;
   });
-
-});
-
-},
-'hsl/replaceTags':function(){
-define(function(){
-
-  return function(str){
-    if (str == null){
-      return '';
-    }
-    return String(str).replace(/<\/?[^>]+>/g, ' ');
-  };
 
 });
 
@@ -8441,1051 +8407,1123 @@ define(["./kernel", "../has", "../sniff"], function(dojo, has){
 
 
 },
-'dojo/date':function(){
-define("dojo/date", ["./has", "./_base/lang"], function(has, lang){
-// module:
-//		dojo/date
+'dojo/request/script':function(){
+define([
+	'module',
+	'./watch',
+	'./util',
+	'../_base/array',
+	'../_base/lang',
+	'../on',
+	'../dom',
+	'../dom-construct',
+	'../has',
+	'../_base/window'/*=====,
+	'../request',
+	'../_base/declare' =====*/
+], function(module, watch, util, array, lang, on, dom, domConstruct, has, win/*=====, request, declare =====*/){
+	has.add('script-readystatechange', function(global, document){
+		var script = document.createElement('script');
+		return typeof script['onreadystatechange'] !== 'undefined' &&
+			(typeof global['opera'] === 'undefined' || global['opera'].toString() !== '[object Opera]');
+	});
 
-var date = {
-	// summary:
-	//		Date manipulation utilities
-};
+	var mid = module.id.replace(/[\/\.\-]/g, '_'),
+		counter = 0,
+		loadEvent = has('script-readystatechange') ? 'readystatechange' : 'load',
+		readyRegExp = /complete|loaded/,
+		callbacks = this[mid + '_callbacks'] = {},
+		deadScripts = [];
 
-date.getDaysInMonth = function(/*Date*/dateObject){
-	// summary:
-	//		Returns the number of days in the month used by dateObject
-	var month = dateObject.getMonth();
-	var days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-	if(month == 1 && date.isLeapYear(dateObject)){ return 29; } // Number
-	return days[month]; // Number
-};
+	function attach(id, url, frameDoc){
+		var doc = (frameDoc || win.doc),
+			element = doc.createElement('script');
 
-date.isLeapYear = function(/*Date*/dateObject){
-	// summary:
-	//		Determines if the year of the dateObject is a leap year
-	// description:
-	//		Leap years are years with an additional day YYYY-02-29, where the
-	//		year number is a multiple of four with the following exception: If
-	//		a year is a multiple of 100, then it is only a leap year if it is
-	//		also a multiple of 400. For example, 1900 was not a leap year, but
-	//		2000 is one.
+		element.type = 'text/javascript';
+		element.src = url;
+		element.id = id;
+		element.async = true;
+		element.charset = 'utf-8';
 
-	var year = dateObject.getFullYear();
-	return !(year%400) || (!(year%4) && !!(year%100)); // Boolean
-};
+		return doc.getElementsByTagName('head')[0].appendChild(element);
+	}
 
-// FIXME: This is not localized
-date.getTimezoneName = function(/*Date*/dateObject){
-	// summary:
-	//		Get the user's time zone as provided by the browser
-	// dateObject:
-	//		Needed because the timezone may vary with time (daylight savings)
-	// description:
-	//		Try to get time zone info from toString or toLocaleString method of
-	//		the Date object -- UTC offset is not a time zone.  See
-	//		http://www.twinsun.com/tz/tz-link.htm Note: results may be
-	//		inconsistent across browsers.
+	function remove(id, frameDoc, cleanup){
+		domConstruct.destroy(dom.byId(id, frameDoc));
 
-	var str = dateObject.toString(); // Start looking in toString
-	var tz = ''; // The result -- return empty string if nothing found
-	var match;
-
-	// First look for something in parentheses -- fast lookup, no regex
-	var pos = str.indexOf('(');
-	if(pos > -1){
-		tz = str.substring(++pos, str.indexOf(')'));
-	}else{
-		// If at first you don't succeed ...
-		// If IE knows about the TZ, it appears before the year
-		// Capital letters or slash before a 4-digit year
-		// at the end of string
-		var pat = /([A-Z\/]+) \d{4}$/;
-		if((match = str.match(pat))){
-			tz = match[1];
-		}else{
-		// Some browsers (e.g. Safari) glue the TZ on the end
-		// of toLocaleString instead of putting it in toString
-			str = dateObject.toLocaleString();
-			// Capital letters or slash -- end of string,
-			// after space
-			pat = / ([A-Z\/]+)$/;
-			if((match = str.match(pat))){
-				tz = match[1];
+		if(callbacks[id]){
+			if(cleanup){
+				// set callback to a function that deletes itself so requests that
+				// are in-flight don't error out when returning and also
+				// clean up after themselves
+				callbacks[id] = function(){
+					delete callbacks[id];
+				};
+			}else{
+				delete callbacks[id];
 			}
 		}
 	}
 
-	// Make sure it doesn't somehow end up return AM or PM
-	return (tz == 'AM' || tz == 'PM') ? '' : tz; // String
-};
+	function _addDeadScript(dfd){
+		// Be sure to check ioArgs because it can dynamically change in the dojox/io plugins.
+		// See http://bugs.dojotoolkit.org/ticket/15890.
+		var options = dfd.response.options,
+			frameDoc = options.ioArgs ? options.ioArgs.frameDoc : options.frameDoc;
 
-// Utility methods to do arithmetic calculations with Dates
+		deadScripts.push({ id: dfd.id, frameDoc: frameDoc });
 
-date.compare = function(/*Date*/date1, /*Date?*/date2, /*String?*/portion){
-	// summary:
-	//		Compare two date objects by date, time, or both.
-	// description:
-	//		Returns 0 if equal, positive if a > b, else negative.
-	// date1:
-	//		Date object
-	// date2:
-	//		Date object.  If not specified, the current Date is used.
-	// portion:
-	//		A string indicating the "date" or "time" portion of a Date object.
-	//		Compares both "date" and "time" by default.  One of the following:
-	//		"date", "time", "datetime"
-
-	// Extra step required in copy for IE - see #3112
-	date1 = new Date(+date1);
-	date2 = new Date(+(date2 || new Date()));
-
-	if(portion == "date"){
-		// Ignore times and compare dates.
-		date1.setHours(0, 0, 0, 0);
-		date2.setHours(0, 0, 0, 0);
-	}else if(portion == "time"){
-		// Ignore dates and compare times.
-		date1.setFullYear(0, 0, 0);
-		date2.setFullYear(0, 0, 0);
+		if(options.ioArgs){
+			options.ioArgs.frameDoc = null;
+		}
+		options.frameDoc = null;
 	}
 
-	if(date1 > date2){ return 1; } // int
-	if(date1 < date2){ return -1; } // int
-	return 0; // int
-};
+	function canceler(dfd, response){
+		if(dfd.canDelete){
+			//For timeouts and cancels, remove the script element immediately to
+			//avoid a response from it coming back later and causing trouble.
+			script._remove(dfd.id, response.options.frameDoc, true);
+		}
+	}
+	function isValid(response){
+		//Do script cleanup here. We wait for one inflight pass
+		//to make sure we don't get any weird things by trying to remove a script
+		//tag that is part of the call chain (IE 6 has been known to
+		//crash in that case).
+		if(deadScripts && deadScripts.length){
+			array.forEach(deadScripts, function(_script){
+				script._remove(_script.id, _script.frameDoc);
+				_script.frameDoc = null;
+			});
+			deadScripts = [];
+		}
 
-date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
-	// summary:
-	//		Add to a Date in intervals of different size, from milliseconds to years
-	// date: Date
-	//		Date object to start with
-	// interval:
-	//		A string representing the interval.  One of the following:
-	//		"year", "month", "day", "hour", "minute", "second",
-	//		"millisecond", "quarter", "week", "weekday"
-	// amount:
-	//		How much to add to the date.
+		return response.options.jsonp ? !response.data : true;
+	}
+	function isReadyScript(response){
+		return !!this.scriptLoaded;
+	}
+	function isReadyCheckString(response){
+		var checkString = response.options.checkString;
 
-	var sum = new Date(+date); // convert to Number before copying to accomodate IE (#3112)
-	var fixOvershoot = false;
-	var property = "Date";
+		return checkString && eval('typeof(' + checkString + ') !== "undefined"');
+	}
+	function handleResponse(response, error){
+		if(this.canDelete){
+			_addDeadScript(this);
+		}
+		if(error){
+			this.reject(error);
+		}else{
+			this.resolve(response);
+		}
+	}
 
-	switch(interval){
-		case "day":
-			break;
-		case "weekday":
-			//i18n FIXME: assumes Saturday/Sunday weekend, but this is not always true.  see dojo/cldr/supplemental
+	function script(url, options, returnDeferred){
+		var response = util.parseArgs(url, util.deepCopy({}, options));
+		url = response.url;
+		options = response.options;
 
-			// Divide the increment time span into weekspans plus leftover days
-			// e.g., 8 days is one 5-day weekspan / and two leftover days
-			// Can't have zero leftover days, so numbers divisible by 5 get
-			// a days value of 5, and the remaining days make up the number of weeks
-			var days, weeks;
-			var mod = amount % 5;
-			if(!mod){
-				days = (amount > 0) ? 5 : -5;
-				weeks = (amount > 0) ? ((amount-5)/5) : ((amount+5)/5);
-			}else{
-				days = mod;
-				weeks = parseInt(amount/5);
+		var dfd = util.deferred(
+			response,
+			canceler,
+			isValid,
+			options.jsonp ? null : (options.checkString ? isReadyCheckString : isReadyScript),
+			handleResponse
+		);
+
+		lang.mixin(dfd, {
+			id: mid + (counter++),
+			canDelete: false
+		});
+
+		if(options.jsonp){
+			var queryParameter = new RegExp('[?&]' + options.jsonp + '=');
+			if(!queryParameter.test(url)){
+				url += (~url.indexOf('?') ? '&' : '?') +
+					options.jsonp + '=' +
+					(options.frameDoc ? 'parent.' : '') +
+					mid + '_callbacks.' + dfd.id;
 			}
-			// Get weekday value for orig date param
-			var strt = date.getDay();
-			// Orig date is Sat / positive incrementer
-			// Jump over Sun
-			var adj = 0;
-			if(strt == 6 && amount > 0){
-				adj = 1;
-			}else if(strt == 0 && amount < 0){
-			// Orig date is Sun / negative incrementer
-			// Jump back over Sat
-				adj = -1;
-			}
-			// Get weekday val for the new date
-			var trgt = strt + days;
-			// New date is on Sat or Sun
-			if(trgt == 0 || trgt == 6){
-				adj = (amount > 0) ? 2 : -2;
-			}
-			// Increment by number of weeks plus leftover days plus
-			// weekend adjustments
-			amount = (7 * weeks) + days + adj;
-			break;
-		case "year":
-			property = "FullYear";
-			// Keep increment/decrement from 2/29 out of March
-			fixOvershoot = true;
-			break;
-		case "week":
-			amount *= 7;
-			break;
-		case "quarter":
-			// Naive quarter is just three months
-			amount *= 3;
-			// fallthrough...
-		case "month":
-			// Reset to last day of month if you overshoot
-			fixOvershoot = true;
-			property = "Month";
-			break;
-//		case "hour":
-//		case "minute":
-//		case "second":
-//		case "millisecond":
-		default:
-			property = "UTC"+interval.charAt(0).toUpperCase() + interval.substring(1) + "s";
-	}
 
-	if(property){
-		sum["set"+property](sum["get"+property]()+amount);
-	}
+			dfd.canDelete = true;
+			callbacks[dfd.id] = function(json){
+				response.data = json;
+				dfd.handleResponse(response);
+			};
+		}
 
-	if(fixOvershoot && (sum.getDate() < date.getDate())){
-		sum.setDate(0);
-	}
+		if(util.notify){
+			util.notify.emit('send', response, dfd.promise.cancel);
+		}
 
-	return sum; // Date
-};
+		if(!options.canAttach || options.canAttach(dfd)){
+			var node = script._attach(dfd.id, url, options.frameDoc);
 
-date.difference = function(/*Date*/date1, /*Date?*/date2, /*String?*/interval){
-	// summary:
-	//		Get the difference in a specific unit of time (e.g., number of
-	//		months, weeks, days, etc.) between two dates, rounded to the
-	//		nearest integer.
-	// date1:
-	//		Date object
-	// date2:
-	//		Date object.  If not specified, the current Date is used.
-	// interval:
-	//		A string representing the interval.  One of the following:
-	//		"year", "month", "day", "hour", "minute", "second",
-	//		"millisecond", "quarter", "week", "weekday"
-	//
-	//		Defaults to "day".
-
-	date2 = date2 || new Date();
-	interval = interval || "day";
-	var yearDiff = date2.getFullYear() - date1.getFullYear();
-	var delta = 1; // Integer return value
-
-	switch(interval){
-		case "quarter":
-			var m1 = date1.getMonth();
-			var m2 = date2.getMonth();
-			// Figure out which quarter the months are in
-			var q1 = Math.floor(m1/3) + 1;
-			var q2 = Math.floor(m2/3) + 1;
-			// Add quarters for any year difference between the dates
-			q2 += (yearDiff * 4);
-			delta = q2 - q1;
-			break;
-		case "weekday":
-			var days = Math.round(date.difference(date1, date2, "day"));
-			var weeks = parseInt(date.difference(date1, date2, "week"));
-			var mod = days % 7;
-
-			// Even number of weeks
-			if(mod == 0){
-				days = weeks*5;
-			}else{
-				// Weeks plus spare change (< 7 days)
-				var adj = 0;
-				var aDay = date1.getDay();
-				var bDay = date2.getDay();
-
-				weeks = parseInt(days/7);
-				mod = days % 7;
-				// Mark the date advanced by the number of
-				// round weeks (may be zero)
-				var dtMark = new Date(date1);
-				dtMark.setDate(dtMark.getDate()+(weeks*7));
-				var dayMark = dtMark.getDay();
-
-				// Spare change days -- 6 or less
-				if(days > 0){
-					switch(true){
-						// Range starts on Sat
-						case aDay == 6:
-							adj = -1;
-							break;
-						// Range starts on Sun
-						case aDay == 0:
-							adj = 0;
-							break;
-						// Range ends on Sat
-						case bDay == 6:
-							adj = -1;
-							break;
-						// Range ends on Sun
-						case bDay == 0:
-							adj = -2;
-							break;
-						// Range contains weekend
-						case (dayMark + mod) > 5:
-							adj = -2;
+			if(!options.jsonp && !options.checkString){
+				var handle = on(node, loadEvent, function(evt){
+					if(evt.type === 'load' || readyRegExp.test(node.readyState)){
+						handle.remove();
+						dfd.scriptLoaded = evt;
 					}
-				}else if(days < 0){
-					switch(true){
-						// Range starts on Sat
-						case aDay == 6:
-							adj = 0;
-							break;
-						// Range starts on Sun
-						case aDay == 0:
-							adj = 1;
-							break;
-						// Range ends on Sat
-						case bDay == 6:
-							adj = 2;
-							break;
-						// Range ends on Sun
-						case bDay == 0:
-							adj = 1;
-							break;
-						// Range contains weekend
-						case (dayMark + mod) < 0:
-							adj = 2;
-					}
-				}
-				days += adj;
-				days -= (weeks*2);
+				});
 			}
-			delta = days;
-			break;
-		case "year":
-			delta = yearDiff;
-			break;
-		case "month":
-			delta = (date2.getMonth() - date1.getMonth()) + (yearDiff * 12);
-			break;
-		case "week":
-			// Truncate instead of rounding
-			// Don't use Math.floor -- value may be negative
-			delta = parseInt(date.difference(date1, date2, "day")/7);
-			break;
-		case "day":
-			delta /= 24;
-			// fallthrough
-		case "hour":
-			delta /= 60;
-			// fallthrough
-		case "minute":
-			delta /= 60;
-			// fallthrough
-		case "second":
-			delta /= 1000;
-			// fallthrough
-		case "millisecond":
-			delta *= date2.getTime() - date1.getTime();
+		}
+
+		watch(dfd);
+
+		return returnDeferred ? dfd : dfd.promise;
 	}
+	script.get = script;
+	/*=====
+	script = function(url, options){
+		// summary:
+		//		Sends a request using a script element with the given URL and options.
+		// url: String
+		//		URL to request
+		// options: dojo/request/script.__Options?
+		//		Options for the request.
+		// returns: dojo/request.__Promise
+	};
+	script.__BaseOptions = declare(request.__BaseOptions, {
+		// jsonp: String?
+		//		The URL parameter name that indicates the JSONP callback string.
+		//		For instance, when using Yahoo JSONP calls it is normally,
+		//		jsonp: "callback". For AOL JSONP calls it is normally
+		//		jsonp: "c".
+		// checkString: String?
+		//		A string of JavaScript that when evaluated like so:
+		//		"typeof(" + checkString + ") != 'undefined'"
+		//		being true means that the script fetched has been loaded.
+		//		Do not use this if doing a JSONP type of call (use `jsonp` instead).
+		// frameDoc: Document?
+		//		The Document object of a child iframe. If this is passed in, the script
+		//		will be attached to that document. This can be helpful in some comet long-polling
+		//		scenarios with Firefox and Opera.
+	});
+	script.__MethodOptions = declare(null, {
+		// method: String?
+		//		This option is ignored. All requests using this transport are
+		//		GET requests.
+	});
+	script.__Options = declare([script.__BaseOptions, script.__MethodOptions]);
 
-	// Round for fractional values and DST leaps
-	return Math.round(delta); // Number (integer)
-};
+	script.get = function(url, options){
+		// summary:
+		//		Send an HTTP GET request using a script element with the given URL and options.
+		// url: String
+		//		URL to request
+		// options: dojo/request/script.__BaseOptions?
+		//		Options for the request.
+		// returns: dojo/request.__Promise
+	};
+	=====*/
 
-// Don't use setObject() because it may overwrite dojo/date/stamp (if that has already been loaded)
- 1  && lang.mixin(lang.getObject("dojo.date", true), date);
+	// TODO: Remove in 2.0
+	script._attach = attach;
+	script._remove = remove;
+	script._callbacksProperty = mid + '_callbacks';
 
-return date;
+	return script;
 });
 
 },
-'dojo/date/locale':function(){
+'dojo/request/watch':function(){
 define([
-	"../_base/lang",
-	"../_base/array",
-	"../date",
-	/*===== "../_base/declare", =====*/
-	"../cldr/supplemental",
-	"../i18n",
-	"../regexp",
-	"../string",
-	"../i18n!../cldr/nls/gregorian",
-	"module"
-], function(lang, array, date, /*===== declare, =====*/ supplemental, i18n, regexp, string, gregorian, module){
+	'./util',
+	'../errors/RequestTimeoutError',
+	'../errors/CancelError',
+	'../_base/array',
+	'../_base/window',
+	'../has!host-browser?dom-addeventlistener?:../on:'
+], function(util, RequestTimeoutError, CancelError, array, win, on){
+	// avoid setting a timer per request. It degrades performance on IE
+	// something fierece if we don't use unified loops.
+	var _inFlightIntvl = null,
+		_inFlight = [];
 
-// module:
-//		dojo/date/locale
+	function watchInFlight(){
+		// summary:
+		//		internal method that checks each inflight XMLHttpRequest to see
+		//		if it has completed or if the timeout situation applies.
 
-var exports = {
-	// summary:
-	//		This modules defines dojo/date/locale, localization methods for Date.
-};
-lang.setObject(module.id.replace(/\//g, "."), exports);
+		var now = +(new Date);
 
-// Localization methods for Date.   Honor local customs using locale-dependent dojo.cldr data.
-
-// Load the bundles containing localization information for
-// names and formats
-
-//NOTE: Everything in this module assumes Gregorian calendars.
-// Other calendars will be implemented in separate modules.
-
-	// Format a pattern without literals
-	function formatPattern(dateObject, bundle, options, pattern){
-		return pattern.replace(/([a-z])\1*/ig, function(match){
-			var s, pad,
-				c = match.charAt(0),
-				l = match.length,
-				widthList = ["abbr", "wide", "narrow"];
-			switch(c){
-				case 'G':
-					s = bundle[(l < 4) ? "eraAbbr" : "eraNames"][dateObject.getFullYear() < 0 ? 0 : 1];
-					break;
-				case 'y':
-					s = dateObject.getFullYear();
-					switch(l){
-						case 1:
-							break;
-						case 2:
-							if(!options.fullYear){
-								s = String(s); s = s.substr(s.length - 2);
-								break;
-							}
-							// fallthrough
-						default:
-							pad = true;
-					}
-					break;
-				case 'Q':
-				case 'q':
-					s = Math.ceil((dateObject.getMonth()+1)/3);
-//					switch(l){
-//						case 1: case 2:
-							pad = true;
-//							break;
-//						case 3: case 4: // unimplemented
-//					}
-					break;
-				case 'M':
-				case 'L':
-					var m = dateObject.getMonth();
-					if(l<3){
-						s = m+1; pad = true;
-					}else{
-						var propM = [
-							"months",
-							c == 'L' ? "standAlone" : "format",
-							widthList[l-3]
-						].join("-");
-						s = bundle[propM][m];
-					}
-					break;
-				case 'w':
-					var firstDay = 0;
-					s = exports._getWeekOfYear(dateObject, firstDay); pad = true;
-					break;
-				case 'd':
-					s = dateObject.getDate(); pad = true;
-					break;
-				case 'D':
-					s = exports._getDayOfYear(dateObject); pad = true;
-					break;
-				case 'e':
-				case 'c':
-					var d = dateObject.getDay();
-					if(l<2){
-						s = (d - supplemental.getFirstDayOfWeek(options.locale) + 8) % 7
-						break;
-					}
-					// fallthrough
-				case 'E':
-					d = dateObject.getDay();
-					if(l<3){
-						s = d+1; pad = true;
-					}else{
-						var propD = [
-							"days",
-							c == 'c' ? "standAlone" : "format",
-							widthList[l-3]
-						].join("-");
-						s = bundle[propD][d];
-					}
-					break;
-				case 'a':
-					var timePeriod = dateObject.getHours() < 12 ? 'am' : 'pm';
-					s = options[timePeriod] || bundle['dayPeriods-format-wide-' + timePeriod];
-					break;
-				case 'h':
-				case 'H':
-				case 'K':
-				case 'k':
-					var h = dateObject.getHours();
-					// strange choices in the date format make it impossible to write this succinctly
-					switch (c){
-						case 'h': // 1-12
-							s = (h % 12) || 12;
-							break;
-						case 'H': // 0-23
-							s = h;
-							break;
-						case 'K': // 0-11
-							s = (h % 12);
-							break;
-						case 'k': // 1-24
-							s = h || 24;
-							break;
-					}
-					pad = true;
-					break;
-				case 'm':
-					s = dateObject.getMinutes(); pad = true;
-					break;
-				case 's':
-					s = dateObject.getSeconds(); pad = true;
-					break;
-				case 'S':
-					s = Math.round(dateObject.getMilliseconds() * Math.pow(10, l-3)); pad = true;
-					break;
-				case 'v': // FIXME: don't know what this is. seems to be same as z?
-				case 'z':
-					// We only have one timezone to offer; the one from the browser
-					s = exports._getZone(dateObject, true, options);
-					if(s){break;}
-					l=4;
-					// fallthrough... use GMT if tz not available
-				case 'Z':
-					var offset = exports._getZone(dateObject, false, options);
-					var tz = [
-						(offset<=0 ? "+" : "-"),
-						string.pad(Math.floor(Math.abs(offset)/60), 2),
-						string.pad(Math.abs(offset)% 60, 2)
-					];
-					if(l==4){
-						tz.splice(0, 0, "GMT");
-						tz.splice(3, 0, ":");
-					}
-					s = tz.join("");
-					break;
-//				case 'Y': case 'u': case 'W': case 'F': case 'g': case 'A':
-//					0 && console.log(match+" modifier unimplemented");
-				default:
-					throw new Error("dojo.date.locale.format: invalid pattern char: "+pattern);
+		// we need manual loop because we often modify _inFlight (and therefore 'i') while iterating
+		for(var i = 0, dfd; i < _inFlight.length && (dfd = _inFlight[i]); i++){
+			var response = dfd.response,
+				options = response.options;
+			if((dfd.isCanceled && dfd.isCanceled()) || (dfd.isValid && !dfd.isValid(response))){
+				_inFlight.splice(i--, 1);
+				watch._onAction && watch._onAction();
+			}else if(dfd.isReady && dfd.isReady(response)){
+				_inFlight.splice(i--, 1);
+				dfd.handleResponse(response);
+				watch._onAction && watch._onAction();
+			}else if(dfd.startTime){
+				// did we timeout?
+				if(dfd.startTime + (options.timeout || 0) < now){
+					_inFlight.splice(i--, 1);
+					// Cancel the request so the io module can do appropriate cleanup.
+					dfd.cancel(new RequestTimeoutError('Timeout exceeded', response));
+					watch._onAction && watch._onAction();
+				}
 			}
-			if(pad){ s = string.pad(s, l); }
-			return s;
+		}
+
+		watch._onInFlight && watch._onInFlight(dfd);
+
+		if(!_inFlight.length){
+			clearInterval(_inFlightIntvl);
+			_inFlightIntvl = null;
+		}
+	}
+
+	function watch(dfd){
+		// summary:
+		//		Watches the io request represented by dfd to see if it completes.
+		// dfd: Deferred
+		//		The Deferred object to watch.
+		// response: Object
+		//		The object used as the value of the request promise.
+		// validCheck: Function
+		//		Function used to check if the IO request is still valid. Gets the dfd
+		//		object as its only argument.
+		// ioCheck: Function
+		//		Function used to check if basic IO call worked. Gets the dfd
+		//		object as its only argument.
+		// resHandle: Function
+		//		Function used to process response. Gets the dfd
+		//		object as its only argument.
+		if(dfd.response.options.timeout){
+			dfd.startTime = +(new Date);
+		}
+
+		if(dfd.isFulfilled()){
+			// bail out if the deferred is already fulfilled
+			return;
+		}
+
+		_inFlight.push(dfd);
+		if(!_inFlightIntvl){
+			_inFlightIntvl = setInterval(watchInFlight, 50);
+		}
+
+		// handle sync requests separately from async:
+		// http://bugs.dojotoolkit.org/ticket/8467
+		if(dfd.response.options.sync){
+			watchInFlight();
+		}
+	}
+
+	watch.cancelAll = function cancelAll(){
+		// summary:
+		//		Cancels all pending IO requests, regardless of IO type
+		try{
+			array.forEach(_inFlight, function(dfd){
+				try{
+					dfd.cancel(new CancelError('All requests canceled.'));
+				}catch(e){}
+			});
+		}catch(e){}
+	};
+
+	if(win && on && win.doc.attachEvent){
+		// Automatically call cancel all io calls on unload in IE
+		// http://bugs.dojotoolkit.org/ticket/2357
+		on(win.global, 'unload', function(){
+			watch.cancelAll();
 		});
 	}
 
-/*=====
-var __FormatOptions = exports.__FormatOptions = declare(null, {
-	// selector: String
-	//		choice of 'time','date' (default: date and time)
-	// formatLength: String
-	//		choice of long, short, medium or full (plus any custom additions).  Defaults to 'short'
-	// datePattern:String
-	//		override pattern with this string
-	// timePattern:String
-	//		override pattern with this string
-	// am: String
-	//		override strings for am in times
-	// pm: String
-	//		override strings for pm in times
-	// locale: String
-	//		override the locale used to determine formatting rules
-	// fullYear: Boolean
-	//		(format only) use 4 digit years whenever 2 digit years are called for
-	// strict: Boolean
-	//		(parse only) strict parsing, off by default
-});
-=====*/
-
-exports._getZone = function(/*Date*/ dateObject, /*boolean*/ getName, /*__FormatOptions?*/ options){
-	// summary:
-	//		Returns the zone (or offset) for the given date and options.  This
-	//		is broken out into a separate function so that it can be overridden
-	//		by timezone-aware code.
-	//
-	// dateObject:
-	//		the date and/or time being formatted.
-	//
-	// getName:
-	//		Whether to return the timezone string (if true), or the offset (if false)
-	//
-	// options:
-	//		The options being used for formatting
-	if(getName){
-		return date.getTimezoneName(dateObject);
-	}else{
-		return dateObject.getTimezoneOffset();
-	}
-};
-
-
-exports.format = function(/*Date*/ dateObject, /*__FormatOptions?*/ options){
-	// summary:
-	//		Format a Date object as a String, using locale-specific settings.
-	//
-	// description:
-	//		Create a string from a Date object using a known localized pattern.
-	//		By default, this method formats both date and time from dateObject.
-	//		Formatting patterns are chosen appropriate to the locale.  Different
-	//		formatting lengths may be chosen, with "full" used by default.
-	//		Custom patterns may be used or registered with translations using
-	//		the dojo/date/locale.addCustomFormats() method.
-	//		Formatting patterns are implemented using [the syntax described at
-	//		unicode.org](http://www.unicode.org/reports/tr35/tr35-4.html#Date_Format_Patterns)
-	//
-	// dateObject:
-	//		the date and/or time to be formatted.  If a time only is formatted,
-	//		the values in the year, month, and day fields are irrelevant.  The
-	//		opposite is true when formatting only dates.
-
-	options = options || {};
-
-	var locale = i18n.normalizeLocale(options.locale),
-		formatLength = options.formatLength || 'short',
-		bundle = exports._getGregorianBundle(locale),
-		str = [],
-		sauce = lang.hitch(this, formatPattern, dateObject, bundle, options);
-	if(options.selector == "year"){
-		return _processPattern(bundle["dateFormatItem-yyyy"] || "yyyy", sauce);
-	}
-	var pattern;
-	if(options.selector != "date"){
-		pattern = options.timePattern || bundle["timeFormat-"+formatLength];
-		if(pattern){str.push(_processPattern(pattern, sauce));}
-	}
-	if(options.selector != "time"){
-		pattern = options.datePattern || bundle["dateFormat-"+formatLength];
-		if(pattern){str.push(_processPattern(pattern, sauce));}
-	}
-
-	return str.length == 1 ? str[0] : bundle["dateTimeFormat-"+formatLength].replace(/\'/g,'').replace(/\{(\d+)\}/g,
-		function(match, key){ return str[key]; }); // String
-};
-
-exports.regexp = function(/*__FormatOptions?*/ options){
-	// summary:
-	//		Builds the regular needed to parse a localized date
-
-	return exports._parseInfo(options).regexp; // String
-};
-
-exports._parseInfo = function(/*__FormatOptions?*/ options){
-	options = options || {};
-	var locale = i18n.normalizeLocale(options.locale),
-		bundle = exports._getGregorianBundle(locale),
-		formatLength = options.formatLength || 'short',
-		datePattern = options.datePattern || bundle["dateFormat-" + formatLength],
-		timePattern = options.timePattern || bundle["timeFormat-" + formatLength],
-		pattern;
-	if(options.selector == 'date'){
-		pattern = datePattern;
-	}else if(options.selector == 'time'){
-		pattern = timePattern;
-	}else{
-		pattern = bundle["dateTimeFormat-"+formatLength].replace(/\{(\d+)\}/g,
-			function(match, key){ return [timePattern, datePattern][key]; });
-	}
-
-	var tokens = [],
-		re = _processPattern(pattern, lang.hitch(this, _buildDateTimeRE, tokens, bundle, options));
-	return {regexp: re, tokens: tokens, bundle: bundle};
-};
-
-exports.parse = function(/*String*/ value, /*__FormatOptions?*/ options){
-	// summary:
-	//		Convert a properly formatted string to a primitive Date object,
-	//		using locale-specific settings.
-	//
-	// description:
-	//		Create a Date object from a string using a known localized pattern.
-	//		By default, this method parses looking for both date and time in the string.
-	//		Formatting patterns are chosen appropriate to the locale.  Different
-	//		formatting lengths may be chosen, with "full" used by default.
-	//		Custom patterns may be used or registered with translations using
-	//		the dojo/date/locale.addCustomFormats() method.
-	//
-	//		Formatting patterns are implemented using [the syntax described at
-	//		unicode.org](http://www.unicode.org/reports/tr35/tr35-4.html#Date_Format_Patterns)
-	//		When two digit years are used, a century is chosen according to a sliding
-	//		window of 80 years before and 20 years after present year, for both `yy` and `yyyy` patterns.
-	//		year < 100CE requires strict mode.
-	//
-	// value:
-	//		A string representation of a date
-
-	// remove non-printing bidi control chars from input and pattern
-	var controlChars = /[\u200E\u200F\u202A\u202E]/g,
-		info = exports._parseInfo(options),
-		tokens = info.tokens, bundle = info.bundle,
-		re = new RegExp("^" + info.regexp.replace(controlChars, "") + "$",
-			info.strict ? "" : "i"),
-		match = re.exec(value && value.replace(controlChars, ""));
-
-	if(!match){ return null; } // null
-
-	var widthList = ['abbr', 'wide', 'narrow'],
-		result = [1970,0,1,0,0,0,0], // will get converted to a Date at the end
-		amPm = "",
-		valid = array.every(match, function(v, i){
-		if(!i){return true;}
-		var token = tokens[i-1],
-			l = token.length,
-			c = token.charAt(0);
-		switch(c){
-			case 'y':
-				if(l != 2 && options.strict){
-					//interpret year literally, so '5' would be 5 A.D.
-					result[0] = v;
-				}else{
-					if(v<100){
-						v = Number(v);
-						//choose century to apply, according to a sliding window
-						//of 80 years before and 20 years after present year
-						var year = '' + new Date().getFullYear(),
-							century = year.substring(0, 2) * 100,
-							cutoff = Math.min(Number(year.substring(2, 4)) + 20, 99);
-						result[0] = (v < cutoff) ? century + v : century - 100 + v;
-					}else{
-						//we expected 2 digits and got more...
-						if(options.strict){
-							return false;
-						}
-						//interpret literally, so '150' would be 150 A.D.
-						//also tolerate '1950', if 'yyyy' input passed to 'yy' format
-						result[0] = v;
-					}
-				}
-				break;
-			case 'M':
-			case 'L':
-				if(l>2){
-					var months = bundle['months-' +
-							    (c == 'L' ? 'standAlone' : 'format') +
-							    '-' + widthList[l-3]].concat();
-					if(!options.strict){
-						//Tolerate abbreviating period in month part
-						//Case-insensitive comparison
-						v = v.replace(".","").toLowerCase();
-						months = array.map(months, function(s){ return s.replace(".","").toLowerCase(); } );
-					}
-					v = array.indexOf(months, v);
-					if(v == -1){
-//						0 && console.log("dojo/date/locale.parse: Could not parse month name: '" + v + "'.");
-						return false;
-					}
-				}else{
-					v--;
-				}
-				result[1] = v;
-				break;
-			case 'E':
-			case 'e':
-			case 'c':
-				var days = bundle['days-' +
-						  (c == 'c' ? 'standAlone' : 'format') +
-						  '-' + widthList[l-3]].concat();
-				if(!options.strict){
-					//Case-insensitive comparison
-					v = v.toLowerCase();
-					days = array.map(days, function(d){return d.toLowerCase();});
-				}
-				v = array.indexOf(days, v);
-				if(v == -1){
-//					0 && console.log("dojo/date/locale.parse: Could not parse weekday name: '" + v + "'.");
-					return false;
-				}
-
-				//TODO: not sure what to actually do with this input,
-				//in terms of setting something on the Date obj...?
-				//without more context, can't affect the actual date
-				//TODO: just validate?
-				break;
-			case 'D':
-				result[1] = 0;
-				// fallthrough...
-			case 'd':
-				result[2] = v;
-				break;
-			case 'a': //am/pm
-				var am = options.am || bundle['dayPeriods-format-wide-am'],
-					pm = options.pm || bundle['dayPeriods-format-wide-pm'];
-				if(!options.strict){
-					var period = /\./g;
-					v = v.replace(period,'').toLowerCase();
-					am = am.replace(period,'').toLowerCase();
-					pm = pm.replace(period,'').toLowerCase();
-				}
-				if(options.strict && v != am && v != pm){
-//					0 && console.log("dojo/date/locale.parse: Could not parse am/pm part.");
-					return false;
-				}
-
-				// we might not have seen the hours field yet, so store the state and apply hour change later
-				amPm = (v == pm) ? 'p' : (v == am) ? 'a' : '';
-				break;
-			case 'K': //hour (1-24)
-				if(v == 24){ v = 0; }
-				// fallthrough...
-			case 'h': //hour (1-12)
-			case 'H': //hour (0-23)
-			case 'k': //hour (0-11)
-				//TODO: strict bounds checking, padding
-				if(v > 23){
-//					0 && console.log("dojo/date/locale.parse: Illegal hours value");
-					return false;
-				}
-
-				//in the 12-hour case, adjusting for am/pm requires the 'a' part
-				//which could come before or after the hour, so we will adjust later
-				result[3] = v;
-				break;
-			case 'm': //minutes
-				result[4] = v;
-				break;
-			case 's': //seconds
-				result[5] = v;
-				break;
-			case 'S': //milliseconds
-				result[6] = v;
-//				break;
-//			case 'w':
-//TODO				var firstDay = 0;
-//			default:
-//TODO: throw?
-//				0 && console.log("dojo/date/locale.parse: unsupported pattern char=" + token.charAt(0));
-		}
-		return true;
-	});
-
-	var hours = +result[3];
-	if(amPm === 'p' && hours < 12){
-		result[3] = hours + 12; //e.g., 3pm -> 15
-	}else if(amPm === 'a' && hours == 12){
-		result[3] = 0; //12am -> 0
-	}
-
-	//TODO: implement a getWeekday() method in order to test
-	//validity of input strings containing 'EEE' or 'EEEE'...
-
-	var dateObject = new Date(result[0], result[1], result[2], result[3], result[4], result[5], result[6]); // Date
-	if(options.strict){
-		dateObject.setFullYear(result[0]);
-	}
-
-	// Check for overflow.  The Date() constructor normalizes things like April 32nd...
-	//TODO: why isn't this done for times as well?
-	var allTokens = tokens.join(""),
-		dateToken = allTokens.indexOf('d') != -1,
-		monthToken = allTokens.indexOf('M') != -1;
-
-	if(!valid ||
-		(monthToken && dateObject.getMonth() > result[1]) ||
-		(dateToken && dateObject.getDate() > result[2])){
-		return null;
-	}
-
-	// Check for underflow, due to DST shifts.  See #9366
-	// This assumes a 1 hour dst shift correction at midnight
-	// We could compare the timezone offset after the shift and add the difference instead.
-	if((monthToken && dateObject.getMonth() < result[1]) ||
-		(dateToken && dateObject.getDate() < result[2])){
-		dateObject = date.add(dateObject, "hour", 1);
-	}
-
-	return dateObject; // Date
-};
-
-function _processPattern(pattern, applyPattern, applyLiteral, applyAll){
-	//summary: Process a pattern with literals in it
-
-	// Break up on single quotes, treat every other one as a literal, except '' which becomes '
-	var identity = function(x){return x;};
-	applyPattern = applyPattern || identity;
-	applyLiteral = applyLiteral || identity;
-	applyAll = applyAll || identity;
-
-	//split on single quotes (which escape literals in date format strings)
-	//but preserve escaped single quotes (e.g., o''clock)
-	var chunks = pattern.match(/(''|[^'])+/g),
-		literal = pattern.charAt(0) == "'";
-
-	array.forEach(chunks, function(chunk, i){
-		if(!chunk){
-			chunks[i]='';
-		}else{
-			chunks[i]=(literal ? applyLiteral : applyPattern)(chunk.replace(/''/g, "'"));
-			literal = !literal;
-		}
-	});
-	return applyAll(chunks.join(''));
-}
-
-function _buildDateTimeRE(tokens, bundle, options, pattern){
-	pattern = regexp.escapeString(pattern);
-	if(!options.strict){ pattern = pattern.replace(" a", " ?a"); } // kludge to tolerate no space before am/pm
-	return pattern.replace(/([a-z])\1*/ig, function(match){
-		// Build a simple regexp.  Avoid captures, which would ruin the tokens list
-		var s,
-			c = match.charAt(0),
-			l = match.length,
-			p2 = '', p3 = '';
-		if(options.strict){
-			if(l > 1){ p2 = '0' + '{'+(l-1)+'}'; }
-			if(l > 2){ p3 = '0' + '{'+(l-2)+'}'; }
-		}else{
-			p2 = '0?'; p3 = '0{0,2}';
-		}
-		switch(c){
-			case 'y':
-				s = '\\d{2,4}';
-				break;
-			case 'M':
-			case 'L':
-				s = (l>2) ? '\\S+?' : '1[0-2]|'+p2+'[1-9]';
-				break;
-			case 'D':
-				s = '[12][0-9][0-9]|3[0-5][0-9]|36[0-6]|'+p2+'[1-9][0-9]|'+p3+'[1-9]';
-				break;
-			case 'd':
-				s = '3[01]|[12]\\d|'+p2+'[1-9]';
-				break;
-			case 'w':
-				s = '[1-4][0-9]|5[0-3]|'+p2+'[1-9]';
-				break;
-			case 'E':
-			case 'e':
-			case 'c':
-				s = '\\S+';
-				break;
-			case 'h': //hour (1-12)
-				s = '1[0-2]|'+p2+'[1-9]';
-				break;
-			case 'k': //hour (0-11)
-				s = '1[01]|'+p2+'\\d';
-				break;
-			case 'H': //hour (0-23)
-				s = '1\\d|2[0-3]|'+p2+'\\d';
-				break;
-			case 'K': //hour (1-24)
-				s = '1\\d|2[0-4]|'+p2+'[1-9]';
-				break;
-			case 'm':
-			case 's':
-				s = '[0-5]\\d';
-				break;
-			case 'S':
-				s = '\\d{'+l+'}';
-				break;
-			case 'a':
-				var am = options.am || bundle['dayPeriods-format-wide-am'],
-					pm = options.pm || bundle['dayPeriods-format-wide-pm'];
-					s = am + '|' + pm;
-				if(!options.strict){
-					if(am != am.toLowerCase()){ s += '|' + am.toLowerCase(); }
-					if(pm != pm.toLowerCase()){ s += '|' + pm.toLowerCase(); }
-					if(s.indexOf('.') != -1){ s += '|' + s.replace(/\./g, ""); }
-				}
-				s = s.replace(/\./g, "\\.");
-				break;
-			default:
-			// case 'v':
-			// case 'z':
-			// case 'Z':
-				s = ".*";
-//				0 && console.log("parse of date format, pattern=" + pattern);
-		}
-
-		if(tokens){ tokens.push(match); }
-
-		return "(" + s + ")"; // add capture
-	}).replace(/[\xa0 ]/g, "[\\s\\xa0]"); // normalize whitespace.  Need explicit handling of \xa0 for IE.
-}
-
-var _customFormats = [];
-exports.addCustomFormats = function(/*String*/ packageName, /*String*/ bundleName){
-	// summary:
-	//		Add a reference to a bundle containing localized custom formats to be
-	//		used by date/time formatting and parsing routines.
-	//
-	// description:
-	//		The user may add custom localized formats where the bundle has properties following the
-	//		same naming convention used by dojo.cldr: `dateFormat-xxxx` / `timeFormat-xxxx`
-	//		The pattern string should match the format used by the CLDR.
-	//		See dojo/date/locale.format() for details.
-	//		The resources must be loaded by dojo.requireLocalization() prior to use
-
-	_customFormats.push({pkg:packageName,name:bundleName});
-};
-
-exports._getGregorianBundle = function(/*String*/ locale){
-	var gregorian = {};
-	array.forEach(_customFormats, function(desc){
-		var bundle = i18n.getLocalization(desc.pkg, desc.name, locale);
-		gregorian = lang.mixin(gregorian, bundle);
-	}, this);
-	return gregorian; /*Object*/
-};
-
-exports.addCustomFormats(module.id.replace(/\/date\/locale$/, ".cldr"),"gregorian");
-
-exports.getNames = function(/*String*/ item, /*String*/ type, /*String?*/ context, /*String?*/ locale){
-	// summary:
-	//		Used to get localized strings from dojo.cldr for day or month names.
-	//
-	// item:
-	//	'months' || 'days'
-	// type:
-	//	'wide' || 'abbr' || 'narrow' (e.g. "Monday", "Mon", or "M" respectively, in English)
-	// context:
-	//	'standAlone' || 'format' (default)
-	// locale:
-	//	override locale used to find the names
-
-	var label,
-		lookup = exports._getGregorianBundle(locale),
-		props = [item, context, type];
-	if(context == 'standAlone'){
-		var key = props.join('-');
-		label = lookup[key];
-		// Fall back to 'format' flavor of name
-		if(label[0] == 1){ label = undefined; } // kludge, in the absence of real aliasing support in dojo.cldr
-	}
-	props[1] = 'format';
-
-	// return by copy so changes won't be made accidentally to the in-memory model
-	return (label || lookup[props.join('-')]).concat(); /*Array*/
-};
-
-exports.isWeekend = function(/*Date?*/ dateObject, /*String?*/ locale){
-	// summary:
-	//	Determines if the date falls on a weekend, according to local custom.
-
-	var weekend = supplemental.getWeekend(locale),
-		day = (dateObject || new Date()).getDay();
-	if(weekend.end < weekend.start){
-		weekend.end += 7;
-		if(day < weekend.start){ day += 7; }
-	}
-	return day >= weekend.start && day <= weekend.end; // Boolean
-};
-
-// These are used only by format and strftime.  Do they need to be public?  Which module should they go in?
-
-exports._getDayOfYear = function(/*Date*/ dateObject){
-	// summary:
-	//		gets the day of the year as represented by dateObject
-	return date.difference(new Date(dateObject.getFullYear(), 0, 1, dateObject.getHours()), dateObject) + 1; // Number
-};
-
-exports._getWeekOfYear = function(/*Date*/ dateObject, /*Number*/ firstDayOfWeek){
-	if(arguments.length == 1){ firstDayOfWeek = 0; } // Sunday
-
-	var firstDayOfYear = new Date(dateObject.getFullYear(), 0, 1).getDay(),
-		adj = (firstDayOfYear - firstDayOfWeek + 7) % 7,
-		week = Math.floor((exports._getDayOfYear(dateObject) + adj - 1) / 7);
-
-	// if year starts on the specified day, start counting weeks at 1
-	if(firstDayOfYear == firstDayOfWeek){ week++; }
-
-	return week; // Number
-};
-
-return exports;
+	return watch;
 });
 
+},
+'dojo/request/util':function(){
+define([
+	'exports',
+	'../errors/RequestError',
+	'../errors/CancelError',
+	'../Deferred',
+	'../io-query',
+	'../_base/array',
+	'../_base/lang'
+], function(exports, RequestError, CancelError, Deferred, ioQuery, array, lang){
+	exports.deepCopy = function deepCopy(target, source){
+		for(var name in source){
+			var tval = target[name],
+				sval = source[name];
+			if(tval !== sval){
+				if(tval && typeof tval === 'object' && sval && typeof sval === 'object'){
+					exports.deepCopy(tval, sval);
+				}else{
+					target[name] = sval;
+				}
+			}
+		}
+		return target;
+	};
+
+	exports.deepCreate = function deepCreate(source, properties){
+		properties = properties || {};
+		var target = lang.delegate(source),
+			name, value;
+
+		for(name in source){
+			value = source[name];
+
+			if(value && typeof value === 'object'){
+				target[name] = exports.deepCreate(value, properties[name]);
+			}
+		}
+		return exports.deepCopy(target, properties);
+	};
+
+	var freeze = Object.freeze || function(obj){ return obj; };
+	function okHandler(response){
+		return freeze(response);
+	}
+
+	exports.deferred = function deferred(response, cancel, isValid, isReady, handleResponse, last){
+		var def = new Deferred(function(reason){
+			cancel && cancel(def, response);
+
+			if(!reason || !(reason instanceof RequestError) && !(reason instanceof CancelError)){
+				return new CancelError('Request canceled', response);
+			}
+			return reason;
+		});
+
+		def.response = response;
+		def.isValid = isValid;
+		def.isReady = isReady;
+		def.handleResponse = handleResponse;
+
+		function errHandler(error){
+			error.response = response;
+			throw error;
+		}
+		var responsePromise = def.then(okHandler).otherwise(errHandler);
+
+		if(exports.notify){
+			responsePromise.then(
+				lang.hitch(exports.notify, 'emit', 'load'),
+				lang.hitch(exports.notify, 'emit', 'error')
+			);
+		}
+
+		var dataPromise = responsePromise.then(function(response){
+				return response.data || response.text;
+			});
+
+		var promise = freeze(lang.delegate(dataPromise, {
+			response: responsePromise
+		}));
+
+
+		if(last){
+			def.then(function(response){
+				last.call(def, response);
+			}, function(error){
+				last.call(def, response, error);
+			});
+		}
+
+		def.promise = promise;
+		def.then = promise.then;
+
+		return def;
+	};
+
+	exports.addCommonMethods = function addCommonMethods(provider, methods){
+		array.forEach(methods||['GET', 'POST', 'PUT', 'DELETE'], function(method){
+			provider[(method === 'DELETE' ? 'DEL' : method).toLowerCase()] = function(url, options){
+				options = lang.delegate(options||{});
+				options.method = method;
+				return provider(url, options);
+			};
+		});
+	};
+
+	exports.parseArgs = function parseArgs(url, options, skipData){
+		var data = options.data,
+			query = options.query;
+		
+		if(data && !skipData){
+			if(typeof data === 'object'){
+				options.data = ioQuery.objectToQuery(data);
+			}
+		}
+
+		if(query){
+			if(typeof query === 'object'){
+				query = ioQuery.objectToQuery(query);
+			}
+			if(options.preventCache){
+				query += (query ? '&' : '') + 'request.preventCache=' + (+(new Date));
+			}
+		}else if(options.preventCache){
+			query = 'request.preventCache=' + (+(new Date));
+		}
+
+		if(url && query){
+			url += (~url.indexOf('?') ? '&' : '?') + query;
+		}
+
+		return {
+			url: url,
+			options: options,
+			getHeader: function(headerName){ return null; }
+		};
+	};
+
+	exports.checkStatus = function(stat){
+		stat = stat || 0;
+		return (stat >= 200 && stat < 300) || // allow any 2XX response code
+			stat === 304 ||                 // or, get it out of the cache
+			stat === 1223 ||                // or, Internet Explorer mangled the status code
+			!stat;                         // or, we're Titanium/browser chrome/chrome extension requesting a local file
+	};
+});
+
+},
+'dojo/errors/RequestError':function(){
+define(['./create'], function(create){
+	// module:
+	//		dojo/errors/RequestError
+
+	/*=====
+	 return function(){
+		 // summary:
+		 //		TODOC
+	 };
+	 =====*/
+
+	return create("RequestError", function(message, response){
+		this.response = response;
+	});
+});
+
+},
+'dojo/errors/create':function(){
+define(["../_base/lang"], function(lang){
+	return function(name, ctor, base, props){
+		base = base || Error;
+
+		var ErrorCtor = function(message){
+			if(base === Error){
+				if(Error.captureStackTrace){
+					Error.captureStackTrace(this, ErrorCtor);
+				}
+
+				// Error.call() operates on the returned error
+				// object rather than operating on |this|
+				var err = Error.call(this, message),
+					prop;
+
+				// Copy own properties from err to |this|
+				for(prop in err){
+					if(err.hasOwnProperty(prop)){
+						this[prop] = err[prop];
+					}
+				}
+
+				// messsage is non-enumerable in ES5
+				this.message = message;
+				// stack is non-enumerable in at least Firefox
+				this.stack = err.stack;
+			}else{
+				base.apply(this, arguments);
+			}
+			if(ctor){
+				ctor.apply(this, arguments);
+			}
+		};
+
+		ErrorCtor.prototype = lang.delegate(base.prototype, props);
+		ErrorCtor.prototype.name = name;
+		ErrorCtor.prototype.constructor = ErrorCtor;
+
+		return ErrorCtor;
+	};
+});
+
+},
+'dojo/errors/CancelError':function(){
+define(["./create"], function(create){
+	// module:
+	//		dojo/errors/CancelError
+
+	/*=====
+	return function(){
+		// summary:
+		//		Default error if a promise is canceled without a reason.
+	};
+	=====*/
+
+	return create("CancelError", null, null, { dojoType: "cancel" });
+});
+
+},
+'dojo/Deferred':function(){
+define("dojo/Deferred", [
+	"./has",
+	"./_base/lang",
+	"./errors/CancelError",
+	"./promise/Promise",
+	"require"
+], function(has, lang, CancelError, Promise, instrumentation){
+	"use strict";
+
+	// module:
+	//		dojo/Deferred
+
+	var PROGRESS = 0,
+			RESOLVED = 1,
+			REJECTED = 2;
+	var FULFILLED_ERROR_MESSAGE = "This deferred has already been fulfilled.";
+
+	var freezeObject = Object.freeze || function(){};
+
+	var signalWaiting = function(waiting, type, result, rejection, deferred){
+		if( 0 ){
+			if(type === REJECTED && Deferred.instrumentRejected && waiting.length === 0){
+				Deferred.instrumentRejected(result, false, rejection, deferred);
+			}
+		}
+
+		for(var i = 0; i < waiting.length; i++){
+			signalListener(waiting[i], type, result, rejection);
+		}
+	};
+
+	var signalListener = function(listener, type, result, rejection){
+		var func = listener[type];
+		var deferred = listener.deferred;
+		if(func){
+			try{
+				var newResult = func(result);
+				if(type === PROGRESS){
+					if(typeof newResult !== "undefined"){
+						signalDeferred(deferred, type, newResult);
+					}
+				}else{
+					if(newResult && typeof newResult.then === "function"){
+						listener.cancel = newResult.cancel;
+						newResult.then(
+								// Only make resolvers if they're actually going to be used
+								makeDeferredSignaler(deferred, RESOLVED),
+								makeDeferredSignaler(deferred, REJECTED),
+								makeDeferredSignaler(deferred, PROGRESS));
+						return;
+					}
+					signalDeferred(deferred, RESOLVED, newResult);
+				}
+			}catch(error){
+				signalDeferred(deferred, REJECTED, error);
+			}
+		}else{
+			signalDeferred(deferred, type, result);
+		}
+
+		if( 0 ){
+			if(type === REJECTED && Deferred.instrumentRejected){
+				Deferred.instrumentRejected(result, !!func, rejection, deferred.promise);
+			}
+		}
+	};
+
+	var makeDeferredSignaler = function(deferred, type){
+		return function(value){
+			signalDeferred(deferred, type, value);
+		};
+	};
+
+	var signalDeferred = function(deferred, type, result){
+		if(!deferred.isCanceled()){
+			switch(type){
+				case PROGRESS:
+					deferred.progress(result);
+					break;
+				case RESOLVED:
+					deferred.resolve(result);
+					break;
+				case REJECTED:
+					deferred.reject(result);
+					break;
+			}
+		}
+	};
+
+	var Deferred = function(canceler){
+		// summary:
+		//		Creates a new deferred. This API is preferred over
+		//		`dojo/_base/Deferred`.
+		// description:
+		//		Creates a new deferred, as an abstraction over (primarily)
+		//		asynchronous operations. The deferred is the private interface
+		//		that should not be returned to calling code. That's what the
+		//		`promise` is for. See `dojo/promise/Promise`.
+		// canceler: Function?
+		//		Will be invoked if the deferred is canceled. The canceler
+		//		receives the reason the deferred was canceled as its argument.
+		//		The deferred is rejected with its return value, or a new
+		//		`dojo/errors/CancelError` instance.
+
+		// promise: dojo/promise/Promise
+		//		The public promise object that clients can add callbacks to. 
+		var promise = this.promise = new Promise();
+
+		var deferred = this;
+		var fulfilled, result, rejection;
+		var canceled = false;
+		var waiting = [];
+
+		if( 0  && Error.captureStackTrace){
+			Error.captureStackTrace(deferred, Deferred);
+			Error.captureStackTrace(promise, Deferred);
+		}
+
+		this.isResolved = promise.isResolved = function(){
+			// summary:
+			//		Checks whether the deferred has been resolved.
+			// returns: Boolean
+
+			return fulfilled === RESOLVED;
+		};
+
+		this.isRejected = promise.isRejected = function(){
+			// summary:
+			//		Checks whether the deferred has been rejected.
+			// returns: Boolean
+
+			return fulfilled === REJECTED;
+		};
+
+		this.isFulfilled = promise.isFulfilled = function(){
+			// summary:
+			//		Checks whether the deferred has been resolved or rejected.
+			// returns: Boolean
+
+			return !!fulfilled;
+		};
+
+		this.isCanceled = promise.isCanceled = function(){
+			// summary:
+			//		Checks whether the deferred has been canceled.
+			// returns: Boolean
+
+			return canceled;
+		};
+
+		this.progress = function(update, strict){
+			// summary:
+			//		Emit a progress update on the deferred.
+			// description:
+			//		Emit a progress update on the deferred. Progress updates
+			//		can be used to communicate updates about the asynchronous
+			//		operation before it has finished.
+			// update: any
+			//		The progress update. Passed to progbacks.
+			// strict: Boolean?
+			//		If strict, will throw an error if the deferred has already
+			//		been fulfilled and consequently no progress can be emitted.
+			// returns: dojo/promise/Promise
+			//		Returns the original promise for the deferred.
+
+			if(!fulfilled){
+				signalWaiting(waiting, PROGRESS, update, null, deferred);
+				return promise;
+			}else if(strict === true){
+				throw new Error(FULFILLED_ERROR_MESSAGE);
+			}else{
+				return promise;
+			}
+		};
+
+		this.resolve = function(value, strict){
+			// summary:
+			//		Resolve the deferred.
+			// description:
+			//		Resolve the deferred, putting it in a success state.
+			// value: any
+			//		The result of the deferred. Passed to callbacks.
+			// strict: Boolean?
+			//		If strict, will throw an error if the deferred has already
+			//		been fulfilled and consequently cannot be resolved.
+			// returns: dojo/promise/Promise
+			//		Returns the original promise for the deferred.
+
+			if(!fulfilled){
+				// Set fulfilled, store value. After signaling waiting listeners unset
+				// waiting.
+				signalWaiting(waiting, fulfilled = RESOLVED, result = value, null, deferred);
+				waiting = null;
+				return promise;
+			}else if(strict === true){
+				throw new Error(FULFILLED_ERROR_MESSAGE);
+			}else{
+				return promise;
+			}
+		};
+
+		var reject = this.reject = function(error, strict){
+			// summary:
+			//		Reject the deferred.
+			// description:
+			//		Reject the deferred, putting it in an error state.
+			// error: any
+			//		The error result of the deferred. Passed to errbacks.
+			// strict: Boolean?
+			//		If strict, will throw an error if the deferred has already
+			//		been fulfilled and consequently cannot be rejected.
+			// returns: dojo/promise/Promise
+			//		Returns the original promise for the deferred.
+
+			if(!fulfilled){
+				if( 0  && Error.captureStackTrace){
+					Error.captureStackTrace(rejection = {}, reject);
+				}
+				signalWaiting(waiting, fulfilled = REJECTED, result = error, rejection, deferred);
+				waiting = null;
+				return promise;
+			}else if(strict === true){
+				throw new Error(FULFILLED_ERROR_MESSAGE);
+			}else{
+				return promise;
+			}
+		};
+
+		this.then = promise.then = function(callback, errback, progback){
+			// summary:
+			//		Add new callbacks to the deferred.
+			// description:
+			//		Add new callbacks to the deferred. Callbacks can be added
+			//		before or after the deferred is fulfilled.
+			// callback: Function?
+			//		Callback to be invoked when the promise is resolved.
+			//		Receives the resolution value.
+			// errback: Function?
+			//		Callback to be invoked when the promise is rejected.
+			//		Receives the rejection error.
+			// progback: Function?
+			//		Callback to be invoked when the promise emits a progress
+			//		update. Receives the progress update.
+			// returns: dojo/promise/Promise
+			//		Returns a new promise for the result of the callback(s).
+			//		This can be used for chaining many asynchronous operations.
+
+			var listener = [progback, callback, errback];
+			// Ensure we cancel the promise we're waiting for, or if callback/errback
+			// have returned a promise, cancel that one.
+			listener.cancel = promise.cancel;
+			listener.deferred = new Deferred(function(reason){
+				// Check whether cancel is really available, returned promises are not
+				// required to expose `cancel`
+				return listener.cancel && listener.cancel(reason);
+			});
+			if(fulfilled && !waiting){
+				signalListener(listener, fulfilled, result, rejection);
+			}else{
+				waiting.push(listener);
+			}
+			return listener.deferred.promise;
+		};
+
+		this.cancel = promise.cancel = function(reason, strict){
+			// summary:
+			//		Inform the deferred it may cancel its asynchronous operation.
+			// description:
+			//		Inform the deferred it may cancel its asynchronous operation.
+			//		The deferred's (optional) canceler is invoked and the
+			//		deferred will be left in a rejected state. Can affect other
+			//		promises that originate with the same deferred.
+			// reason: any
+			//		A message that may be sent to the deferred's canceler,
+			//		explaining why it's being canceled.
+			// strict: Boolean?
+			//		If strict, will throw an error if the deferred has already
+			//		been fulfilled and consequently cannot be canceled.
+			// returns: any
+			//		Returns the rejection reason if the deferred was canceled
+			//		normally.
+
+			if(!fulfilled){
+				// Cancel can be called even after the deferred is fulfilled
+				if(canceler){
+					var returnedReason = canceler(reason);
+					reason = typeof returnedReason === "undefined" ? reason : returnedReason;
+				}
+				canceled = true;
+				if(!fulfilled){
+					// Allow canceler to provide its own reason, but fall back to a CancelError
+					if(typeof reason === "undefined"){
+						reason = new CancelError();
+					}
+					reject(reason);
+					return reason;
+				}else if(fulfilled === REJECTED && result === reason){
+					return reason;
+				}
+			}else if(strict === true){
+				throw new Error(FULFILLED_ERROR_MESSAGE);
+			}
+		};
+
+		freezeObject(promise);
+	};
+
+	Deferred.prototype.toString = function(){
+		// returns: String
+		//		Returns `[object Deferred]`.
+
+		return "[object Deferred]";
+	};
+
+	if(instrumentation){
+		instrumentation(Deferred);
+	}
+
+	return Deferred;
+});
+
+},
+'dojo/promise/Promise':function(){
+define([
+	"../_base/lang"
+], function(lang){
+	"use strict";
+
+	// module:
+	//		dojo/promise/Promise
+
+	function throwAbstract(){
+		throw new TypeError("abstract");
+	}
+
+	return lang.extend(function Promise(){
+		// summary:
+		//		The public interface to a deferred.
+		// description:
+		//		The public interface to a deferred. All promises in Dojo are
+		//		instances of this class.
+	}, {
+		then: function(callback, errback, progback){
+			// summary:
+			//		Add new callbacks to the promise.
+			// description:
+			//		Add new callbacks to the deferred. Callbacks can be added
+			//		before or after the deferred is fulfilled.
+			// callback: Function?
+			//		Callback to be invoked when the promise is resolved.
+			//		Receives the resolution value.
+			// errback: Function?
+			//		Callback to be invoked when the promise is rejected.
+			//		Receives the rejection error.
+			// progback: Function?
+			//		Callback to be invoked when the promise emits a progress
+			//		update. Receives the progress update.
+			// returns: dojo/promise/Promise
+			//		Returns a new promise for the result of the callback(s).
+			//		This can be used for chaining many asynchronous operations.
+
+			throwAbstract();
+		},
+
+		cancel: function(reason, strict){
+			// summary:
+			//		Inform the deferred it may cancel its asynchronous operation.
+			// description:
+			//		Inform the deferred it may cancel its asynchronous operation.
+			//		The deferred's (optional) canceler is invoked and the
+			//		deferred will be left in a rejected state. Can affect other
+			//		promises that originate with the same deferred.
+			// reason: any
+			//		A message that may be sent to the deferred's canceler,
+			//		explaining why it's being canceled.
+			// strict: Boolean?
+			//		If strict, will throw an error if the deferred has already
+			//		been fulfilled and consequently cannot be canceled.
+			// returns: any
+			//		Returns the rejection reason if the deferred was canceled
+			//		normally.
+
+			throwAbstract();
+		},
+
+		isResolved: function(){
+			// summary:
+			//		Checks whether the promise has been resolved.
+			// returns: Boolean
+
+			throwAbstract();
+		},
+
+		isRejected: function(){
+			// summary:
+			//		Checks whether the promise has been rejected.
+			// returns: Boolean
+
+			throwAbstract();
+		},
+
+		isFulfilled: function(){
+			// summary:
+			//		Checks whether the promise has been resolved or rejected.
+			// returns: Boolean
+
+			throwAbstract();
+		},
+
+		isCanceled: function(){
+			// summary:
+			//		Checks whether the promise has been canceled.
+			// returns: Boolean
+
+			throwAbstract();
+		},
+
+		always: function(callbackOrErrback){
+			// summary:
+			//		Add a callback to be invoked when the promise is resolved
+			//		or rejected.
+			// callbackOrErrback: Function?
+			//		A function that is used both as a callback and errback.
+			// returns: dojo/promise/Promise
+			//		Returns a new promise for the result of the callback/errback.
+
+			return this.then(callbackOrErrback, callbackOrErrback);
+		},
+
+		otherwise: function(errback){
+			// summary:
+			//		Add new errbacks to the promise.
+			// errback: Function?
+			//		Callback to be invoked when the promise is rejected.
+			// returns: dojo/promise/Promise
+			//		Returns a new promise for the result of the errback.
+
+			return this.then(null, errback);
+		},
+
+		trace: function(){
+			return this;
+		},
+
+		traceRejected: function(){
+			return this;
+		},
+
+		toString: function(){
+			// returns: string
+			//		Returns `[object Promise]`.
+
+			return "[object Promise]";
+		}
+	});
+});
+
+},
+'dojo/io-query':function(){
+define(["./_base/lang"], function(lang){
+
+// module:
+//		dojo/io-query
+
+var backstop = {};
+
+return {
+// summary:
+//		This module defines query string processing functions.
+
+	objectToQuery: function objectToQuery(/*Object*/ map){
+		// summary:
+        //		takes a name/value mapping object and returns a string representing
+        //		a URL-encoded version of that object.
+        // example:
+        //		this object:
+        //
+        //	|	{
+        //	|		blah: "blah",
+        //	|		multi: [
+        //	|			"thud",
+        //	|			"thonk"
+        //	|		]
+        //	|	};
+        //
+        //		yields the following query string:
+        //
+        //	|	"blah=blah&multi=thud&multi=thonk"
+
+        // FIXME: need to implement encodeAscii!!
+        var enc = encodeURIComponent, pairs = [];
+        for(var name in map){
+            var value = map[name];
+            if(value != backstop[name]){
+                var assign = enc(name) + "=";
+                if(lang.isArray(value)){
+                    for(var i = 0, l = value.length; i < l; ++i){
+                        pairs.push(assign + enc(value[i]));
+                    }
+                }else{
+                    pairs.push(assign + enc(value));
+                }
+            }
+        }
+        return pairs.join("&"); // String
+    },
+
+	queryToObject: function queryToObject(/*String*/ str){
+        // summary:
+        //		Create an object representing a de-serialized query section of a
+        //		URL. Query keys with multiple values are returned in an array.
+        //
+        // example:
+        //		This string:
+        //
+        //	|		"foo=bar&foo=baz&thinger=%20spaces%20=blah&zonk=blarg&"
+        //
+        //		results in this object structure:
+        //
+        //	|		{
+        //	|			foo: [ "bar", "baz" ],
+        //	|			thinger: " spaces =blah",
+        //	|			zonk: "blarg"
+        //	|		}
+        //
+        //		Note that spaces and other urlencoded entities are correctly
+        //		handled.
+
+        // FIXME: should we grab the URL string if we're not passed one?
+        var dec = decodeURIComponent, qp = str.split("&"), ret = {}, name, val;
+        for(var i = 0, l = qp.length, item; i < l; ++i){
+            item = qp[i];
+            if(item.length){
+                var s = item.indexOf("=");
+                if(s < 0){
+                    name = dec(item);
+                    val = "";
+                }else{
+                    name = dec(item.slice(0, s));
+                    val  = dec(item.slice(s + 1));
+                }
+                if(typeof ret[name] == "string"){ // inline'd type check
+                    ret[name] = [ret[name]];
+                }
+
+                if(lang.isArray(ret[name])){
+                    ret[name].push(val);
+                }else{
+                    ret[name] = val;
+                }
+            }
+        }
+        return ret; // Object
+    }
+};
+});
 },
 'dojo/_base/array':function(){
 define(["./kernel", "../has", "./lang"], function(dojo, has, lang){
@@ -9840,2929 +9878,21 @@ define(["./kernel", "../has", "./lang"], function(dojo, has, lang){
 });
 
 },
-'dojo/cldr/supplemental':function(){
-define(["../_base/lang", "../i18n"], function(lang, i18n){
-
-// module:
-//		dojo/cldr/supplemental
-
-
-var supplemental = {
-	// summary:
-	//		TODOC
-};
-lang.setObject("dojo.cldr.supplemental", supplemental);
-
-supplemental.getFirstDayOfWeek = function(/*String?*/locale){
-	// summary:
-	//		Returns a zero-based index for first day of the week
-	// description:
-	//		Returns a zero-based index for first day of the week, as used by the local (Gregorian) calendar.
-	//		e.g. Sunday (returns 0), or Monday (returns 1)
-
-	// from http://www.unicode.org/cldr/data/common/supplemental/supplementalData.xml:supplementalData/weekData/firstDay
-	var firstDay = {/*default is 1=Monday*/
-		bd:5,mv:5,
-		ae:6,af:6,bh:6,dj:6,dz:6,eg:6,iq:6,ir:6,jo:6,kw:6,
-		ly:6,ma:6,om:6,qa:6,sa:6,sd:6,sy:6,ye:6,
-		ag:0,ar:0,as:0,au:0,br:0,bs:0,bt:0,bw:0,by:0,bz:0,ca:0,cn:0,
-		co:0,dm:0,'do':0,et:0,gt:0,gu:0,hk:0,hn:0,id:0,ie:0,il:0,'in':0,
-		jm:0,jp:0,ke:0,kh:0,kr:0,la:0,mh:0,mm:0,mo:0,mt:0,mx:0,mz:0,
-		ni:0,np:0,nz:0,pa:0,pe:0,ph:0,pk:0,pr:0,py:0,sg:0,sv:0,th:0,
-		tn:0,tt:0,tw:0,um:0,us:0,ve:0,vi:0,ws:0,za:0,zw:0
-	};
-
-	var country = supplemental._region(locale);
-	var dow = firstDay[country];
-	return (dow === undefined) ? 1 : dow; /*Number*/
-};
-
-supplemental._region = function(/*String?*/locale){
-	locale = i18n.normalizeLocale(locale);
-	var tags = locale.split('-');
-	var region = tags[1];
-	if(!region){
-		// IE often gives language only (#2269)
-		// Arbitrary mappings of language-only locales to a country:
-		region = {de:"de", en:"us", es:"es", fi:"fi", fr:"fr", he:"il", hu:"hu", it:"it",
-			ja:"jp", ko:"kr", nl:"nl", pt:"br", sv:"se", zh:"cn"}[tags[0]];
-	}else if(region.length == 4){
-		// The ISO 3166 country code is usually in the second position, unless a
-		// 4-letter script is given. See http://www.ietf.org/rfc/rfc4646.txt
-		region = tags[2];
-	}
-	return region;
-};
-
-supplemental.getWeekend = function(/*String?*/locale){
-	// summary:
-	//		Returns a hash containing the start and end days of the weekend
-	// description:
-	//		Returns a hash containing the start and end days of the weekend according to local custom using locale,
-	//		or by default in the user's locale.
-	//		e.g. {start:6, end:0}
-
-	// from http://www.unicode.org/cldr/data/common/supplemental/supplementalData.xml:supplementalData/weekData/weekend{Start,End}
-	var weekendStart = {/*default is 6=Saturday*/
-			'in':0,
-			af:4,dz:4,ir:4,om:4,sa:4,ye:4,
-			ae:5,bh:5,eg:5,il:5,iq:5,jo:5,kw:5,ly:5,ma:5,qa:5,sd:5,sy:5,tn:5
-		},
-
-		weekendEnd = {/*default is 0=Sunday*/
-			af:5,dz:5,ir:5,om:5,sa:5,ye:5,
-			ae:6,bh:5,eg:6,il:6,iq:6,jo:6,kw:6,ly:6,ma:6,qa:6,sd:6,sy:6,tn:6
-		},
-
-		country = supplemental._region(locale),
-		start = weekendStart[country],
-		end = weekendEnd[country];
-
-	if(start === undefined){start=6;}
-	if(end === undefined){end=0;}
-	return {start:start, end:end}; /*Object {start,end}*/
-};
-
-return supplemental;
-});
-
-},
-'dojo/i18n':function(){
-define(["./_base/kernel", "require", "./has", "./_base/array", "./_base/config", "./_base/lang", "./_base/xhr", "./json", "module"],
-	function(dojo, require, has, array, config, lang, xhr, json, module){
-
+'dojo/errors/RequestTimeoutError':function(){
+define(['./create', './RequestError'], function(create, RequestError){
 	// module:
-	//		dojo/i18n
-
-	has.add("dojo-preload-i18n-Api",
-		// if true, define the preload localizations machinery
-		1
-	);
-
-	 1 || has.add("dojo-v1x-i18n-Api",
-		// if true, define the v1.x i18n functions
-		1
-	);
-
-	var
-		thisModule = dojo.i18n =
-			{
-				// summary:
-				//		This module implements the dojo/i18n! plugin and the v1.6- i18n API
-				// description:
-				//		We choose to include our own plugin to leverage functionality already contained in dojo
-				//		and thereby reduce the size of the plugin compared to various loader implementations. Also, this
-				//		allows foreign AMD loaders to be used without their plugins.
-			},
-
-		nlsRe =
-			// regexp for reconstructing the master bundle name from parts of the regexp match
-			// nlsRe.exec("foo/bar/baz/nls/en-ca/foo") gives:
-			// ["foo/bar/baz/nls/en-ca/foo", "foo/bar/baz/nls/", "/", "/", "en-ca", "foo"]
-			// nlsRe.exec("foo/bar/baz/nls/foo") gives:
-			// ["foo/bar/baz/nls/foo", "foo/bar/baz/nls/", "/", "/", "foo", ""]
-			// so, if match[5] is blank, it means this is the top bundle definition.
-			// courtesy of http://requirejs.org
-			/(^.*(^|\/)nls)(\/|$)([^\/]*)\/?([^\/]*)/,
-
-		getAvailableLocales = function(
-			root,
-			locale,
-			bundlePath,
-			bundleName
-		){
-			// summary:
-			//		return a vector of module ids containing all available locales with respect to the target locale
-			//		For example, assuming:
-			//
-			//		- the root bundle indicates specific bundles for "fr" and "fr-ca",
-			//		-  bundlePath is "myPackage/nls"
-			//		- bundleName is "myBundle"
-			//
-			//		Then a locale argument of "fr-ca" would return
-			//
-			//			["myPackage/nls/myBundle", "myPackage/nls/fr/myBundle", "myPackage/nls/fr-ca/myBundle"]
-			//
-			//		Notice that bundles are returned least-specific to most-specific, starting with the root.
-			//
-			//		If root===false indicates we're working with a pre-AMD i18n bundle that doesn't tell about the available locales;
-			//		therefore, assume everything is available and get 404 errors that indicate a particular localization is not available
-
-			for(var result = [bundlePath + bundleName], localeParts = locale.split("-"), current = "", i = 0; i<localeParts.length; i++){
-				current += (current ? "-" : "") + localeParts[i];
-				if(!root || root[current]){
-					result.push(bundlePath + current + "/" + bundleName);
-				}
-			}
-			return result;
-		},
-
-		cache = {},
-
-		getBundleName = function(moduleName, bundleName, locale){
-			locale = locale ? locale.toLowerCase() : dojo.locale;
-			moduleName = moduleName.replace(/\./g, "/");
-			bundleName = bundleName.replace(/\./g, "/");
-			return (/root/i.test(locale)) ?
-				(moduleName + "/nls/" + bundleName) :
-				(moduleName + "/nls/" + locale + "/" + bundleName);
-		},
-
-		getL10nName = dojo.getL10nName = function(moduleName, bundleName, locale){
-			return moduleName = module.id + "!" + getBundleName(moduleName, bundleName, locale);
-		},
-
-		doLoad = function(require, bundlePathAndName, bundlePath, bundleName, locale, load){
-			// summary:
-			//		get the root bundle which instructs which other bundles are required to construct the localized bundle
-			require([bundlePathAndName], function(root){
-				var current = lang.clone(root.root),
-					availableLocales = getAvailableLocales(!root._v1x && root, locale, bundlePath, bundleName);
-				require(availableLocales, function(){
-					for (var i = 1; i<availableLocales.length; i++){
-						current = lang.mixin(lang.clone(current), arguments[i]);
-					}
-					// target may not have been resolve (e.g., maybe only "fr" exists when "fr-ca" was requested)
-					var target = bundlePathAndName + "/" + locale;
-					cache[target] = current;
-					load();
-				});
-			});
-		},
-
-		normalize = function(id, toAbsMid){
-			// summary:
-			//		id may be relative.
-			//		preload has form `*preload*<path>/nls/<module>*<flattened locales>` and
-			//		therefore never looks like a relative
-			return /^\./.test(id) ? toAbsMid(id) : id;
-		},
-
-		getLocalesToLoad = function(targetLocale){
-			var list = config.extraLocale || [];
-			list = lang.isArray(list) ? list : [list];
-			list.push(targetLocale);
-			return list;
-		},
-
-		load = function(id, require, load){
-			// summary:
-			//		id is in one of the following formats
-			//
-			//		1. <path>/nls/<bundle>
-			//			=> load the bundle, localized to config.locale; load all bundles localized to
-			//			config.extraLocale (if any); return the loaded bundle localized to config.locale.
-			//
-			//		2. <path>/nls/<locale>/<bundle>
-			//			=> load then return the bundle localized to <locale>
-			//
-			//		3. *preload*<path>/nls/<module>*<JSON array of available locales>
-			//			=> for config.locale and all config.extraLocale, load all bundles found
-			//			in the best-matching bundle rollup. A value of 1 is returned, which
-			//			is meaningless other than to say the plugin is executing the requested
-			//			preloads
-			//
-			//		In cases 1 and 2, <path> is always normalized to an absolute module id upon entry; see
-			//		normalize. In case 3, it <path> is assumed to be absolute; this is arranged by the builder.
-			//
-			//		To load a bundle means to insert the bundle into the plugin's cache and publish the bundle
-			//		value to the loader. Given <path>, <bundle>, and a particular <locale>, the cache key
-			//
-			//			<path>/nls/<bundle>/<locale>
-			//
-			//		will hold the value. Similarly, then plugin will publish this value to the loader by
-			//
-			//			define("<path>/nls/<bundle>/<locale>", <bundle-value>);
-			//
-			//		Given this algorithm, other machinery can provide fast load paths be preplacing
-			//		values in the plugin's cache, which is public. When a load is demanded the
-			//		cache is inspected before starting any loading. Explicitly placing values in the plugin
-			//		cache is an advanced/experimental feature that should not be needed; use at your own risk.
-			//
-			//		For the normal AMD algorithm, the root bundle is loaded first, which instructs the
-			//		plugin what additional localized bundles are required for a particular locale. These
-			//		additional locales are loaded and a mix of the root and each progressively-specific
-			//		locale is returned. For example:
-			//
-			//		1. The client demands "dojo/i18n!some/path/nls/someBundle
-			//
-			//		2. The loader demands load(some/path/nls/someBundle)
-			//
-			//		3. This plugin require's "some/path/nls/someBundle", which is the root bundle.
-			//
-			//		4. Assuming config.locale is "ab-cd-ef" and the root bundle indicates that localizations
-			//		are available for "ab" and "ab-cd-ef" (note the missing "ab-cd", then the plugin
-			//		requires "some/path/nls/ab/someBundle" and "some/path/nls/ab-cd-ef/someBundle"
-			//
-			//		5. Upon receiving all required bundles, the plugin constructs the value of the bundle
-			//		ab-cd-ef as...
-			//
-			//				mixin(mixin(mixin({}, require("some/path/nls/someBundle"),
-			//		  			require("some/path/nls/ab/someBundle")),
-			//					require("some/path/nls/ab-cd-ef/someBundle"));
-			//
-			//		This value is inserted into the cache and published to the loader at the
-			//		key/module-id some/path/nls/someBundle/ab-cd-ef.
-			//
-			//		The special preload signature (case 3) instructs the plugin to stop servicing all normal requests
-			//		(further preload requests will be serviced) until all ongoing preloading has completed.
-			//
-			//		The preload signature instructs the plugin that a special rollup module is available that contains
-			//		one or more flattened, localized bundles. The JSON array of available locales indicates which locales
-			//		are available. Here is an example:
-			//
-			//			*preload*some/path/nls/someModule*["root", "ab", "ab-cd-ef"]
-			//
-			//		This indicates the following rollup modules are available:
-			//
-			//			some/path/nls/someModule_ROOT
-			//			some/path/nls/someModule_ab
-			//			some/path/nls/someModule_ab-cd-ef
-			//
-			//		Each of these modules is a normal AMD module that contains one or more flattened bundles in a hash.
-			//		For example, assume someModule contained the bundles some/bundle/path/someBundle and
-			//		some/bundle/path/someOtherBundle, then some/path/nls/someModule_ab would be expressed as follows:
-			//
-			//			define({
-			//				some/bundle/path/someBundle:<value of someBundle, flattened with respect to locale ab>,
-			//				some/bundle/path/someOtherBundle:<value of someOtherBundle, flattened with respect to locale ab>,
-			//			});
-			//
-			//		E.g., given this design, preloading for locale=="ab" can execute the following algorithm:
-			//
-			//			require(["some/path/nls/someModule_ab"], function(rollup){
-			//				for(var p in rollup){
-			//					var id = p + "/ab",
-			//					cache[id] = rollup[p];
-			//					define(id, rollup[p]);
-			//				}
-			//			});
-			//
-			//		Similarly, if "ab-cd" is requested, the algorithm can determine that "ab" is the best available and
-			//		load accordingly.
-			//
-			//		The builder will write such rollups for every layer if a non-empty localeList  profile property is
-			//		provided. Further, the builder will include the following cache entry in the cache associated with
-			//		any layer.
-			//
-			//			"*now":function(r){r(['dojo/i18n!*preload*<path>/nls/<module>*<JSON array of available locales>']);}
-			//
-			//		The *now special cache module instructs the loader to apply the provided function to context-require
-			//		with respect to the particular layer being defined. This causes the plugin to hold all normal service
-			//		requests until all preloading is complete.
-			//
-			//		Notice that this algorithm is rarely better than the standard AMD load algorithm. Consider the normal case
-			//		where the target locale has a single segment and a layer depends on a single bundle:
-			//
-			//		Without Preloads:
-			//
-			//		1. Layer loads root bundle.
-			//		2. bundle is demanded; plugin loads single localized bundle.
-			//
-			//		With Preloads:
-			//
-			//		1. Layer causes preloading of target bundle.
-			//		2. bundle is demanded; service is delayed until preloading complete; bundle is returned.
-			//
-			//		In each case a single transaction is required to load the target bundle. In cases where multiple bundles
-			//		are required and/or the locale has multiple segments, preloads still requires a single transaction whereas
-			//		the normal path requires an additional transaction for each additional bundle/locale-segment. However all
-			//		of these additional transactions can be done concurrently. Owing to this analysis, the entire preloading
-			//		algorithm can be discard during a build by setting the has feature dojo-preload-i18n-Api to false.
-
-			if(has("dojo-preload-i18n-Api")){
-				var split = id.split("*"),
-					preloadDemand = split[1] == "preload";
-				if(preloadDemand){
-					if(!cache[id]){
-						// use cache[id] to prevent multiple preloads of the same preload; this shouldn't happen, but
-						// who knows what over-aggressive human optimizers may attempt
-						cache[id] = 1;
-						preloadL10n(split[2], json.parse(split[3]), 1, require);
-					}
-					// don't stall the loader!
-					load(1);
-				}
-				if(preloadDemand || waitForPreloads(id, require, load)){
-					return;
-				}
-			}
-
-			var match = nlsRe.exec(id),
-				bundlePath = match[1] + "/",
-				bundleName = match[5] || match[4],
-				bundlePathAndName = bundlePath + bundleName,
-				localeSpecified = (match[5] && match[4]),
-				targetLocale =	localeSpecified || dojo.locale,
-				loadTarget = bundlePathAndName + "/" + targetLocale,
-				loadList = localeSpecified ? [targetLocale] : getLocalesToLoad(targetLocale),
-				remaining = loadList.length,
-				finish = function(){
-					if(!--remaining){
-						load(lang.delegate(cache[loadTarget]));
-					}
-				};
-			array.forEach(loadList, function(locale){
-				var target = bundlePathAndName + "/" + locale;
-				if(has("dojo-preload-i18n-Api")){
-					checkForLegacyModules(target);
-				}
-				if(!cache[target]){
-					doLoad(require, bundlePathAndName, bundlePath, bundleName, locale, finish);
-				}else{
-					finish();
-				}
-			});
-		};
-
-	if(has("dojo-unit-tests")){
-		var unitTests = thisModule.unitTests = [];
-	}
-
-	if(has("dojo-preload-i18n-Api") ||  1 ){
-		var normalizeLocale = thisModule.normalizeLocale = function(locale){
-				var result = locale ? locale.toLowerCase() : dojo.locale;
-				return result == "root" ? "ROOT" : result;
-			},
-
-			isXd = function(mid, contextRequire){
-				return ( 0  &&  1 ) ?
-					contextRequire.isXdUrl(require.toUrl(mid + ".js")) :
-					true;
-			},
-
-			preloading = 0,
-
-			preloadWaitQueue = [],
-
-			preloadL10n = thisModule._preloadLocalizations = function(/*String*/bundlePrefix, /*Array*/localesGenerated, /*boolean?*/ guaranteedAmdFormat, /*function?*/ contextRequire){
-				// summary:
-				//		Load available flattened resource bundles associated with a particular module for dojo/locale and all dojo/config.extraLocale (if any)
-				// description:
-				//		Only called by built layer files. The entire locale hierarchy is loaded. For example,
-				//		if locale=="ab-cd", then ROOT, "ab", and "ab-cd" are loaded. This is different than v1.6-
-				//		in that the v1.6- would only load ab-cd...which was *always* flattened.
-				//
-				//		If guaranteedAmdFormat is true, then the module can be loaded with require thereby circumventing the detection algorithm
-				//		and the extra possible extra transaction.
-
-				// If this function is called from legacy code, then guaranteedAmdFormat and contextRequire will be undefined. Since the function
-				// needs a require in order to resolve module ids, fall back to the context-require associated with this dojo/i18n module, which
-				// itself may have been mapped.
-				contextRequire = contextRequire || require;
-
-				function doRequire(mid, callback){
-					if(isXd(mid, contextRequire) || guaranteedAmdFormat){
-						contextRequire([mid], callback);
-					}else{
-						syncRequire([mid], callback, contextRequire);
-					}
-				}
-
-				function forEachLocale(locale, func){
-					// given locale= "ab-cd-ef", calls func on "ab-cd-ef", "ab-cd", "ab", "ROOT"; stops calling the first time func returns truthy
-					var parts = locale.split("-");
-					while(parts.length){
-						if(func(parts.join("-"))){
-							return;
-						}
-						parts.pop();
-					}
-					func("ROOT");
-				}
-
-				function preload(locale){
-					locale = normalizeLocale(locale);
-					forEachLocale(locale, function(loc){
-						if(array.indexOf(localesGenerated, loc)>=0){
-							var mid = bundlePrefix.replace(/\./g, "/")+"_"+loc;
-							preloading++;
-							doRequire(mid, function(rollup){
-								for(var p in rollup){
-									cache[require.toAbsMid(p) + "/" + loc] = rollup[p];
-								}
-								--preloading;
-								while(!preloading && preloadWaitQueue.length){
-									load.apply(null, preloadWaitQueue.shift());
-								}
-							});
-							return true;
-						}
-						return false;
-					});
-				}
-
-				preload();
-				array.forEach(dojo.config.extraLocale, preload);
-			},
-
-			waitForPreloads = function(id, require, load){
-				if(preloading){
-					preloadWaitQueue.push([id, require, load]);
-				}
-				return preloading;
-			},
-
-			checkForLegacyModules = function()
-				{};
-	}
-
-	if( 1 ){
-		// this code path assumes the dojo loader and won't work with a standard AMD loader
-		var amdValue = {},
-			evalBundle =
-				// use the function ctor to keep the minifiers away (also come close to global scope, but this is secondary)
-				new Function(
-					"__bundle",				   // the bundle to evalutate
-					"__checkForLegacyModules", // a function that checks if __bundle defined __mid in the global space
-					"__mid",				   // the mid that __bundle is intended to define
-					"__amdValue",
-
-					// returns one of:
-					//		1 => the bundle was an AMD bundle
-					//		a legacy bundle object that is the value of __mid
-					//		instance of Error => could not figure out how to evaluate bundle
-
-					  // used to detect when __bundle calls define
-					  "var define = function(mid, factory){define.called = 1; __amdValue.result = factory || mid;},"
-					+ "	   require = function(){define.called = 1;};"
-
-					+ "try{"
-					+		"define.called = 0;"
-					+		"eval(__bundle);"
-					+		"if(define.called==1)"
-								// bundle called define; therefore signal it's an AMD bundle
-					+			"return __amdValue;"
-
-					+		"if((__checkForLegacyModules = __checkForLegacyModules(__mid)))"
-								// bundle was probably a v1.6- built NLS flattened NLS bundle that defined __mid in the global space
-					+			"return __checkForLegacyModules;"
-
-					+ "}catch(e){}"
-					// evaulating the bundle was *neither* an AMD *nor* a legacy flattened bundle
-					// either way, re-eval *after* surrounding with parentheses
-
-					+ "try{"
-					+		"return eval('('+__bundle+')');"
-					+ "}catch(e){"
-					+		"return e;"
-					+ "}"
-				),
-
-			syncRequire = function(deps, callback, require){
-				var results = [];
-				array.forEach(deps, function(mid){
-					var url = require.toUrl(mid + ".js");
-
-					function load(text){
-						var result = evalBundle(text, checkForLegacyModules, mid, amdValue);
-						if(result===amdValue){
-							// the bundle was an AMD module; re-inject it through the normal AMD path
-							// we gotta do this since it could be an anonymous module and simply evaluating
-							// the text here won't provide the loader with the context to know what
-							// module is being defined()'d. With browser caching, this should be free; further
-							// this entire code path can be circumvented by using the AMD format to begin with
-							results.push(cache[url] = amdValue.result);
-						}else{
-							if(result instanceof Error){
-								console.error("failed to evaluate i18n bundle; url=" + url, result);
-								result = {};
-							}
-							// nls/<locale>/<bundle-name> indicates not the root.
-							results.push(cache[url] = (/nls\/[^\/]+\/[^\/]+$/.test(url) ? result : {root:result, _v1x:1}));
-						}
-					}
-
-					if(cache[url]){
-						results.push(cache[url]);
-					}else{
-						var bundle = require.syncLoadNls(mid);
-						// don't need to check for legacy since syncLoadNls returns a module if the module
-						// (1) was already loaded, or (2) was in the cache. In case 1, if syncRequire is called
-						// from getLocalization --> load, then load will have called checkForLegacyModules() before
-						// calling syncRequire; if syncRequire is called from preloadLocalizations, then we
-						// don't care about checkForLegacyModules() because that will be done when a particular
-						// bundle is actually demanded. In case 2, checkForLegacyModules() is never relevant
-						// because cached modules are always v1.7+ built modules.
-						if(bundle){
-							results.push(bundle);
-						}else{
-							if(!xhr){
-								try{
-									require.getText(url, true, load);
-								}catch(e){
-									results.push(cache[url] = {});
-								}
-							}else{
-								xhr.get({
-									url:url,
-									sync:true,
-									load:load,
-									error:function(){
-										results.push(cache[url] = {});
-									}
-								});
-							}
-						}
-					}
-				});
-				callback && callback.apply(null, results);
-			};
-
-		checkForLegacyModules = function(target){
-			// legacy code may have already loaded [e.g] the raw bundle x/y/z at x.y.z; when true, push into the cache
-			for(var result, names = target.split("/"), object = dojo.global[names[0]], i = 1; object && i<names.length-1; object = object[names[i++]]){}
-			if(object){
-				result = object[names[i]];
-				if(!result){
-					// fallback for incorrect bundle build of 1.6
-					result = object[names[i].replace(/-/g,"_")];
-				}
-				if(result){
-					cache[target] = result;
-				}
-			}
-			return result;
-		};
-
-		thisModule.getLocalization = function(moduleName, bundleName, locale){
-			var result,
-				l10nName = getBundleName(moduleName, bundleName, locale);
-			load(
-				l10nName,
-
-				// isXd() and syncRequire() need a context-require in order to resolve the mid with respect to a reference module.
-				// Since this legacy function does not have the concept of a reference module, resolve with respect to this
-				// dojo/i18n module, which, itself may have been mapped.
-				(!isXd(l10nName, require) ? function(deps, callback){ syncRequire(deps, callback, require); } : require),
-
-				function(result_){ result = result_; }
-			);
-			return result;
-		};
-
-		if(has("dojo-unit-tests")){
-			unitTests.push(function(doh){
-				doh.register("tests.i18n.unit", function(t){
-					var check;
-
-					check = evalBundle("{prop:1}", checkForLegacyModules, "nonsense", amdValue);
-					t.is({prop:1}, check); t.is(undefined, check[1]);
-
-					check = evalBundle("({prop:1})", checkForLegacyModules, "nonsense", amdValue);
-					t.is({prop:1}, check); t.is(undefined, check[1]);
-
-					check = evalBundle("{'prop-x':1}", checkForLegacyModules, "nonsense", amdValue);
-					t.is({'prop-x':1}, check); t.is(undefined, check[1]);
-
-					check = evalBundle("({'prop-x':1})", checkForLegacyModules, "nonsense", amdValue);
-					t.is({'prop-x':1}, check); t.is(undefined, check[1]);
-
-					check = evalBundle("define({'prop-x':1})", checkForLegacyModules, "nonsense", amdValue);
-					t.is(amdValue, check); t.is({'prop-x':1}, amdValue.result);
-
-					check = evalBundle("define('some/module', {'prop-x':1})", checkForLegacyModules, "nonsense", amdValue);
-					t.is(amdValue, check); t.is({'prop-x':1}, amdValue.result);
-
-					check = evalBundle("this is total nonsense and should throw an error", checkForLegacyModules, "nonsense", amdValue);
-					t.is(check instanceof Error, true);
-				});
-			});
-		}
-	}
-
-	return lang.mixin(thisModule, {
-		dynamic:true,
-		normalize:normalize,
-		load:load,
-		cache:cache,
-		getL10nName: getL10nName
-	});
-});
-
-},
-'dojo/_base/xhr':function(){
-define([
-	"./kernel",
-	"./sniff",
-	"require",
-	"../io-query",
-	/*===== "./declare", =====*/
-	"../dom",
-	"../dom-form",
-	"./Deferred",
-	"./config",
-	"./json",
-	"./lang",
-	"./array",
-	"../on",
-	"../aspect",
-	"../request/watch",
-	"../request/xhr",
-	"../request/util"
-], function(dojo, has, require, ioq, /*===== declare, =====*/ dom, domForm, Deferred, config, json, lang, array, on, aspect, watch, _xhr, util){
-	// module:
-	//		dojo/_base/xhr
+	//		dojo/errors/RequestTimeoutError
 
 	/*=====
-	dojo._xhrObj = function(){
-		// summary:
-		//		does the work of portably generating a new XMLHTTPRequest object.
-	};
-	=====*/
-	dojo._xhrObj = _xhr._create;
+	 return function(){
+		 // summary:
+		 //		TODOC
+	 };
+	 =====*/
 
-	var cfg = dojo.config;
-
-	// mix in io-query and dom-form
-	dojo.objectToQuery = ioq.objectToQuery;
-	dojo.queryToObject = ioq.queryToObject;
-	dojo.fieldToObject = domForm.fieldToObject;
-	dojo.formToObject = domForm.toObject;
-	dojo.formToQuery = domForm.toQuery;
-	dojo.formToJson = domForm.toJson;
-
-	// need to block async callbacks from snatching this thread as the result
-	// of an async callback might call another sync XHR, this hangs khtml forever
-	// must checked by watchInFlight()
-
-	dojo._blockAsync = false;
-
-	// MOW: remove dojo._contentHandlers alias in 2.0
-	var handlers = dojo._contentHandlers = dojo.contentHandlers = {
-		// summary:
-		//		A map of available XHR transport handle types. Name matches the
-		//		`handleAs` attribute passed to XHR calls.
-		// description:
-		//		A map of available XHR transport handle types. Name matches the
-		//		`handleAs` attribute passed to XHR calls. Each contentHandler is
-		//		called, passing the xhr object for manipulation. The return value
-		//		from the contentHandler will be passed to the `load` or `handle`
-		//		functions defined in the original xhr call.
-		// example:
-		//		Creating a custom content-handler:
-		//	|	xhr.contentHandlers.makeCaps = function(xhr){
-		//	|		return xhr.responseText.toUpperCase();
-		//	|	}
-		//	|	// and later:
-		//	|	dojo.xhrGet({
-		//	|		url:"foo.txt",
-		//	|		handleAs:"makeCaps",
-		//	|		load: function(data){ /* data is a toUpper version of foo.txt */ }
-		//	|	});
-
-		"text": function(xhr){
-			// summary:
-			//		A contentHandler which simply returns the plaintext response data
-			return xhr.responseText;
-		},
-		"json": function(xhr){
-			// summary:
-			//		A contentHandler which returns a JavaScript object created from the response data
-			return json.fromJson(xhr.responseText || null);
-		},
-		"json-comment-filtered": function(xhr){
-			// summary:
-			//		A contentHandler which expects comment-filtered JSON.
-			// description:
-			//		A contentHandler which expects comment-filtered JSON.
-			//		the json-comment-filtered option was implemented to prevent
-			//		"JavaScript Hijacking", but it is less secure than standard JSON. Use
-			//		standard JSON instead. JSON prefixing can be used to subvert hijacking.
-			//
-			//		Will throw a notice suggesting to use application/json mimetype, as
-			//		json-commenting can introduce security issues. To decrease the chances of hijacking,
-			//		use the standard `json` contentHandler, and prefix your "JSON" with: {}&&
-			//
-			//		use djConfig.useCommentedJson = true to turn off the notice
-			if(!config.useCommentedJson){
-				console.warn("Consider using the standard mimetype:application/json."
-					+ " json-commenting can introduce security issues. To"
-					+ " decrease the chances of hijacking, use the standard the 'json' handler and"
-					+ " prefix your json with: {}&&\n"
-					+ "Use djConfig.useCommentedJson=true to turn off this message.");
-			}
-
-			var value = xhr.responseText;
-			var cStartIdx = value.indexOf("\/*");
-			var cEndIdx = value.lastIndexOf("*\/");
-			if(cStartIdx == -1 || cEndIdx == -1){
-				throw new Error("JSON was not comment filtered");
-			}
-			return json.fromJson(value.substring(cStartIdx+2, cEndIdx));
-		},
-		"javascript": function(xhr){
-			// summary:
-			//		A contentHandler which evaluates the response data, expecting it to be valid JavaScript
-
-			// FIXME: try Moz and IE specific eval variants?
-			return dojo.eval(xhr.responseText);
-		},
-		"xml": function(xhr){
-			// summary:
-			//		A contentHandler returning an XML Document parsed from the response data
-			var result = xhr.responseXML;
-
-			if(has("ie")){
-				if((!result || !result.documentElement)){
-					//WARNING: this branch used by the xml handling in dojo.io.iframe,
-					//so be sure to test dojo.io.iframe if making changes below.
-					var ms = function(n){ return "MSXML" + n + ".DOMDocument"; };
-					var dp = ["Microsoft.XMLDOM", ms(6), ms(4), ms(3), ms(2)];
-					array.some(dp, function(p){
-						try{
-							var dom = new ActiveXObject(p);
-							dom.async = false;
-							dom.loadXML(xhr.responseText);
-							result = dom;
-						}catch(e){ return false; }
-						return true;
-					});
-				}
-			}
-			return result; // DOMDocument
-		},
-		"json-comment-optional": function(xhr){
-			// summary:
-			//		A contentHandler which checks the presence of comment-filtered JSON and
-			//		alternates between the `json` and `json-comment-filtered` contentHandlers.
-			if(xhr.responseText && /^[^{\[]*\/\*/.test(xhr.responseText)){
-				return handlers["json-comment-filtered"](xhr);
-			}else{
-				return handlers["json"](xhr);
-			}
-		}
-	};
-
-	/*=====
-
-	// kwargs function parameter definitions.   Assigning to dojo namespace rather than making them local variables
-	// because they are used by dojo/io modules too
-
-	dojo.__IoArgs = declare(null, {
-		// url: String
-		//		URL to server endpoint.
-		// content: Object?
-		//		Contains properties with string values. These
-		//		properties will be serialized as name1=value2 and
-		//		passed in the request.
-		// timeout: Integer?
-		//		Milliseconds to wait for the response. If this time
-		//		passes, the then error callbacks are called.
-		// form: DOMNode?
-		//		DOM node for a form. Used to extract the form values
-		//		and send to the server.
-		// preventCache: Boolean?
-		//		Default is false. If true, then a
-		//		"dojo.preventCache" parameter is sent in the request
-		//		with a value that changes with each request
-		//		(timestamp). Useful only with GET-type requests.
-		// handleAs: String?
-		//		Acceptable values depend on the type of IO
-		//		transport (see specific IO calls for more information).
-		// rawBody: String?
-		//		Sets the raw body for an HTTP request. If this is used, then the content
-		//		property is ignored. This is mostly useful for HTTP methods that have
-		//		a body to their requests, like PUT or POST. This property can be used instead
-		//		of postData and putData for dojo/_base/xhr.rawXhrPost and dojo/_base/xhr.rawXhrPut respectively.
-		// ioPublish: Boolean?
-		//		Set this explicitly to false to prevent publishing of topics related to
-		//		IO operations. Otherwise, if djConfig.ioPublish is set to true, topics
-		//		will be published via dojo/topic.publish() for different phases of an IO operation.
-		//		See dojo/main.__IoPublish for a list of topics that are published.
-
-		load: function(response, ioArgs){
-			// summary:
-			//		This function will be
-			//		called on a successful HTTP response code.
-	 		// ioArgs: dojo/main.__IoCallbackArgs
-			//		Provides additional information about the request.
-			// response: Object
-			//		The response in the format as defined with handleAs.
-		},
-
-		error: function(response, ioArgs){
-			// summary:
-			//		This function will
-			//		be called when the request fails due to a network or server error, the url
-			//		is invalid, etc. It will also be called if the load or handle callback throws an
-			//		exception, unless djConfig.debugAtAllCosts is true.	 This allows deployed applications
-			//		to continue to run even when a logic error happens in the callback, while making
-			//		it easier to troubleshoot while in debug mode.
-			// ioArgs: dojo/main.__IoCallbackArgs
-			//		Provides additional information about the request.
-			// response: Object
-			//		The response in the format as defined with handleAs.
-		},
-
-		handle: function(loadOrError, response, ioArgs){
-			// summary:
-	 		//		This function will
-	 		//		be called at the end of every request, whether or not an error occurs.
-			// loadOrError: String
-			//		Provides a string that tells you whether this function
-			//		was called because of success (load) or failure (error).
-			// response: Object
-			//		The response in the format as defined with handleAs.
-			// ioArgs: dojo/main.__IoCallbackArgs
-			//		Provides additional information about the request.
-		}
+	return create("RequestTimeoutError", null, RequestError, {
+		dojoType: "timeout"
 	});
-
-	dojo.__IoCallbackArgs = declare(null, {
-		// args: Object
-		//		the original object argument to the IO call.
-		// xhr: XMLHttpRequest
-		//		For XMLHttpRequest calls only, the
-		//		XMLHttpRequest object that was used for the
-		//		request.
-		// url: String
-		//		The final URL used for the call. Many times it
-		//		will be different than the original args.url
-		//		value.
-		// query: String
-		//		For non-GET requests, the
-		//		name1=value1&name2=value2 parameters sent up in
-		//		the request.
-		// handleAs: String
-		//		The final indicator on how the response will be
-		//		handled.
-		// id: String
-		//		For dojo/io/script calls only, the internal
-		//		script ID used for the request.
-		// canDelete: Boolean
-		//		For dojo/io/script calls only, indicates
-		//		whether the script tag that represents the
-		//		request can be deleted after callbacks have
-		//		been called. Used internally to know when
-		//		cleanup can happen on JSONP-type requests.
-		// json: Object
-		//		For dojo/io/script calls only: holds the JSON
-		//		response for JSONP-type requests. Used
-		//		internally to hold on to the JSON responses.
-		//		You should not need to access it directly --
-		//		the same object should be passed to the success
-		//		callbacks directly.
-	});
-
-	dojo.__IoPublish = declare(null, {
-		// summary:
-		//		This is a list of IO topics that can be published
-		//		if djConfig.ioPublish is set to true. IO topics can be
-		//		published for any Input/Output, network operation. So,
-		//		dojo.xhr, dojo.io.script and dojo.io.iframe can all
-		//		trigger these topics to be published.
-		// start: String
-		//		"/dojo/io/start" is sent when there are no outstanding IO
-		//		requests, and a new IO request is started. No arguments
-		//		are passed with this topic.
-		// send: String
-		//		"/dojo/io/send" is sent whenever a new IO request is started.
-		//		It passes the dojo.Deferred for the request with the topic.
-		// load: String
-		//		"/dojo/io/load" is sent whenever an IO request has loaded
-		//		successfully. It passes the response and the dojo.Deferred
-		//		for the request with the topic.
-		// error: String
-		//		"/dojo/io/error" is sent whenever an IO request has errored.
-		//		It passes the error and the dojo.Deferred
-		//		for the request with the topic.
-		// done: String
-		//		"/dojo/io/done" is sent whenever an IO request has completed,
-		//		either by loading or by erroring. It passes the error and
-		//		the dojo.Deferred for the request with the topic.
-		// stop: String
-		//		"/dojo/io/stop" is sent when all outstanding IO requests have
-		//		finished. No arguments are passed with this topic.
-	});
-	=====*/
-
-
-	dojo._ioSetArgs = function(/*dojo/main.__IoArgs*/args,
-			/*Function*/canceller,
-			/*Function*/okHandler,
-			/*Function*/errHandler){
-		// summary:
-		//		sets up the Deferred and ioArgs property on the Deferred so it
-		//		can be used in an io call.
-		// args:
-		//		The args object passed into the public io call. Recognized properties on
-		//		the args object are:
-		// canceller:
-		//		The canceller function used for the Deferred object. The function
-		//		will receive one argument, the Deferred object that is related to the
-		//		canceller.
-		// okHandler:
-		//		The first OK callback to be registered with Deferred. It has the opportunity
-		//		to transform the OK response. It will receive one argument -- the Deferred
-		//		object returned from this function.
-		// errHandler:
-		//		The first error callback to be registered with Deferred. It has the opportunity
-		//		to do cleanup on an error. It will receive two arguments: error (the
-		//		Error object) and dfd, the Deferred object returned from this function.
-
-		var ioArgs = {args: args, url: args.url};
-
-		//Get values from form if requested.
-		var formObject = null;
-		if(args.form){
-			var form = dom.byId(args.form);
-			//IE requires going through getAttributeNode instead of just getAttribute in some form cases,
-			//so use it for all. See #2844
-			var actnNode = form.getAttributeNode("action");
-			ioArgs.url = ioArgs.url || (actnNode ? actnNode.value : null);
-			formObject = domForm.toObject(form);
-		}
-
-		// set up the query params
-		var miArgs = [{}];
-
-		if(formObject){
-			// potentially over-ride url-provided params w/ form values
-			miArgs.push(formObject);
-		}
-		if(args.content){
-			// stuff in content over-rides what's set by form
-			miArgs.push(args.content);
-		}
-		if(args.preventCache){
-			miArgs.push({"dojo.preventCache": new Date().valueOf()});
-		}
-		ioArgs.query = ioq.objectToQuery(lang.mixin.apply(null, miArgs));
-
-		// .. and the real work of getting the deferred in order, etc.
-		ioArgs.handleAs = args.handleAs || "text";
-		var d = new Deferred(function(dfd){
-			dfd.canceled = true;
-			canceller && canceller(dfd);
-
-			var err = dfd.ioArgs.error;
-			if(!err){
-				err = new Error("request cancelled");
-				err.dojoType="cancel";
-				dfd.ioArgs.error = err;
-			}
-			return err;
-		});
-		d.addCallback(okHandler);
-
-		//Support specifying load, error and handle callback functions from the args.
-		//For those callbacks, the "this" object will be the args object.
-		//The callbacks will get the deferred result value as the
-		//first argument and the ioArgs object as the second argument.
-		var ld = args.load;
-		if(ld && lang.isFunction(ld)){
-			d.addCallback(function(value){
-				return ld.call(args, value, ioArgs);
-			});
-		}
-		var err = args.error;
-		if(err && lang.isFunction(err)){
-			d.addErrback(function(value){
-				return err.call(args, value, ioArgs);
-			});
-		}
-		var handle = args.handle;
-		if(handle && lang.isFunction(handle)){
-			d.addBoth(function(value){
-				return handle.call(args, value, ioArgs);
-			});
-		}
-
-		// Attach error handler last (not including topic publishing)
-		// to catch any errors that may have been generated from load
-		// or handle functions.
-		d.addErrback(function(error){
-			return errHandler(error, d);
-		});
-
-		//Plug in topic publishing, if dojo.publish is loaded.
-		if(cfg.ioPublish && dojo.publish && ioArgs.args.ioPublish !== false){
-			d.addCallbacks(
-				function(res){
-					dojo.publish("/dojo/io/load", [d, res]);
-					return res;
-				},
-				function(res){
-					dojo.publish("/dojo/io/error", [d, res]);
-					return res;
-				}
-			);
-			d.addBoth(function(res){
-				dojo.publish("/dojo/io/done", [d, res]);
-				return res;
-			});
-		}
-
-		d.ioArgs = ioArgs;
-
-		// FIXME: need to wire up the xhr object's abort method to something
-		// analogous in the Deferred
-		return d;
-	};
-
-	var _deferredOk = function(/*Deferred*/dfd){
-		// summary:
-		//		okHandler function for dojo._ioSetArgs call.
-
-		var ret = handlers[dfd.ioArgs.handleAs](dfd.ioArgs.xhr);
-		return ret === undefined ? null : ret;
-	};
-	var _deferError = function(/*Error*/error, /*Deferred*/dfd){
-		// summary:
-		//		errHandler function for dojo._ioSetArgs call.
-
-		if(!dfd.ioArgs.args.failOk){
-			console.error(error);
-		}
-		return error;
-	};
-
-	//Use a separate count for knowing if we are starting/stopping io calls.
-	var _checkPubCount = function(dfd){
-		if(_pubCount <= 0){
-			_pubCount = 0;
-			if(cfg.ioPublish && dojo.publish && (!dfd || dfd && dfd.ioArgs.args.ioPublish !== false)){
-				dojo.publish("/dojo/io/stop");
-			}
-		}
-	};
-
-	var _pubCount = 0;
-	aspect.after(watch, "_onAction", function(){
-		_pubCount -= 1;
-	});
-	aspect.after(watch, "_onInFlight", _checkPubCount);
-
-	dojo._ioCancelAll = watch.cancelAll;
-	/*=====
-	dojo._ioCancelAll = function(){
-		// summary:
-		//		Cancels all pending IO requests, regardless of IO type
-		//		(xhr, script, iframe).
-	};
-	=====*/
-
-	dojo._ioNotifyStart = function(/*Deferred*/dfd){
-		// summary:
-		//		If dojo.publish is available, publish topics
-		//		about the start of a request queue and/or the
-		//		the beginning of request.
-		//
-		//		Used by IO transports. An IO transport should
-		//		call this method before making the network connection.
-		if(cfg.ioPublish && dojo.publish && dfd.ioArgs.args.ioPublish !== false){
-			if(!_pubCount){
-				dojo.publish("/dojo/io/start");
-			}
-			_pubCount += 1;
-			dojo.publish("/dojo/io/send", [dfd]);
-		}
-	};
-
-	dojo._ioWatch = function(dfd, validCheck, ioCheck, resHandle){
-		// summary:
-		//		Watches the io request represented by dfd to see if it completes.
-		// dfd: Deferred
-		//		The Deferred object to watch.
-		// validCheck: Function
-		//		Function used to check if the IO request is still valid. Gets the dfd
-		//		object as its only argument.
-		// ioCheck: Function
-		//		Function used to check if basic IO call worked. Gets the dfd
-		//		object as its only argument.
-		// resHandle: Function
-		//		Function used to process response. Gets the dfd
-		//		object as its only argument.
-
-		var args = dfd.ioArgs.options = dfd.ioArgs.args;
-		lang.mixin(dfd, {
-			response: dfd.ioArgs,
-			isValid: function(response){
-				return validCheck(dfd);
-			},
-			isReady: function(response){
-				return ioCheck(dfd);
-			},
-			handleResponse: function(response){
-				return resHandle(dfd);
-			}
-		});
-		watch(dfd);
-
-		_checkPubCount(dfd);
-	};
-
-	var _defaultContentType = "application/x-www-form-urlencoded";
-
-	dojo._ioAddQueryToUrl = function(/*dojo.__IoCallbackArgs*/ioArgs){
-		// summary:
-		//		Adds query params discovered by the io deferred construction to the URL.
-		//		Only use this for operations which are fundamentally GET-type operations.
-		if(ioArgs.query.length){
-			ioArgs.url += (ioArgs.url.indexOf("?") == -1 ? "?" : "&") + ioArgs.query;
-			ioArgs.query = null;
-		}
-	};
-
-	/*=====
-	dojo.__XhrArgs = declare(dojo.__IoArgs, {
-		// summary:
-		//		In addition to the properties listed for the dojo._IoArgs type,
-		//		the following properties are allowed for dojo.xhr* methods.
-		// handleAs: String?
-		//		Acceptable values are: text (default), json, json-comment-optional,
-		//		json-comment-filtered, javascript, xml. See `dojo/_base/xhr.contentHandlers`
-	 	// sync: Boolean?
-		//		false is default. Indicates whether the request should
-		//		be a synchronous (blocking) request.
-		// headers: Object?
-		//		Additional HTTP headers to send in the request.
-		// failOk: Boolean?
-		//		false is default. Indicates whether a request should be
-		//		allowed to fail (and therefore no console error message in
-		//		the event of a failure)
-		// contentType: String|Boolean
-		//		"application/x-www-form-urlencoded" is default. Set to false to
-		//		prevent a Content-Type header from being sent, or to a string
-		//		to send a different Content-Type.
-	 });
-	=====*/
-
-	dojo.xhr = function(/*String*/ method, /*dojo.__XhrArgs*/ args, /*Boolean?*/ hasBody){
-		// summary:
-		//		Deprecated.   Use dojo/request instead.
-		// description:
-		//		Sends an HTTP request with the given method.
-		//		See also dojo.xhrGet(), xhrPost(), xhrPut() and dojo.xhrDelete() for shortcuts
-		//		for those HTTP methods. There are also methods for "raw" PUT and POST methods
-		//		via dojo.rawXhrPut() and dojo.rawXhrPost() respectively.
-		// method:
-		//		HTTP method to be used, such as GET, POST, PUT, DELETE. Should be uppercase.
-		// hasBody:
-		//		If the request has an HTTP body, then pass true for hasBody.
-
-		var rDfd;
-		//Make the Deferred object for this xhr request.
-		var dfd = dojo._ioSetArgs(args, function(dfd){
-			rDfd && rDfd.cancel();
-		}, _deferredOk, _deferError);
-		var ioArgs = dfd.ioArgs;
-
-		//Allow for specifying the HTTP body completely.
-		if("postData" in args){
-			ioArgs.query = args.postData;
-		}else if("putData" in args){
-			ioArgs.query = args.putData;
-		}else if("rawBody" in args){
-			ioArgs.query = args.rawBody;
-		}else if((arguments.length > 2 && !hasBody) || "POST|PUT".indexOf(method.toUpperCase()) === -1){
-			//Check for hasBody being passed. If no hasBody,
-			//then only append query string if not a POST or PUT request.
-			dojo._ioAddQueryToUrl(ioArgs);
-		}
-
-		var options = {
-			method: method,
-			handleAs: "text",
-			timeout: args.timeout,
-			withCredentials: args.withCredentials,
-			ioArgs: ioArgs
-		};
-
-		if(typeof args.headers !== 'undefined'){
-			options.headers = args.headers;
-		}
-		if(typeof args.contentType !== 'undefined'){
-			if(!options.headers){
-				options.headers = {};
-			}
-			options.headers['Content-Type'] = args.contentType;
-		}
-		if(typeof ioArgs.query !== 'undefined'){
-			options.data = ioArgs.query;
-		}
-		if(typeof args.sync !== 'undefined'){
-			options.sync = args.sync;
-		}
-
-		dojo._ioNotifyStart(dfd);
-		try{
-			rDfd = _xhr(ioArgs.url, options, true);
-		}catch(e){
-			// If XHR creation fails, dojo/request/xhr throws
-			// When this happens, cancel the deferred
-			dfd.cancel();
-			return dfd;
-		}
-
-		// sync ioArgs
-		dfd.ioArgs.xhr = rDfd.response.xhr;
-
-		rDfd.then(function(){
-			dfd.resolve(dfd);
-		}).otherwise(function(error){
-			ioArgs.error = error;
-			if(error.response){
-				error.status = error.response.status;
-				error.responseText = error.response.text;
-				error.xhr = error.response.xhr;
-			}
-			dfd.reject(error);
-		});
-		return dfd; // dojo/_base/Deferred
-	};
-
-	dojo.xhrGet = function(/*dojo.__XhrArgs*/ args){
-		// summary:
-		//		Sends an HTTP GET request to the server.
-		return dojo.xhr("GET", args); // dojo/_base/Deferred
-	};
-
-	dojo.rawXhrPost = dojo.xhrPost = function(/*dojo.__XhrArgs*/ args){
-		// summary:
-		//		Sends an HTTP POST request to the server. In addition to the properties
-		//		listed for the dojo.__XhrArgs type, the following property is allowed:
-		// postData:
-		//		String. Send raw data in the body of the POST request.
-		return dojo.xhr("POST", args, true); // dojo/_base/Deferred
-	};
-
-	dojo.rawXhrPut = dojo.xhrPut = function(/*dojo.__XhrArgs*/ args){
-		// summary:
-		//		Sends an HTTP PUT request to the server. In addition to the properties
-		//		listed for the dojo.__XhrArgs type, the following property is allowed:
-		// putData:
-		//		String. Send raw data in the body of the PUT request.
-		return dojo.xhr("PUT", args, true); // dojo/_base/Deferred
-	};
-
-	dojo.xhrDelete = function(/*dojo.__XhrArgs*/ args){
-		// summary:
-		//		Sends an HTTP DELETE request to the server.
-		return dojo.xhr("DELETE", args); // dojo/_base/Deferred
-	};
-
-	/*
-	dojo.wrapForm = function(formNode){
-		// summary:
-		//		A replacement for FormBind, but not implemented yet.
-
-		// FIXME: need to think harder about what extensions to this we might
-		// want. What should we allow folks to do w/ this? What events to
-		// set/send?
-		throw new Error("dojo.wrapForm not yet implemented");
-	}
-	*/
-
-	dojo._isDocumentOk = function(x){
-		return util.checkStatus(x.status);
-	};
-
-	dojo._getText = function(url){
-		var result;
-		dojo.xhrGet({url:url, sync:true, load:function(text){
-			result = text;
-		}});
-		return result;
-	};
-
-	// Add aliases for static functions to dojo.xhr since dojo.xhr is what's returned from this module
-	lang.mixin(dojo.xhr, {
-		_xhrObj: dojo._xhrObj,
-		fieldToObject: domForm.fieldToObject,
-		formToObject: domForm.toObject,
-		objectToQuery: ioq.objectToQuery,
-		formToQuery: domForm.toQuery,
-		formToJson: domForm.toJson,
-		queryToObject: ioq.queryToObject,
-		contentHandlers: handlers,
-		_ioSetArgs: dojo._ioSetArgs,
-		_ioCancelAll: dojo._ioCancelAll,
-		_ioNotifyStart: dojo._ioNotifyStart,
-		_ioWatch: dojo._ioWatch,
-		_ioAddQueryToUrl: dojo._ioAddQueryToUrl,
-		_isDocumentOk: dojo._isDocumentOk,
-		_getText: dojo._getText,
-		get: dojo.xhrGet,
-		post: dojo.xhrPost,
-		put: dojo.xhrPut,
-		del: dojo.xhrDelete	// because "delete" is a reserved word
-	});
-
-	return dojo.xhr;
-});
-
-},
-'dojo/_base/sniff':function(){
-define(["./kernel", "./lang", "../sniff"], function(dojo, lang, has){
-	// module:
-	//		dojo/_base/sniff
-
-	/*=====
-	return {
-		// summary:
-		//		Deprecated.   New code should use dojo/sniff.
-		//		This module populates the dojo browser version sniffing properties like dojo.isIE.
-	};
-	=====*/
-
-	if(! 1 ){
-		return has;
-	}
-
-	// no idea what this is for, or if it's used
-	dojo._name = "browser";
-
-	lang.mixin(dojo, {
-		// isBrowser: Boolean
-		//		True if the client is a web-browser
-		isBrowser: true,
-
-		// isFF: Number|undefined
-		//		Version as a Number if client is FireFox. undefined otherwise. Corresponds to
-		//		major detected FireFox version (1.5, 2, 3, etc.)
-		isFF: has("ff"),
-
-		// isIE: Number|undefined
-		//		Version as a Number if client is MSIE(PC). undefined otherwise. Corresponds to
-		//		major detected IE version (6, 7, 8, etc.)
-		isIE: has("ie"),
-
-		// isKhtml: Number|undefined
-		//		Version as a Number if client is a KHTML browser. undefined otherwise. Corresponds to major
-		//		detected version.
-		isKhtml: has("khtml"),
-
-		// isWebKit: Number|undefined
-		//		Version as a Number if client is a WebKit-derived browser (Konqueror,
-		//		Safari, Chrome, etc.). undefined otherwise.
-		isWebKit: has("webkit"),
-
-		// isMozilla: Number|undefined
-		//		Version as a Number if client is a Mozilla-based browser (Firefox,
-		//		SeaMonkey). undefined otherwise. Corresponds to major detected version.
-		isMozilla: has("mozilla"),
-		// isMoz: Number|undefined
-		//		Version as a Number if client is a Mozilla-based browser (Firefox,
-		//		SeaMonkey). undefined otherwise. Corresponds to major detected version.
-		isMoz: has("mozilla"),
-
-		// isOpera: Number|undefined
-		//		Version as a Number if client is Opera. undefined otherwise. Corresponds to
-		//		major detected version.
-		isOpera: has("opera"),
-
-		// isSafari: Number|undefined
-		//		Version as a Number if client is Safari or iPhone. undefined otherwise.
-		isSafari: has("safari"),
-
-		// isChrome: Number|undefined
-		//		Version as a Number if client is Chrome browser. undefined otherwise.
-		isChrome: has("chrome"),
-
-		// isMac: Boolean
-		//		True if the client runs on Mac
-		isMac: has("mac"),
-
-		// isIos: Boolean
-		//		True if client is iPhone, iPod, or iPad
-		isIos: has("ios"),
-
-		// isAndroid: Number|undefined
-		//		Version as a Number if client is android browser. undefined otherwise.
-		isAndroid: has("android"),
-
-		// isWii: Boolean
-		//		True if client is Wii
-		isWii: has("wii"),
-
-		// isQuirks: Boolean
-		//		Page is in quirks mode.
-		isQuirks: has("quirks"),
-
-		// isAir: Boolean
-		//		True if client is Adobe Air
-		isAir: has("air")
-	});
-
-
-	dojo.locale = dojo.locale || (has("ie") ? navigator.userLanguage : navigator.language).toLowerCase();
-
-	return has;
-});
-
-},
-'dojo/io-query':function(){
-define(["./_base/lang"], function(lang){
-
-// module:
-//		dojo/io-query
-
-var backstop = {};
-
-return {
-// summary:
-//		This module defines query string processing functions.
-
-	objectToQuery: function objectToQuery(/*Object*/ map){
-		// summary:
-        //		takes a name/value mapping object and returns a string representing
-        //		a URL-encoded version of that object.
-        // example:
-        //		this object:
-        //
-        //	|	{
-        //	|		blah: "blah",
-        //	|		multi: [
-        //	|			"thud",
-        //	|			"thonk"
-        //	|		]
-        //	|	};
-        //
-        //		yields the following query string:
-        //
-        //	|	"blah=blah&multi=thud&multi=thonk"
-
-        // FIXME: need to implement encodeAscii!!
-        var enc = encodeURIComponent, pairs = [];
-        for(var name in map){
-            var value = map[name];
-            if(value != backstop[name]){
-                var assign = enc(name) + "=";
-                if(lang.isArray(value)){
-                    for(var i = 0, l = value.length; i < l; ++i){
-                        pairs.push(assign + enc(value[i]));
-                    }
-                }else{
-                    pairs.push(assign + enc(value));
-                }
-            }
-        }
-        return pairs.join("&"); // String
-    },
-
-	queryToObject: function queryToObject(/*String*/ str){
-        // summary:
-        //		Create an object representing a de-serialized query section of a
-        //		URL. Query keys with multiple values are returned in an array.
-        //
-        // example:
-        //		This string:
-        //
-        //	|		"foo=bar&foo=baz&thinger=%20spaces%20=blah&zonk=blarg&"
-        //
-        //		results in this object structure:
-        //
-        //	|		{
-        //	|			foo: [ "bar", "baz" ],
-        //	|			thinger: " spaces =blah",
-        //	|			zonk: "blarg"
-        //	|		}
-        //
-        //		Note that spaces and other urlencoded entities are correctly
-        //		handled.
-
-        // FIXME: should we grab the URL string if we're not passed one?
-        var dec = decodeURIComponent, qp = str.split("&"), ret = {}, name, val;
-        for(var i = 0, l = qp.length, item; i < l; ++i){
-            item = qp[i];
-            if(item.length){
-                var s = item.indexOf("=");
-                if(s < 0){
-                    name = dec(item);
-                    val = "";
-                }else{
-                    name = dec(item.slice(0, s));
-                    val  = dec(item.slice(s + 1));
-                }
-                if(typeof ret[name] == "string"){ // inline'd type check
-                    ret[name] = [ret[name]];
-                }
-
-                if(lang.isArray(ret[name])){
-                    ret[name].push(val);
-                }else{
-                    ret[name] = val;
-                }
-            }
-        }
-        return ret; // Object
-    }
-};
-});
-},
-'dojo/dom-form':function(){
-define(["./_base/lang", "./dom", "./io-query", "./json"], function(lang, dom, ioq, json){
-	// module:
-	//		dojo/dom-form
-
-    function setValue(/*Object*/ obj, /*String*/ name, /*String*/ value){
-        // summary:
-        //		For the named property in object, set the value. If a value
-        //		already exists and it is a string, convert the value to be an
-        //		array of values.
-
-        // Skip it if there is no value
-        if(value === null){
-            return;
-        }
-
-        var val = obj[name];
-        if(typeof val == "string"){ // inline'd type check
-            obj[name] = [val, value];
-        }else if(lang.isArray(val)){
-            val.push(value);
-        }else{
-            obj[name] = value;
-        }
-    }
-
-	var exclude = "file|submit|image|reset|button";
-
-	var form = {
-		// summary:
-		//		This module defines form-processing functions.
-
-		fieldToObject: function fieldToObject(/*DOMNode|String*/ inputNode){
-			// summary:
-			//		Serialize a form field to a JavaScript object.
-			// description:
-			//		Returns the value encoded in a form field as
-			//		as a string or an array of strings. Disabled form elements
-			//		and unchecked radio and checkboxes are skipped.	Multi-select
-			//		elements are returned as an array of string values.
-			// inputNode: DOMNode|String
-			// returns: Object
-
-			var ret = null;
-			inputNode = dom.byId(inputNode);
-			if(inputNode){
-				var _in = inputNode.name, type = (inputNode.type || "").toLowerCase();
-				if(_in && type && !inputNode.disabled){
-					if(type == "radio" || type == "checkbox"){
-						if(inputNode.checked){
-							ret = inputNode.value;
-						}
-					}else if(inputNode.multiple){
-						ret = [];
-						var nodes = [inputNode.firstChild];
-						while(nodes.length){
-							for(var node = nodes.pop(); node; node = node.nextSibling){
-								if(node.nodeType == 1 && node.tagName.toLowerCase() == "option"){
-									if(node.selected){
-										ret.push(node.value);
-									}
-								}else{
-									if(node.nextSibling){
-										nodes.push(node.nextSibling);
-									}
-									if(node.firstChild){
-										nodes.push(node.firstChild);
-									}
-									break;
-								}
-							}
-						}
-					}else{
-						ret = inputNode.value;
-					}
-				}
-			}
-			return ret; // Object
-		},
-
-		toObject: function formToObject(/*DOMNode|String*/ formNode){
-			// summary:
-			//		Serialize a form node to a JavaScript object.
-			// description:
-			//		Returns the values encoded in an HTML form as
-			//		string properties in an object which it then returns. Disabled form
-			//		elements, buttons, and other non-value form elements are skipped.
-			//		Multi-select elements are returned as an array of string values.
-			// formNode: DOMNode|String
-			// example:
-			//		This form:
-			//		|	<form id="test_form">
-			//		|		<input type="text" name="blah" value="blah">
-			//		|		<input type="text" name="no_value" value="blah" disabled>
-			//		|		<input type="button" name="no_value2" value="blah">
-			//		|		<select type="select" multiple name="multi" size="5">
-			//		|			<option value="blah">blah</option>
-			//		|			<option value="thud" selected>thud</option>
-			//		|			<option value="thonk" selected>thonk</option>
-			//		|		</select>
-			//		|	</form>
-			//
-			//		yields this object structure as the result of a call to
-			//		formToObject():
-			//
-			//		|	{
-			//		|		blah: "blah",
-			//		|		multi: [
-			//		|			"thud",
-			//		|			"thonk"
-			//		|		]
-			//		|	};
-
-			var ret = {}, elems = dom.byId(formNode).elements;
-			for(var i = 0, l = elems.length; i < l; ++i){
-				var item = elems[i], _in = item.name, type = (item.type || "").toLowerCase();
-				if(_in && type && exclude.indexOf(type) < 0 && !item.disabled){
-					setValue(ret, _in, form.fieldToObject(item));
-					if(type == "image"){
-						ret[_in + ".x"] = ret[_in + ".y"] = ret[_in].x = ret[_in].y = 0;
-					}
-				}
-			}
-			return ret; // Object
-		},
-
-		toQuery: function formToQuery(/*DOMNode|String*/ formNode){
-			// summary:
-			//		Returns a URL-encoded string representing the form passed as either a
-			//		node or string ID identifying the form to serialize
-			// formNode: DOMNode|String
-			// returns: String
-
-			return ioq.objectToQuery(form.toObject(formNode)); // String
-		},
-
-		toJson: function formToJson(/*DOMNode|String*/ formNode, /*Boolean?*/ prettyPrint){
-			// summary:
-			//		Create a serialized JSON string from a form node or string
-			//		ID identifying the form to serialize
-			// formNode: DOMNode|String
-			// prettyPrint: Boolean?
-			// returns: String
-
-			return json.stringify(form.toObject(formNode), null, prettyPrint ? 4 : 0); // String
-		}
-	};
-
-    return form;
-});
-
-},
-'dojo/json':function(){
-define(["./has"], function(has){
-	"use strict";
-	var hasJSON = typeof JSON != "undefined";
-	has.add("json-parse", hasJSON); // all the parsers work fine
-		// Firefox 3.5/Gecko 1.9 fails to use replacer in stringify properly https://bugzilla.mozilla.org/show_bug.cgi?id=509184
-	has.add("json-stringify", hasJSON && JSON.stringify({a:0}, function(k,v){return v||1;}) == '{"a":1}');
-
-	/*=====
-	return {
-		// summary:
-		//		Functions to parse and serialize JSON
-
-		parse: function(str, strict){
-			// summary:
-			//		Parses a [JSON](http://json.org) string to return a JavaScript object.
-			// description:
-			//		This function follows [native JSON API](https://developer.mozilla.org/en/JSON)
-			//		Throws for invalid JSON strings. This delegates to eval() if native JSON
-			//		support is not available. By default this will evaluate any valid JS expression.
-			//		With the strict parameter set to true, the parser will ensure that only
-			//		valid JSON strings are parsed (otherwise throwing an error). Without the strict
-			//		parameter, the content passed to this method must come
-			//		from a trusted source.
-			// str:
-			//		a string literal of a JSON item, for instance:
-			//		`'{ "foo": [ "bar", 1, { "baz": "thud" } ] }'`
-			// strict:
-			//		When set to true, this will ensure that only valid, secure JSON is ever parsed.
-			//		Make sure this is set to true for untrusted content. Note that on browsers/engines
-			//		without native JSON support, setting this to true will run slower.
-		},
-		stringify: function(value, replacer, spacer){
-			// summary:
-			//		Returns a [JSON](http://json.org) serialization of an object.
-			// description:
-			//		Returns a [JSON](http://json.org) serialization of an object.
-			//		This function follows [native JSON API](https://developer.mozilla.org/en/JSON)
-			//		Note that this doesn't check for infinite recursion, so don't do that!
-			// value:
-			//		A value to be serialized.
-			// replacer:
-			//		A replacer function that is called for each value and can return a replacement
-			// spacer:
-			//		A spacer string to be used for pretty printing of JSON
-			// example:
-			//		simple serialization of a trivial object
-			//	|	define(["dojo/json"], function(JSON){
-			// 	|		var jsonStr = JSON.stringify({ howdy: "stranger!", isStrange: true });
-			//	|		doh.is('{"howdy":"stranger!","isStrange":true}', jsonStr);
-		}
-	};
-	=====*/
-
-	if(has("json-stringify")){
-		return JSON;
-	}else{
-		var escapeString = function(/*String*/str){
-			// summary:
-			//		Adds escape sequences for non-visual characters, double quote and
-			//		backslash and surrounds with double quotes to form a valid string
-			//		literal.
-			return ('"' + str.replace(/(["\\])/g, '\\$1') + '"').
-				replace(/[\f]/g, "\\f").replace(/[\b]/g, "\\b").replace(/[\n]/g, "\\n").
-				replace(/[\t]/g, "\\t").replace(/[\r]/g, "\\r"); // string
-		};
-		return {
-			parse: has("json-parse") ? JSON.parse : function(str, strict){
-				if(strict && !/^([\s\[\{]*(?:"(?:\\.|[^"])+"|-?\d[\d\.]*(?:[Ee][+-]?\d+)?|null|true|false|)[\s\]\}]*(?:,|:|$))+$/.test(str)){
-					throw new SyntaxError("Invalid characters in JSON");
-				}
-				return eval('(' + str + ')');
-			},
-			stringify: function(value, replacer, spacer){
-				var undef;
-				if(typeof replacer == "string"){
-					spacer = replacer;
-					replacer = null;
-				}
-				function stringify(it, indent, key){
-					if(replacer){
-						it = replacer(key, it);
-					}
-					var val, objtype = typeof it;
-					if(objtype == "number"){
-						return isFinite(it) ? it + "" : "null";
-					}
-					if(objtype == "boolean"){
-						return it + "";
-					}
-					if(it === null){
-						return "null";
-					}
-					if(typeof it == "string"){
-						return escapeString(it);
-					}
-					if(objtype == "function" || objtype == "undefined"){
-						return undef; // undefined
-					}
-					// short-circuit for objects that support "json" serialization
-					// if they return "self" then just pass-through...
-					if(typeof it.toJSON == "function"){
-						return stringify(it.toJSON(key), indent, key);
-					}
-					if(it instanceof Date){
-						return '"{FullYear}-{Month+}-{Date}T{Hours}:{Minutes}:{Seconds}Z"'.replace(/\{(\w+)(\+)?\}/g, function(t, prop, plus){
-							var num = it["getUTC" + prop]() + (plus ? 1 : 0);
-							return num < 10 ? "0" + num : num;
-						});
-					}
-					if(it.valueOf() !== it){
-						// primitive wrapper, try again unwrapped:
-						return stringify(it.valueOf(), indent, key);
-					}
-					var nextIndent= spacer ? (indent + spacer) : "";
-					/* we used to test for DOM nodes and throw, but FF serializes them as {}, so cross-browser consistency is probably not efficiently attainable */ 
-				
-					var sep = spacer ? " " : "";
-					var newLine = spacer ? "\n" : "";
-				
-					// array
-					if(it instanceof Array){
-						var itl = it.length, res = [];
-						for(key = 0; key < itl; key++){
-							var obj = it[key];
-							val = stringify(obj, nextIndent, key);
-							if(typeof val != "string"){
-								val = "null";
-							}
-							res.push(newLine + nextIndent + val);
-						}
-						return "[" + res.join(",") + newLine + indent + "]";
-					}
-					// generic object code path
-					var output = [];
-					for(key in it){
-						var keyStr;
-						if(it.hasOwnProperty(key)){
-							if(typeof key == "number"){
-								keyStr = '"' + key + '"';
-							}else if(typeof key == "string"){
-								keyStr = escapeString(key);
-							}else{
-								// skip non-string or number keys
-								continue;
-							}
-							val = stringify(it[key], nextIndent, key);
-							if(typeof val != "string"){
-								// skip non-serializable values
-								continue;
-							}
-							// At this point, the most non-IE browsers don't get in this branch 
-							// (they have native JSON), so push is definitely the way to
-							output.push(newLine + nextIndent + keyStr + ":" + sep + val);
-						}
-					}
-					return "{" + output.join(",") + newLine + indent + "}"; // String
-				}
-				return stringify(value, "", "");
-			}
-		};
-	}
-});
-
-},
-'dojo/_base/Deferred':function(){
-define([
-	"./kernel",
-	"../Deferred",
-	"../promise/Promise",
-	"../errors/CancelError",
-	"../has",
-	"./lang",
-	"../when"
-], function(dojo, NewDeferred, Promise, CancelError, has, lang, when){
-	// module:
-	//		dojo/_base/Deferred
-
-	var mutator = function(){};
-	var freeze = Object.freeze || function(){};
-	// A deferred provides an API for creating and resolving a promise.
-	var Deferred = dojo.Deferred = function(/*Function?*/ canceller){
-		// summary:
-		//		Deprecated.   This module defines the legacy dojo/_base/Deferred API.
-		//		New code should use dojo/Deferred instead.
-		// description:
-		//		The Deferred API is based on the concept of promises that provide a
-		//		generic interface into the eventual completion of an asynchronous action.
-		//		The motivation for promises fundamentally is about creating a
-		//		separation of concerns that allows one to achieve the same type of
-		//		call patterns and logical data flow in asynchronous code as can be
-		//		achieved in synchronous code. Promises allows one
-		//		to be able to call a function purely with arguments needed for
-		//		execution, without conflating the call with concerns of whether it is
-		//		sync or async. One shouldn't need to alter a call's arguments if the
-		//		implementation switches from sync to async (or vice versa). By having
-		//		async functions return promises, the concerns of making the call are
-		//		separated from the concerns of asynchronous interaction (which are
-		//		handled by the promise).
-		//
-		//		The Deferred is a type of promise that provides methods for fulfilling the
-		//		promise with a successful result or an error. The most important method for
-		//		working with Dojo's promises is the then() method, which follows the
-		//		CommonJS proposed promise API. An example of using a Dojo promise:
-		//
-		//		|	var resultingPromise = someAsyncOperation.then(function(result){
-		//		|		... handle result ...
-		//		|	},
-		//		|	function(error){
-		//		|		... handle error ...
-		//		|	});
-		//
-		//		The .then() call returns a new promise that represents the result of the
-		//		execution of the callback. The callbacks will never affect the original promises value.
-		//
-		//		The Deferred instances also provide the following functions for backwards compatibility:
-		//
-		//		- addCallback(handler)
-		//		- addErrback(handler)
-		//		- callback(result)
-		//		- errback(result)
-		//
-		//		Callbacks are allowed to return promises themselves, so
-		//		you can build complicated sequences of events with ease.
-		//
-		//		The creator of the Deferred may specify a canceller.  The canceller
-		//		is a function that will be called if Deferred.cancel is called
-		//		before the Deferred fires. You can use this to implement clean
-		//		aborting of an XMLHttpRequest, etc. Note that cancel will fire the
-		//		deferred with a CancelledError (unless your canceller returns
-		//		another kind of error), so the errbacks should be prepared to
-		//		handle that error for cancellable Deferreds.
-		// example:
-		//	|	var deferred = new Deferred();
-		//	|	setTimeout(function(){ deferred.callback({success: true}); }, 1000);
-		//	|	return deferred;
-		// example:
-		//		Deferred objects are often used when making code asynchronous. It
-		//		may be easiest to write functions in a synchronous manner and then
-		//		split code using a deferred to trigger a response to a long-lived
-		//		operation. For example, instead of register a callback function to
-		//		denote when a rendering operation completes, the function can
-		//		simply return a deferred:
-		//
-		//		|	// callback style:
-		//		|	function renderLotsOfData(data, callback){
-		//		|		var success = false
-		//		|		try{
-		//		|			for(var x in data){
-		//		|				renderDataitem(data[x]);
-		//		|			}
-		//		|			success = true;
-		//		|		}catch(e){ }
-		//		|		if(callback){
-		//		|			callback(success);
-		//		|		}
-		//		|	}
-		//
-		//		|	// using callback style
-		//		|	renderLotsOfData(someDataObj, function(success){
-		//		|		// handles success or failure
-		//		|		if(!success){
-		//		|			promptUserToRecover();
-		//		|		}
-		//		|	});
-		//		|	// NOTE: no way to add another callback here!!
-		// example:
-		//		Using a Deferred doesn't simplify the sending code any, but it
-		//		provides a standard interface for callers and senders alike,
-		//		providing both with a simple way to service multiple callbacks for
-		//		an operation and freeing both sides from worrying about details
-		//		such as "did this get called already?". With Deferreds, new
-		//		callbacks can be added at any time.
-		//
-		//		|	// Deferred style:
-		//		|	function renderLotsOfData(data){
-		//		|		var d = new Deferred();
-		//		|		try{
-		//		|			for(var x in data){
-		//		|				renderDataitem(data[x]);
-		//		|			}
-		//		|			d.callback(true);
-		//		|		}catch(e){
-		//		|			d.errback(new Error("rendering failed"));
-		//		|		}
-		//		|		return d;
-		//		|	}
-		//
-		//		|	// using Deferred style
-		//		|	renderLotsOfData(someDataObj).then(null, function(){
-		//		|		promptUserToRecover();
-		//		|	});
-		//		|	// NOTE: addErrback and addCallback both return the Deferred
-		//		|	// again, so we could chain adding callbacks or save the
-		//		|	// deferred for later should we need to be notified again.
-		// example:
-		//		In this example, renderLotsOfData is synchronous and so both
-		//		versions are pretty artificial. Putting the data display on a
-		//		timeout helps show why Deferreds rock:
-		//
-		//		|	// Deferred style and async func
-		//		|	function renderLotsOfData(data){
-		//		|		var d = new Deferred();
-		//		|		setTimeout(function(){
-		//		|			try{
-		//		|				for(var x in data){
-		//		|					renderDataitem(data[x]);
-		//		|				}
-		//		|				d.callback(true);
-		//		|			}catch(e){
-		//		|				d.errback(new Error("rendering failed"));
-		//		|			}
-		//		|		}, 100);
-		//		|		return d;
-		//		|	}
-		//
-		//		|	// using Deferred style
-		//		|	renderLotsOfData(someDataObj).then(null, function(){
-		//		|		promptUserToRecover();
-		//		|	});
-		//
-		//		Note that the caller doesn't have to change his code at all to
-		//		handle the asynchronous case.
-
-		var result, finished, canceled, fired, isError, head, nextListener;
-		var promise = (this.promise = new Promise());
-
-		function complete(value){
-			if(finished){
-				throw new Error("This deferred has already been resolved");
-			}
-			result = value;
-			finished = true;
-			notify();
-		}
-		function notify(){
-			var mutated;
-			while(!mutated && nextListener){
-				var listener = nextListener;
-				nextListener = nextListener.next;
-				if((mutated = (listener.progress == mutator))){ // assignment and check
-					finished = false;
-				}
-
-				var func = (isError ? listener.error : listener.resolved);
-				if(has("config-useDeferredInstrumentation")){
-					if(isError && NewDeferred.instrumentRejected){
-						NewDeferred.instrumentRejected(result, !!func);
-					}
-				}
-				if(func){
-					try{
-						var newResult = func(result);
-						if (newResult && typeof newResult.then === "function"){
-							newResult.then(lang.hitch(listener.deferred, "resolve"), lang.hitch(listener.deferred, "reject"), lang.hitch(listener.deferred, "progress"));
-							continue;
-						}
-						var unchanged = mutated && newResult === undefined;
-						if(mutated && !unchanged){
-							isError = newResult instanceof Error;
-						}
-						listener.deferred[unchanged && isError ? "reject" : "resolve"](unchanged ? result : newResult);
-					}catch(e){
-						listener.deferred.reject(e);
-					}
-				}else{
-					if(isError){
-						listener.deferred.reject(result);
-					}else{
-						listener.deferred.resolve(result);
-					}
-				}
-			}
-		}
-
-		this.isResolved = promise.isResolved = function(){
-			// summary:
-			//		Checks whether the deferred has been resolved.
-			// returns: Boolean
-
-			return fired == 0;
-		};
-
-		this.isRejected = promise.isRejected = function(){
-			// summary:
-			//		Checks whether the deferred has been rejected.
-			// returns: Boolean
-
-			return fired == 1;
-		};
-
-		this.isFulfilled = promise.isFulfilled = function(){
-			// summary:
-			//		Checks whether the deferred has been resolved or rejected.
-			// returns: Boolean
-
-			return fired >= 0;
-		};
-
-		this.isCanceled = promise.isCanceled = function(){
-			// summary:
-			//		Checks whether the deferred has been canceled.
-			// returns: Boolean
-
-			return canceled;
-		};
-
-		// calling resolve will resolve the promise
-		this.resolve = this.callback = function(value){
-			// summary:
-			//		Fulfills the Deferred instance successfully with the provide value
-			this.fired = fired = 0;
-			this.results = [value, null];
-			complete(value);
-		};
-
-
-		// calling error will indicate that the promise failed
-		this.reject = this.errback = function(error){
-			// summary:
-			//		Fulfills the Deferred instance as an error with the provided error
-			isError = true;
-			this.fired = fired = 1;
-			if(has("config-useDeferredInstrumentation")){
-				if(NewDeferred.instrumentRejected){
-					NewDeferred.instrumentRejected(error, !!nextListener);
-				}
-			}
-			complete(error);
-			this.results = [null, error];
-		};
-		// call progress to provide updates on the progress on the completion of the promise
-		this.progress = function(update){
-			// summary:
-			//		Send progress events to all listeners
-			var listener = nextListener;
-			while(listener){
-				var progress = listener.progress;
-				progress && progress(update);
-				listener = listener.next;
-			}
-		};
-		this.addCallbacks = function(callback, errback){
-			// summary:
-			//		Adds callback and error callback for this deferred instance.
-			// callback: Function?
-			//		The callback attached to this deferred object.
-			// errback: Function?
-			//		The error callback attached to this deferred object.
-			// returns:
-			//		Returns this deferred object.
-			this.then(callback, errback, mutator);
-			return this;	// Deferred
-		};
-		// provide the implementation of the promise
-		promise.then = this.then = function(/*Function?*/resolvedCallback, /*Function?*/errorCallback, /*Function?*/progressCallback){
-			// summary:
-			//		Adds a fulfilledHandler, errorHandler, and progressHandler to be called for
-			//		completion of a promise. The fulfilledHandler is called when the promise
-			//		is fulfilled. The errorHandler is called when a promise fails. The
-			//		progressHandler is called for progress events. All arguments are optional
-			//		and non-function values are ignored. The progressHandler is not only an
-			//		optional argument, but progress events are purely optional. Promise
-			//		providers are not required to ever create progress events.
-			//
-			//		This function will return a new promise that is fulfilled when the given
-			//		fulfilledHandler or errorHandler callback is finished. This allows promise
-			//		operations to be chained together. The value returned from the callback
-			//		handler is the fulfillment value for the returned promise. If the callback
-			//		throws an error, the returned promise will be moved to failed state.
-			//
-			// returns:
-			//		Returns a new promise that represents the result of the
-			//		execution of the callback. The callbacks will never affect the original promises value.
-			// example:
-			//		An example of using a CommonJS compliant promise:
-			//		|	asyncComputeTheAnswerToEverything().
-			//		|		then(addTwo).
-			//		|		then(printResult, onError);
-			//		|	>44
-			//
-			var returnDeferred = progressCallback == mutator ? this : new Deferred(promise.cancel);
-			var listener = {
-				resolved: resolvedCallback,
-				error: errorCallback,
-				progress: progressCallback,
-				deferred: returnDeferred
-			};
-			if(nextListener){
-				head = head.next = listener;
-			}
-			else{
-				nextListener = head = listener;
-			}
-			if(finished){
-				notify();
-			}
-			return returnDeferred.promise; // Promise
-		};
-		var deferred = this;
-		promise.cancel = this.cancel = function(){
-			// summary:
-			//		Cancels the asynchronous operation
-			if(!finished){
-				var error = canceller && canceller(deferred);
-				if(!finished){
-					if (!(error instanceof Error)){
-						error = new CancelError(error);
-					}
-					error.log = false;
-					deferred.reject(error);
-				}
-			}
-			canceled = true;
-		};
-		freeze(promise);
-	};
-	lang.extend(Deferred, {
-		addCallback: function(/*Function*/ callback){
-			// summary:
-			//		Adds successful callback for this deferred instance.
-			// returns:
-			//		Returns this deferred object.
-			return this.addCallbacks(lang.hitch.apply(dojo, arguments));	// Deferred
-		},
-
-		addErrback: function(/*Function*/ errback){
-			// summary:
-			//		Adds error callback for this deferred instance.
-			// returns:
-			//		Returns this deferred object.
-			return this.addCallbacks(null, lang.hitch.apply(dojo, arguments));	// Deferred
-		},
-
-		addBoth: function(/*Function*/ callback){
-			// summary:
-			//		Add handler as both successful callback and error callback for this deferred instance.
-			// returns:
-			//		Returns this deferred object.
-			var enclosed = lang.hitch.apply(dojo, arguments);
-			return this.addCallbacks(enclosed, enclosed);	// Deferred
-		},
-		fired: -1
-	});
-
-	Deferred.when = dojo.when = when;
-
-	return Deferred;
-});
-
-},
-'dojo/Deferred':function(){
-define("dojo/Deferred", [
-	"./has",
-	"./_base/lang",
-	"./errors/CancelError",
-	"./promise/Promise",
-	"require"
-], function(has, lang, CancelError, Promise, instrumentation){
-	"use strict";
-
-	// module:
-	//		dojo/Deferred
-
-	var PROGRESS = 0,
-			RESOLVED = 1,
-			REJECTED = 2;
-	var FULFILLED_ERROR_MESSAGE = "This deferred has already been fulfilled.";
-
-	var freezeObject = Object.freeze || function(){};
-
-	var signalWaiting = function(waiting, type, result, rejection, deferred){
-		if( 0 ){
-			if(type === REJECTED && Deferred.instrumentRejected && waiting.length === 0){
-				Deferred.instrumentRejected(result, false, rejection, deferred);
-			}
-		}
-
-		for(var i = 0; i < waiting.length; i++){
-			signalListener(waiting[i], type, result, rejection);
-		}
-	};
-
-	var signalListener = function(listener, type, result, rejection){
-		var func = listener[type];
-		var deferred = listener.deferred;
-		if(func){
-			try{
-				var newResult = func(result);
-				if(type === PROGRESS){
-					if(typeof newResult !== "undefined"){
-						signalDeferred(deferred, type, newResult);
-					}
-				}else{
-					if(newResult && typeof newResult.then === "function"){
-						listener.cancel = newResult.cancel;
-						newResult.then(
-								// Only make resolvers if they're actually going to be used
-								makeDeferredSignaler(deferred, RESOLVED),
-								makeDeferredSignaler(deferred, REJECTED),
-								makeDeferredSignaler(deferred, PROGRESS));
-						return;
-					}
-					signalDeferred(deferred, RESOLVED, newResult);
-				}
-			}catch(error){
-				signalDeferred(deferred, REJECTED, error);
-			}
-		}else{
-			signalDeferred(deferred, type, result);
-		}
-
-		if( 0 ){
-			if(type === REJECTED && Deferred.instrumentRejected){
-				Deferred.instrumentRejected(result, !!func, rejection, deferred.promise);
-			}
-		}
-	};
-
-	var makeDeferredSignaler = function(deferred, type){
-		return function(value){
-			signalDeferred(deferred, type, value);
-		};
-	};
-
-	var signalDeferred = function(deferred, type, result){
-		if(!deferred.isCanceled()){
-			switch(type){
-				case PROGRESS:
-					deferred.progress(result);
-					break;
-				case RESOLVED:
-					deferred.resolve(result);
-					break;
-				case REJECTED:
-					deferred.reject(result);
-					break;
-			}
-		}
-	};
-
-	var Deferred = function(canceler){
-		// summary:
-		//		Creates a new deferred. This API is preferred over
-		//		`dojo/_base/Deferred`.
-		// description:
-		//		Creates a new deferred, as an abstraction over (primarily)
-		//		asynchronous operations. The deferred is the private interface
-		//		that should not be returned to calling code. That's what the
-		//		`promise` is for. See `dojo/promise/Promise`.
-		// canceler: Function?
-		//		Will be invoked if the deferred is canceled. The canceler
-		//		receives the reason the deferred was canceled as its argument.
-		//		The deferred is rejected with its return value, or a new
-		//		`dojo/errors/CancelError` instance.
-
-		// promise: dojo/promise/Promise
-		//		The public promise object that clients can add callbacks to. 
-		var promise = this.promise = new Promise();
-
-		var deferred = this;
-		var fulfilled, result, rejection;
-		var canceled = false;
-		var waiting = [];
-
-		if( 0  && Error.captureStackTrace){
-			Error.captureStackTrace(deferred, Deferred);
-			Error.captureStackTrace(promise, Deferred);
-		}
-
-		this.isResolved = promise.isResolved = function(){
-			// summary:
-			//		Checks whether the deferred has been resolved.
-			// returns: Boolean
-
-			return fulfilled === RESOLVED;
-		};
-
-		this.isRejected = promise.isRejected = function(){
-			// summary:
-			//		Checks whether the deferred has been rejected.
-			// returns: Boolean
-
-			return fulfilled === REJECTED;
-		};
-
-		this.isFulfilled = promise.isFulfilled = function(){
-			// summary:
-			//		Checks whether the deferred has been resolved or rejected.
-			// returns: Boolean
-
-			return !!fulfilled;
-		};
-
-		this.isCanceled = promise.isCanceled = function(){
-			// summary:
-			//		Checks whether the deferred has been canceled.
-			// returns: Boolean
-
-			return canceled;
-		};
-
-		this.progress = function(update, strict){
-			// summary:
-			//		Emit a progress update on the deferred.
-			// description:
-			//		Emit a progress update on the deferred. Progress updates
-			//		can be used to communicate updates about the asynchronous
-			//		operation before it has finished.
-			// update: any
-			//		The progress update. Passed to progbacks.
-			// strict: Boolean?
-			//		If strict, will throw an error if the deferred has already
-			//		been fulfilled and consequently no progress can be emitted.
-			// returns: dojo/promise/Promise
-			//		Returns the original promise for the deferred.
-
-			if(!fulfilled){
-				signalWaiting(waiting, PROGRESS, update, null, deferred);
-				return promise;
-			}else if(strict === true){
-				throw new Error(FULFILLED_ERROR_MESSAGE);
-			}else{
-				return promise;
-			}
-		};
-
-		this.resolve = function(value, strict){
-			// summary:
-			//		Resolve the deferred.
-			// description:
-			//		Resolve the deferred, putting it in a success state.
-			// value: any
-			//		The result of the deferred. Passed to callbacks.
-			// strict: Boolean?
-			//		If strict, will throw an error if the deferred has already
-			//		been fulfilled and consequently cannot be resolved.
-			// returns: dojo/promise/Promise
-			//		Returns the original promise for the deferred.
-
-			if(!fulfilled){
-				// Set fulfilled, store value. After signaling waiting listeners unset
-				// waiting.
-				signalWaiting(waiting, fulfilled = RESOLVED, result = value, null, deferred);
-				waiting = null;
-				return promise;
-			}else if(strict === true){
-				throw new Error(FULFILLED_ERROR_MESSAGE);
-			}else{
-				return promise;
-			}
-		};
-
-		var reject = this.reject = function(error, strict){
-			// summary:
-			//		Reject the deferred.
-			// description:
-			//		Reject the deferred, putting it in an error state.
-			// error: any
-			//		The error result of the deferred. Passed to errbacks.
-			// strict: Boolean?
-			//		If strict, will throw an error if the deferred has already
-			//		been fulfilled and consequently cannot be rejected.
-			// returns: dojo/promise/Promise
-			//		Returns the original promise for the deferred.
-
-			if(!fulfilled){
-				if( 0  && Error.captureStackTrace){
-					Error.captureStackTrace(rejection = {}, reject);
-				}
-				signalWaiting(waiting, fulfilled = REJECTED, result = error, rejection, deferred);
-				waiting = null;
-				return promise;
-			}else if(strict === true){
-				throw new Error(FULFILLED_ERROR_MESSAGE);
-			}else{
-				return promise;
-			}
-		};
-
-		this.then = promise.then = function(callback, errback, progback){
-			// summary:
-			//		Add new callbacks to the deferred.
-			// description:
-			//		Add new callbacks to the deferred. Callbacks can be added
-			//		before or after the deferred is fulfilled.
-			// callback: Function?
-			//		Callback to be invoked when the promise is resolved.
-			//		Receives the resolution value.
-			// errback: Function?
-			//		Callback to be invoked when the promise is rejected.
-			//		Receives the rejection error.
-			// progback: Function?
-			//		Callback to be invoked when the promise emits a progress
-			//		update. Receives the progress update.
-			// returns: dojo/promise/Promise
-			//		Returns a new promise for the result of the callback(s).
-			//		This can be used for chaining many asynchronous operations.
-
-			var listener = [progback, callback, errback];
-			// Ensure we cancel the promise we're waiting for, or if callback/errback
-			// have returned a promise, cancel that one.
-			listener.cancel = promise.cancel;
-			listener.deferred = new Deferred(function(reason){
-				// Check whether cancel is really available, returned promises are not
-				// required to expose `cancel`
-				return listener.cancel && listener.cancel(reason);
-			});
-			if(fulfilled && !waiting){
-				signalListener(listener, fulfilled, result, rejection);
-			}else{
-				waiting.push(listener);
-			}
-			return listener.deferred.promise;
-		};
-
-		this.cancel = promise.cancel = function(reason, strict){
-			// summary:
-			//		Inform the deferred it may cancel its asynchronous operation.
-			// description:
-			//		Inform the deferred it may cancel its asynchronous operation.
-			//		The deferred's (optional) canceler is invoked and the
-			//		deferred will be left in a rejected state. Can affect other
-			//		promises that originate with the same deferred.
-			// reason: any
-			//		A message that may be sent to the deferred's canceler,
-			//		explaining why it's being canceled.
-			// strict: Boolean?
-			//		If strict, will throw an error if the deferred has already
-			//		been fulfilled and consequently cannot be canceled.
-			// returns: any
-			//		Returns the rejection reason if the deferred was canceled
-			//		normally.
-
-			if(!fulfilled){
-				// Cancel can be called even after the deferred is fulfilled
-				if(canceler){
-					var returnedReason = canceler(reason);
-					reason = typeof returnedReason === "undefined" ? reason : returnedReason;
-				}
-				canceled = true;
-				if(!fulfilled){
-					// Allow canceler to provide its own reason, but fall back to a CancelError
-					if(typeof reason === "undefined"){
-						reason = new CancelError();
-					}
-					reject(reason);
-					return reason;
-				}else if(fulfilled === REJECTED && result === reason){
-					return reason;
-				}
-			}else if(strict === true){
-				throw new Error(FULFILLED_ERROR_MESSAGE);
-			}
-		};
-
-		freezeObject(promise);
-	};
-
-	Deferred.prototype.toString = function(){
-		// returns: String
-		//		Returns `[object Deferred]`.
-
-		return "[object Deferred]";
-	};
-
-	if(instrumentation){
-		instrumentation(Deferred);
-	}
-
-	return Deferred;
-});
-
-},
-'dojo/errors/CancelError':function(){
-define(["./create"], function(create){
-	// module:
-	//		dojo/errors/CancelError
-
-	/*=====
-	return function(){
-		// summary:
-		//		Default error if a promise is canceled without a reason.
-	};
-	=====*/
-
-	return create("CancelError", null, null, { dojoType: "cancel" });
-});
-
-},
-'dojo/errors/create':function(){
-define(["../_base/lang"], function(lang){
-	return function(name, ctor, base, props){
-		base = base || Error;
-
-		var ErrorCtor = function(message){
-			if(base === Error){
-				if(Error.captureStackTrace){
-					Error.captureStackTrace(this, ErrorCtor);
-				}
-
-				// Error.call() operates on the returned error
-				// object rather than operating on |this|
-				var err = Error.call(this, message),
-					prop;
-
-				// Copy own properties from err to |this|
-				for(prop in err){
-					if(err.hasOwnProperty(prop)){
-						this[prop] = err[prop];
-					}
-				}
-
-				// messsage is non-enumerable in ES5
-				this.message = message;
-				// stack is non-enumerable in at least Firefox
-				this.stack = err.stack;
-			}else{
-				base.apply(this, arguments);
-			}
-			if(ctor){
-				ctor.apply(this, arguments);
-			}
-		};
-
-		ErrorCtor.prototype = lang.delegate(base.prototype, props);
-		ErrorCtor.prototype.name = name;
-		ErrorCtor.prototype.constructor = ErrorCtor;
-
-		return ErrorCtor;
-	};
-});
-
-},
-'dojo/promise/Promise':function(){
-define([
-	"../_base/lang"
-], function(lang){
-	"use strict";
-
-	// module:
-	//		dojo/promise/Promise
-
-	function throwAbstract(){
-		throw new TypeError("abstract");
-	}
-
-	return lang.extend(function Promise(){
-		// summary:
-		//		The public interface to a deferred.
-		// description:
-		//		The public interface to a deferred. All promises in Dojo are
-		//		instances of this class.
-	}, {
-		then: function(callback, errback, progback){
-			// summary:
-			//		Add new callbacks to the promise.
-			// description:
-			//		Add new callbacks to the deferred. Callbacks can be added
-			//		before or after the deferred is fulfilled.
-			// callback: Function?
-			//		Callback to be invoked when the promise is resolved.
-			//		Receives the resolution value.
-			// errback: Function?
-			//		Callback to be invoked when the promise is rejected.
-			//		Receives the rejection error.
-			// progback: Function?
-			//		Callback to be invoked when the promise emits a progress
-			//		update. Receives the progress update.
-			// returns: dojo/promise/Promise
-			//		Returns a new promise for the result of the callback(s).
-			//		This can be used for chaining many asynchronous operations.
-
-			throwAbstract();
-		},
-
-		cancel: function(reason, strict){
-			// summary:
-			//		Inform the deferred it may cancel its asynchronous operation.
-			// description:
-			//		Inform the deferred it may cancel its asynchronous operation.
-			//		The deferred's (optional) canceler is invoked and the
-			//		deferred will be left in a rejected state. Can affect other
-			//		promises that originate with the same deferred.
-			// reason: any
-			//		A message that may be sent to the deferred's canceler,
-			//		explaining why it's being canceled.
-			// strict: Boolean?
-			//		If strict, will throw an error if the deferred has already
-			//		been fulfilled and consequently cannot be canceled.
-			// returns: any
-			//		Returns the rejection reason if the deferred was canceled
-			//		normally.
-
-			throwAbstract();
-		},
-
-		isResolved: function(){
-			// summary:
-			//		Checks whether the promise has been resolved.
-			// returns: Boolean
-
-			throwAbstract();
-		},
-
-		isRejected: function(){
-			// summary:
-			//		Checks whether the promise has been rejected.
-			// returns: Boolean
-
-			throwAbstract();
-		},
-
-		isFulfilled: function(){
-			// summary:
-			//		Checks whether the promise has been resolved or rejected.
-			// returns: Boolean
-
-			throwAbstract();
-		},
-
-		isCanceled: function(){
-			// summary:
-			//		Checks whether the promise has been canceled.
-			// returns: Boolean
-
-			throwAbstract();
-		},
-
-		always: function(callbackOrErrback){
-			// summary:
-			//		Add a callback to be invoked when the promise is resolved
-			//		or rejected.
-			// callbackOrErrback: Function?
-			//		A function that is used both as a callback and errback.
-			// returns: dojo/promise/Promise
-			//		Returns a new promise for the result of the callback/errback.
-
-			return this.then(callbackOrErrback, callbackOrErrback);
-		},
-
-		otherwise: function(errback){
-			// summary:
-			//		Add new errbacks to the promise.
-			// errback: Function?
-			//		Callback to be invoked when the promise is rejected.
-			// returns: dojo/promise/Promise
-			//		Returns a new promise for the result of the errback.
-
-			return this.then(null, errback);
-		},
-
-		trace: function(){
-			return this;
-		},
-
-		traceRejected: function(){
-			return this;
-		},
-
-		toString: function(){
-			// returns: string
-			//		Returns `[object Promise]`.
-
-			return "[object Promise]";
-		}
-	});
-});
-
-},
-'dojo/when':function(){
-define([
-	"./Deferred",
-	"./promise/Promise"
-], function(Deferred, Promise){
-	"use strict";
-
-	// module:
-	//		dojo/when
-
-	return function when(valueOrPromise, callback, errback, progback){
-		// summary:
-		//		Transparently applies callbacks to values and/or promises.
-		// description:
-		//		Accepts promises but also transparently handles non-promises. If no
-		//		callbacks are provided returns a promise, regardless of the initial
-		//		value. Foreign promises are converted.
-		//
-		//		If callbacks are provided and the initial value is not a promise,
-		//		the callback is executed immediately with no error handling. Returns
-		//		a promise if the initial value is a promise, or the result of the
-		//		callback otherwise.
-		// valueOrPromise:
-		//		Either a regular value or an object with a `then()` method that
-		//		follows the Promises/A specification.
-		// callback: Function?
-		//		Callback to be invoked when the promise is resolved, or a non-promise
-		//		is received.
-		// errback: Function?
-		//		Callback to be invoked when the promise is rejected.
-		// progback: Function?
-		//		Callback to be invoked when the promise emits a progress update.
-		// returns: dojo/promise/Promise
-		//		Promise, or if a callback is provided, the result of the callback.
-
-		var receivedPromise = valueOrPromise && typeof valueOrPromise.then === "function";
-		var nativePromise = receivedPromise && valueOrPromise instanceof Promise;
-
-		if(!receivedPromise){
-			if(callback){
-				return callback(valueOrPromise);
-			}else{
-				return new Deferred().resolve(valueOrPromise);
-			}
-		}else if(!nativePromise){
-			var deferred = new Deferred(valueOrPromise.cancel);
-			valueOrPromise.then(deferred.resolve, deferred.reject, deferred.progress);
-			valueOrPromise = deferred.promise;
-		}
-
-		if(callback || errback || progback){
-			return valueOrPromise.then(callback, errback, progback);
-		}
-		return valueOrPromise;
-	};
-});
-
-},
-'dojo/_base/json':function(){
-define(["./kernel", "../json"], function(dojo, json){
-
-// module:
-//		dojo/_base/json
-
-/*=====
-return {
-	// summary:
-	//		This module defines the dojo JSON API.
-};
-=====*/
-
-dojo.fromJson = function(/*String*/ js){
-	// summary:
-	//		Parses a JavaScript expression and returns a JavaScript value.
-	// description:
-	//		Throws for invalid JavaScript expressions. It does not use a strict JSON parser. It
-	//		always delegates to eval(). The content passed to this method must therefore come
-	//		from a trusted source.
-	//		It is recommend that you use dojo/json's parse function for an
-	//		implementation uses the (faster) native JSON parse when available.
-	// js:
-	//		a string literal of a JavaScript expression, for instance:
-	//		`'{ "foo": [ "bar", 1, { "baz": "thud" } ] }'`
-
-	return eval("(" + js + ")"); // Object
-};
-
-/*=====
-dojo._escapeString = function(){
-	// summary:
-	//		Adds escape sequences for non-visual characters, double quote and
-	//		backslash and surrounds with double quotes to form a valid string
-	//		literal.
-};
-=====*/
-dojo._escapeString = json.stringify; // just delegate to json.stringify
-
-dojo.toJsonIndentStr = "\t";
-dojo.toJson = function(/*Object*/ it, /*Boolean?*/ prettyPrint){
-	// summary:
-	//		Returns a [JSON](http://json.org) serialization of an object.
-	// description:
-	//		Returns a [JSON](http://json.org) serialization of an object.
-	//		Note that this doesn't check for infinite recursion, so don't do that!
-	//		It is recommend that you use dojo/json's stringify function for an lighter
-	//		and faster implementation that matches the native JSON API and uses the
-	//		native JSON serializer when available.
-	// it:
-	//		an object to be serialized. Objects may define their own
-	//		serialization via a special "__json__" or "json" function
-	//		property. If a specialized serializer has been defined, it will
-	//		be used as a fallback.
-	//		Note that in 1.6, toJson would serialize undefined, but this no longer supported
-	//		since it is not supported by native JSON serializer.
-	// prettyPrint:
-	//		if true, we indent objects and arrays to make the output prettier.
-	//		The variable `dojo.toJsonIndentStr` is used as the indent string --
-	//		to use something other than the default (tab), change that variable
-	//		before calling dojo.toJson().
-	//		Note that if native JSON support is available, it will be used for serialization,
-	//		and native implementations vary on the exact spacing used in pretty printing.
-	// returns:
-	//		A JSON string serialization of the passed-in object.
-	// example:
-	//		simple serialization of a trivial object
-	//		|	var jsonStr = dojo.toJson({ howdy: "stranger!", isStrange: true });
-	//		|	doh.is('{"howdy":"stranger!","isStrange":true}', jsonStr);
-	// example:
-	//		a custom serializer for an objects of a particular class:
-	//		|	dojo.declare("Furby", null, {
-	//		|		furbies: "are strange",
-	//		|		furbyCount: 10,
-	//		|		__json__: function(){
-	//		|		},
-	//		|	});
-
-	// use dojo/json
-	return json.stringify(it, function(key, value){
-		if(value){
-			var tf = value.__json__||value.json;
-			if(typeof tf == "function"){
-				return tf.call(value);
-			}
-		}
-		return value;
-	}, prettyPrint && dojo.toJsonIndentStr);	// String
-};
-
-return dojo;
 });
 
 },
@@ -13288,1369 +10418,6 @@ define(["./has!dom-addeventlistener?:./aspect", "./_base/kernel", "./sniff"], fu
 		}; 
 	}
 	return on;
-});
-
-},
-'dojo/aspect':function(){
-define("dojo/aspect", [], function(){
-
-	// module:
-	//		dojo/aspect
-
-	"use strict";
-	var undefined, nextId = 0;
-	function advise(dispatcher, type, advice, receiveArguments){
-		var previous = dispatcher[type];
-		var around = type == "around";
-		var signal;
-		if(around){
-			var advised = advice(function(){
-				return previous.advice(this, arguments);
-			});
-			signal = {
-				remove: function(){
-					signal.cancelled = true;
-				},
-				advice: function(target, args){
-					return signal.cancelled ?
-						previous.advice(target, args) : // cancelled, skip to next one
-						advised.apply(target, args);	// called the advised function
-				}
-			};
-		}else{
-			// create the remove handler
-			signal = {
-				remove: function(){
-					if(this.advice){
-						// remove the advice to signal that this signal has been removed
-						this.advice = null;
-						var previous = signal.previous;
-						var next = signal.next;
-						if(!next && !previous){
-							delete dispatcher[type];
-						}else{
-							if(previous){
-								previous.next = next;
-							}else{
-								dispatcher[type] = next;
-							}
-							if(next){
-								next.previous = previous;
-							}
-						}
-					}
-				},
-				id: nextId++,
-				advice: advice,
-				receiveArguments: receiveArguments
-			};
-		}
-		if(previous && !around){
-			if(type == "after"){
-				// add the listener to the end of the list
-				// note that we had to change this loop a little bit to workaround a bizarre IE10 JIT bug 
-				while(previous.next && (previous = previous.next)){}
-				previous.next = signal;
-				signal.previous = previous;
-			}else if(type == "before"){
-				// add to beginning
-				dispatcher[type] = signal;
-				signal.next = previous;
-				previous.previous = signal;
-			}
-		}else{
-			// around or first one just replaces
-			dispatcher[type] = signal;
-		}
-		return signal;
-	}
-	function aspect(type){
-		return function(target, methodName, advice, receiveArguments){
-			var existing = target[methodName], dispatcher;
-			if(!existing || existing.target != target){
-				// no dispatcher in place
-				target[methodName] = dispatcher = function(){
-					var executionId = nextId;
-					// before advice
-					var args = arguments;
-					var before = dispatcher.before;
-					while(before){
-						args = before.advice.apply(this, args) || args;
-						before = before.next;
-					}
-					// around advice
-					if(dispatcher.around){
-						var results = dispatcher.around.advice(this, args);
-					}
-					// after advice
-					var after = dispatcher.after;
-					while(after && after.id < executionId){
-						if(after.receiveArguments){
-							var newResults = after.advice.apply(this, args);
-							// change the return value only if a new value was returned
-							results = newResults === undefined ? results : newResults;
-						}else{
-							results = after.advice.call(this, results, args);
-						}
-						after = after.next;
-					}
-					return results;
-				};
-				if(existing){
-					dispatcher.around = {advice: function(target, args){
-						return existing.apply(target, args);
-					}};
-				}
-				dispatcher.target = target;
-			}
-			var results = advise((dispatcher || existing), type, advice, receiveArguments);
-			advice = null;
-			return results;
-		};
-	}
-
-	// TODOC: after/before/around return object
-
-	var after = aspect("after");
-	/*=====
-	after = function(target, methodName, advice, receiveArguments){
-		// summary:
-		//		The "after" export of the aspect module is a function that can be used to attach
-		//		"after" advice to a method. This function will be executed after the original method
-		//		is executed. By default the function will be called with a single argument, the return
-		//		value of the original method, or the the return value of the last executed advice (if a previous one exists).
-		//		The fourth (optional) argument can be set to true to so the function receives the original
-		//		arguments (from when the original method was called) rather than the return value.
-		//		If there are multiple "after" advisors, they are executed in the order they were registered.
-		// target: Object
-		//		This is the target object
-		// methodName: String
-		//		This is the name of the method to attach to.
-		// advice: Function
-		//		This is function to be called after the original method
-		// receiveArguments: Boolean?
-		//		If this is set to true, the advice function receives the original arguments (from when the original mehtod
-		//		was called) rather than the return value of the original/previous method.
-		// returns:
-		//		A signal object that can be used to cancel the advice. If remove() is called on this signal object, it will
-		//		stop the advice function from being executed.
-	};
-	=====*/
-
-	var before = aspect("before");
-	/*=====
-	before = function(target, methodName, advice){
-		// summary:
-		//		The "before" export of the aspect module is a function that can be used to attach
-		//		"before" advice to a method. This function will be executed before the original method
-		//		is executed. This function will be called with the arguments used to call the method.
-		//		This function may optionally return an array as the new arguments to use to call
-		//		the original method (or the previous, next-to-execute before advice, if one exists).
-		//		If the before method doesn't return anything (returns undefined) the original arguments
-		//		will be preserved.
-		//		If there are multiple "before" advisors, they are executed in the reverse order they were registered.
-		// target: Object
-		//		This is the target object
-		// methodName: String
-		//		This is the name of the method to attach to.
-		// advice: Function
-		//		This is function to be called before the original method
-	};
-	=====*/
-
-	var around = aspect("around");
-	/*=====
-	 around = function(target, methodName, advice){
-		// summary:
-		//		The "around" export of the aspect module is a function that can be used to attach
-		//		"around" advice to a method. The advisor function is immediately executed when
-		//		the around() is called, is passed a single argument that is a function that can be
-		//		called to continue execution of the original method (or the next around advisor).
-		//		The advisor function should return a function, and this function will be called whenever
-		//		the method is called. It will be called with the arguments used to call the method.
-		//		Whatever this function returns will be returned as the result of the method call (unless after advise changes it).
-		// example:
-		//		If there are multiple "around" advisors, the most recent one is executed first,
-		//		which can then delegate to the next one and so on. For example:
-		//		|	around(obj, "foo", function(originalFoo){
-		//		|		return function(){
-		//		|			var start = new Date().getTime();
-		//		|			var results = originalFoo.apply(this, arguments); // call the original
-		//		|			var end = new Date().getTime();
-		//		|			0 && console.log("foo execution took " + (end - start) + " ms");
-		//		|			return results;
-		//		|		};
-		//		|	});
-		// target: Object
-		//		This is the target object
-		// methodName: String
-		//		This is the name of the method to attach to.
-		// advice: Function
-		//		This is function to be called around the original method
-	};
-	=====*/
-
-	return {
-		// summary:
-		//		provides aspect oriented programming functionality, allowing for
-		//		one to add before, around, or after advice on existing methods.
-		// example:
-		//	|	define(["dojo/aspect"], function(aspect){
-		//	|		var signal = aspect.after(targetObject, "methodName", function(someArgument){
-		//	|			this will be called when targetObject.methodName() is called, after the original function is called
-		//	|		});
-		//
-		// example:
-		//	The returned signal object can be used to cancel the advice.
-		//	|	signal.remove(); // this will stop the advice from being executed anymore
-		//	|	aspect.before(targetObject, "methodName", function(someArgument){
-		//	|		// this will be called when targetObject.methodName() is called, before the original function is called
-		//	|	 });
-
-		before: before,
-		around: around,
-		after: after
-	};
-});
-
-},
-'dojo/request/watch':function(){
-define([
-	'./util',
-	'../errors/RequestTimeoutError',
-	'../errors/CancelError',
-	'../_base/array',
-	'../_base/window',
-	'../has!host-browser?dom-addeventlistener?:../on:'
-], function(util, RequestTimeoutError, CancelError, array, win, on){
-	// avoid setting a timer per request. It degrades performance on IE
-	// something fierece if we don't use unified loops.
-	var _inFlightIntvl = null,
-		_inFlight = [];
-
-	function watchInFlight(){
-		// summary:
-		//		internal method that checks each inflight XMLHttpRequest to see
-		//		if it has completed or if the timeout situation applies.
-
-		var now = +(new Date);
-
-		// we need manual loop because we often modify _inFlight (and therefore 'i') while iterating
-		for(var i = 0, dfd; i < _inFlight.length && (dfd = _inFlight[i]); i++){
-			var response = dfd.response,
-				options = response.options;
-			if((dfd.isCanceled && dfd.isCanceled()) || (dfd.isValid && !dfd.isValid(response))){
-				_inFlight.splice(i--, 1);
-				watch._onAction && watch._onAction();
-			}else if(dfd.isReady && dfd.isReady(response)){
-				_inFlight.splice(i--, 1);
-				dfd.handleResponse(response);
-				watch._onAction && watch._onAction();
-			}else if(dfd.startTime){
-				// did we timeout?
-				if(dfd.startTime + (options.timeout || 0) < now){
-					_inFlight.splice(i--, 1);
-					// Cancel the request so the io module can do appropriate cleanup.
-					dfd.cancel(new RequestTimeoutError('Timeout exceeded', response));
-					watch._onAction && watch._onAction();
-				}
-			}
-		}
-
-		watch._onInFlight && watch._onInFlight(dfd);
-
-		if(!_inFlight.length){
-			clearInterval(_inFlightIntvl);
-			_inFlightIntvl = null;
-		}
-	}
-
-	function watch(dfd){
-		// summary:
-		//		Watches the io request represented by dfd to see if it completes.
-		// dfd: Deferred
-		//		The Deferred object to watch.
-		// response: Object
-		//		The object used as the value of the request promise.
-		// validCheck: Function
-		//		Function used to check if the IO request is still valid. Gets the dfd
-		//		object as its only argument.
-		// ioCheck: Function
-		//		Function used to check if basic IO call worked. Gets the dfd
-		//		object as its only argument.
-		// resHandle: Function
-		//		Function used to process response. Gets the dfd
-		//		object as its only argument.
-		if(dfd.response.options.timeout){
-			dfd.startTime = +(new Date);
-		}
-
-		if(dfd.isFulfilled()){
-			// bail out if the deferred is already fulfilled
-			return;
-		}
-
-		_inFlight.push(dfd);
-		if(!_inFlightIntvl){
-			_inFlightIntvl = setInterval(watchInFlight, 50);
-		}
-
-		// handle sync requests separately from async:
-		// http://bugs.dojotoolkit.org/ticket/8467
-		if(dfd.response.options.sync){
-			watchInFlight();
-		}
-	}
-
-	watch.cancelAll = function cancelAll(){
-		// summary:
-		//		Cancels all pending IO requests, regardless of IO type
-		try{
-			array.forEach(_inFlight, function(dfd){
-				try{
-					dfd.cancel(new CancelError('All requests canceled.'));
-				}catch(e){}
-			});
-		}catch(e){}
-	};
-
-	if(win && on && win.doc.attachEvent){
-		// Automatically call cancel all io calls on unload in IE
-		// http://bugs.dojotoolkit.org/ticket/2357
-		on(win.global, 'unload', function(){
-			watch.cancelAll();
-		});
-	}
-
-	return watch;
-});
-
-},
-'dojo/request/util':function(){
-define([
-	'exports',
-	'../errors/RequestError',
-	'../errors/CancelError',
-	'../Deferred',
-	'../io-query',
-	'../_base/array',
-	'../_base/lang'
-], function(exports, RequestError, CancelError, Deferred, ioQuery, array, lang){
-	exports.deepCopy = function deepCopy(target, source){
-		for(var name in source){
-			var tval = target[name],
-				sval = source[name];
-			if(tval !== sval){
-				if(tval && typeof tval === 'object' && sval && typeof sval === 'object'){
-					exports.deepCopy(tval, sval);
-				}else{
-					target[name] = sval;
-				}
-			}
-		}
-		return target;
-	};
-
-	exports.deepCreate = function deepCreate(source, properties){
-		properties = properties || {};
-		var target = lang.delegate(source),
-			name, value;
-
-		for(name in source){
-			value = source[name];
-
-			if(value && typeof value === 'object'){
-				target[name] = exports.deepCreate(value, properties[name]);
-			}
-		}
-		return exports.deepCopy(target, properties);
-	};
-
-	var freeze = Object.freeze || function(obj){ return obj; };
-	function okHandler(response){
-		return freeze(response);
-	}
-
-	exports.deferred = function deferred(response, cancel, isValid, isReady, handleResponse, last){
-		var def = new Deferred(function(reason){
-			cancel && cancel(def, response);
-
-			if(!reason || !(reason instanceof RequestError) && !(reason instanceof CancelError)){
-				return new CancelError('Request canceled', response);
-			}
-			return reason;
-		});
-
-		def.response = response;
-		def.isValid = isValid;
-		def.isReady = isReady;
-		def.handleResponse = handleResponse;
-
-		function errHandler(error){
-			error.response = response;
-			throw error;
-		}
-		var responsePromise = def.then(okHandler).otherwise(errHandler);
-
-		if(exports.notify){
-			responsePromise.then(
-				lang.hitch(exports.notify, 'emit', 'load'),
-				lang.hitch(exports.notify, 'emit', 'error')
-			);
-		}
-
-		var dataPromise = responsePromise.then(function(response){
-				return response.data || response.text;
-			});
-
-		var promise = freeze(lang.delegate(dataPromise, {
-			response: responsePromise
-		}));
-
-
-		if(last){
-			def.then(function(response){
-				last.call(def, response);
-			}, function(error){
-				last.call(def, response, error);
-			});
-		}
-
-		def.promise = promise;
-		def.then = promise.then;
-
-		return def;
-	};
-
-	exports.addCommonMethods = function addCommonMethods(provider, methods){
-		array.forEach(methods||['GET', 'POST', 'PUT', 'DELETE'], function(method){
-			provider[(method === 'DELETE' ? 'DEL' : method).toLowerCase()] = function(url, options){
-				options = lang.delegate(options||{});
-				options.method = method;
-				return provider(url, options);
-			};
-		});
-	};
-
-	exports.parseArgs = function parseArgs(url, options, skipData){
-		var data = options.data,
-			query = options.query;
-		
-		if(data && !skipData){
-			if(typeof data === 'object'){
-				options.data = ioQuery.objectToQuery(data);
-			}
-		}
-
-		if(query){
-			if(typeof query === 'object'){
-				query = ioQuery.objectToQuery(query);
-			}
-			if(options.preventCache){
-				query += (query ? '&' : '') + 'request.preventCache=' + (+(new Date));
-			}
-		}else if(options.preventCache){
-			query = 'request.preventCache=' + (+(new Date));
-		}
-
-		if(url && query){
-			url += (~url.indexOf('?') ? '&' : '?') + query;
-		}
-
-		return {
-			url: url,
-			options: options,
-			getHeader: function(headerName){ return null; }
-		};
-	};
-
-	exports.checkStatus = function(stat){
-		stat = stat || 0;
-		return (stat >= 200 && stat < 300) || // allow any 2XX response code
-			stat === 304 ||                 // or, get it out of the cache
-			stat === 1223 ||                // or, Internet Explorer mangled the status code
-			!stat;                         // or, we're Titanium/browser chrome/chrome extension requesting a local file
-	};
-});
-
-},
-'dojo/errors/RequestError':function(){
-define(['./create'], function(create){
-	// module:
-	//		dojo/errors/RequestError
-
-	/*=====
-	 return function(){
-		 // summary:
-		 //		TODOC
-	 };
-	 =====*/
-
-	return create("RequestError", function(message, response){
-		this.response = response;
-	});
-});
-
-},
-'dojo/errors/RequestTimeoutError':function(){
-define(['./create', './RequestError'], function(create, RequestError){
-	// module:
-	//		dojo/errors/RequestTimeoutError
-
-	/*=====
-	 return function(){
-		 // summary:
-		 //		TODOC
-	 };
-	 =====*/
-
-	return create("RequestTimeoutError", null, RequestError, {
-		dojoType: "timeout"
-	});
-});
-
-},
-'dojo/request/xhr':function(){
-define([
-	'../errors/RequestError',
-	'./watch',
-	'./handlers',
-	'./util',
-	'../has'/*=====,
-	'../request',
-	'../_base/declare' =====*/
-], function(RequestError, watch, handlers, util, has/*=====, request, declare =====*/){
-	has.add('native-xhr', function(){
-		// if true, the environment has a native XHR implementation
-		return typeof XMLHttpRequest !== 'undefined';
-	});
-	has.add('dojo-force-activex-xhr', function(){
-		return has('activex') && !document.addEventListener && window.location.protocol === 'file:';
-	});
-
-	has.add('native-xhr2', function(){
-		if(!has('native-xhr')){ return; }
-		var x = new XMLHttpRequest();
-		return typeof x['addEventListener'] !== 'undefined' &&
-			(typeof opera === 'undefined' || typeof x['upload'] !== 'undefined');
-	});
-
-	has.add('native-formdata', function(){
-		// if true, the environment has a native FormData implementation
-		return typeof FormData === 'function';
-	});
-
-	function handleResponse(response, error){
-		var _xhr = response.xhr;
-		response.status = response.xhr.status;
-		response.text = _xhr.responseText;
-
-		if(response.options.handleAs === 'xml'){
-			response.data = _xhr.responseXML;
-		}
-
-		if(!error){
-			try{
-				handlers(response);
-			}catch(e){
-				error = e;
-			}
-		}
-
-		if(error){
-			this.reject(error);
-		}else if(util.checkStatus(_xhr.status)){
-			this.resolve(response);
-		}else{
-			error = new RequestError('Unable to load ' + response.url + ' status: ' + _xhr.status, response);
-
-			this.reject(error);
-		}
-	}
-
-	var isValid, isReady, addListeners, cancel;
-	if(has('native-xhr2')){
-		// Any platform with XHR2 will only use the watch mechanism for timeout.
-
-		isValid = function(response){
-			// summary:
-			//		Check to see if the request should be taken out of the watch queue
-			return !this.isFulfilled();
-		};
-		cancel = function(dfd, response){
-			// summary:
-			//		Canceler for deferred
-			response.xhr.abort();
-		};
-		addListeners = function(_xhr, dfd, response){
-			// summary:
-			//		Adds event listeners to the XMLHttpRequest object
-			function onLoad(evt){
-				dfd.handleResponse(response);
-			}
-			function onError(evt){
-				var _xhr = evt.target;
-				var error = new RequestError('Unable to load ' + response.url + ' status: ' + _xhr.status, response); 
-				dfd.handleResponse(response, error);
-			}
-
-			function onProgress(evt){
-				if(evt.lengthComputable){
-					response.loaded = evt.loaded;
-					response.total = evt.total;
-					dfd.progress(response);
-				}
-			}
-
-			_xhr.addEventListener('load', onLoad, false);
-			_xhr.addEventListener('error', onError, false);
-			_xhr.addEventListener('progress', onProgress, false);
-
-			return function(){
-				_xhr.removeEventListener('load', onLoad, false);
-				_xhr.removeEventListener('error', onError, false);
-				_xhr.removeEventListener('progress', onProgress, false);
-			};
-		};
-	}else{
-		isValid = function(response){
-			return response.xhr.readyState; //boolean
-		};
-		isReady = function(response){
-			return 4 === response.xhr.readyState; //boolean
-		};
-		cancel = function(dfd, response){
-			// summary:
-			//		canceller function for util.deferred call.
-			var xhr = response.xhr;
-			var _at = typeof xhr.abort;
-			if(_at === 'function' || _at === 'object' || _at === 'unknown'){
-				xhr.abort();
-			}
-		};
-	}
-
-	var undefined,
-		defaultOptions = {
-			data: null,
-			query: null,
-			sync: false,
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
-			}
-		};
-	function xhr(url, options, returnDeferred){
-		var response = util.parseArgs(
-			url,
-			util.deepCreate(defaultOptions, options),
-			has('native-formdata') && options && options.data && options.data instanceof FormData
-		);
-		url = response.url;
-		options = response.options;
-
-		var remover,
-			last = function(){
-				remover && remover();
-			};
-
-		//Make the Deferred object for this xhr request.
-		var dfd = util.deferred(
-			response,
-			cancel,
-			isValid,
-			isReady,
-			handleResponse,
-			last
-		);
-		var _xhr = response.xhr = xhr._create();
-
-		if(!_xhr){
-			// If XHR factory somehow returns nothings,
-			// cancel the deferred.
-			dfd.cancel(new RequestError('XHR was not created'));
-			return returnDeferred ? dfd : dfd.promise;
-		}
-
-		response.getHeader = function(headerName){
-			return this.xhr.getResponseHeader(headerName);
-		};
-
-		if(addListeners){
-			remover = addListeners(_xhr, dfd, response);
-		}
-
-		var data = options.data,
-			async = !options.sync,
-			method = options.method;
-
-		try{
-			// IE6 won't let you call apply() on the native function.
-			_xhr.open(method, url, async, options.user || undefined, options.password || undefined);
-
-			if(options.withCredentials){
-				_xhr.withCredentials = options.withCredentials;
-			}
-
-			var headers = options.headers,
-				contentType;
-			if(headers){
-				for(var hdr in headers){
-					if(hdr.toLowerCase() === 'content-type'){
-						contentType = headers[hdr];
-					}else if(headers[hdr]){
-						//Only add header if it has a value. This allows for instance, skipping
-						//insertion of X-Requested-With by specifying empty value.
-						_xhr.setRequestHeader(hdr, headers[hdr]);
-					}
-				}
-			}
-
-			if(contentType && contentType !== false){
-				_xhr.setRequestHeader('Content-Type', contentType);
-			}
-			if(!headers || !('X-Requested-With' in headers)){
-				_xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-			}
-
-			if(util.notify){
-				util.notify.emit('send', response, dfd.promise.cancel);
-			}
-			_xhr.send(data);
-		}catch(e){
-			dfd.reject(e);
-		}
-
-		watch(dfd);
-		_xhr = null;
-
-		return returnDeferred ? dfd : dfd.promise;
-	}
-
-	/*=====
-	xhr = function(url, options){
-		// summary:
-		//		Sends a request using XMLHttpRequest with the given URL and options.
-		// url: String
-		//		URL to request
-		// options: dojo/request/xhr.__Options?
-		//		Options for the request.
-		// returns: dojo/request.__Promise
-	};
-	xhr.__BaseOptions = declare(request.__BaseOptions, {
-		// sync: Boolean?
-		//		Whether to make a synchronous request or not. Default
-		//		is `false` (asynchronous).
-		// data: String|Object|FormData?
-		//		Data to transfer. This is ignored for GET and DELETE
-		//		requests.
-		// headers: Object?
-		//		Headers to use for the request.
-		// user: String?
-		//		Username to use during the request.
-		// password: String?
-		//		Password to use during the request.
-		// withCredentials: Boolean?
-		//		For cross-site requests, whether to send credentials
-		//		or not.
-	});
-	xhr.__MethodOptions = declare(null, {
-		// method: String?
-		//		The HTTP method to use to make the request. Must be
-		//		uppercase. Default is `"GET"`.
-	});
-	xhr.__Options = declare([xhr.__BaseOptions, xhr.__MethodOptions]);
-
-	xhr.get = function(url, options){
-		// summary:
-		//		Send an HTTP GET request using XMLHttpRequest with the given URL and options.
-		// url: String
-		//		URL to request
-		// options: dojo/request/xhr.__BaseOptions?
-		//		Options for the request.
-		// returns: dojo/request.__Promise
-	};
-	xhr.post = function(url, options){
-		// summary:
-		//		Send an HTTP POST request using XMLHttpRequest with the given URL and options.
-		// url: String
-		//		URL to request
-		// options: dojo/request/xhr.__BaseOptions?
-		//		Options for the request.
-		// returns: dojo/request.__Promise
-	};
-	xhr.put = function(url, options){
-		// summary:
-		//		Send an HTTP PUT request using XMLHttpRequest with the given URL and options.
-		// url: String
-		//		URL to request
-		// options: dojo/request/xhr.__BaseOptions?
-		//		Options for the request.
-		// returns: dojo/request.__Promise
-	};
-	xhr.del = function(url, options){
-		// summary:
-		//		Send an HTTP DELETE request using XMLHttpRequest with the given URL and options.
-		// url: String
-		//		URL to request
-		// options: dojo/request/xhr.__BaseOptions?
-		//		Options for the request.
-		// returns: dojo/request.__Promise
-	};
-	=====*/
-	xhr._create = function(){
-		// summary:
-		//		does the work of portably generating a new XMLHTTPRequest object.
-		throw new Error('XMLHTTP not available');
-	};
-	if(has('native-xhr') && !has('dojo-force-activex-xhr')){
-		xhr._create = function(){
-			return new XMLHttpRequest();
-		};
-	}else if(has('activex')){
-		try{
-			new ActiveXObject('Msxml2.XMLHTTP');
-			xhr._create = function(){
-				return new ActiveXObject('Msxml2.XMLHTTP');
-			};
-		}catch(e){
-			try{
-				new ActiveXObject('Microsoft.XMLHTTP');
-				xhr._create = function(){
-					return new ActiveXObject('Microsoft.XMLHTTP');
-				};
-			}catch(e){}
-		}
-	}
-
-	util.addCommonMethods(xhr);
-
-	return xhr;
-});
-
-},
-'dojo/request/handlers':function(){
-define([
-	'../json',
-	'../_base/kernel',
-	'../_base/array',
-	'../has'
-], function(JSON, kernel, array, has){
-	has.add('activex', typeof ActiveXObject !== 'undefined');
-
-	var handleXML;
-	if(has('activex')){
-		// GUIDs obtained from http://msdn.microsoft.com/en-us/library/ms757837(VS.85).aspx
-		var dp = [
-			'Msxml2.DOMDocument.6.0',
-			'Msxml2.DOMDocument.4.0',
-			'MSXML2.DOMDocument.3.0',
-			'MSXML.DOMDocument' // 2.0
-		];
-
-		handleXML = function(response){
-			var result = response.data;
-
-			if(!result || !result.documentElement){
-				var text = response.text;
-				array.some(dp, function(p){
-					try{
-						var dom = new ActiveXObject(p);
-						dom.async = false;
-						dom.loadXML(text);
-						result = dom;
-					}catch(e){ return false; }
-					return true;
-				});
-			}
-
-			return result;
-		};
-	}
-
-	var handlers = {
-		'javascript': function(response){
-			return kernel.eval(response.text || '');
-		},
-		'json': function(response){
-			return JSON.parse(response.text || null);
-		},
-		'xml': handleXML
-	};
-
-	function handle(response){
-		var handler = handlers[response.options.handleAs];
-
-		response.data = handler ? handler(response) : (response.data || response.text);
-
-		return response;
-	}
-
-	handle.register = function(name, handler){
-		handlers[name] = handler;
-	};
-
-	return handle;
-});
-
-},
-'dojo/regexp':function(){
-define(["./_base/kernel", "./_base/lang"], function(dojo, lang){
-
-// module:
-//		dojo/regexp
-
-var regexp = {
-	// summary:
-	//		Regular expressions and Builder resources
-};
-lang.setObject("dojo.regexp", regexp);
-
-regexp.escapeString = function(/*String*/str, /*String?*/except){
-	// summary:
-	//		Adds escape sequences for special characters in regular expressions
-	// except:
-	//		a String with special characters to be left unescaped
-
-	return str.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, function(ch){
-		if(except && except.indexOf(ch) != -1){
-			return ch;
-		}
-		return "\\" + ch;
-	}); // String
-};
-
-regexp.buildGroupRE = function(/*Object|Array*/arr, /*Function*/re, /*Boolean?*/nonCapture){
-	// summary:
-	//		Builds a regular expression that groups subexpressions
-	// description:
-	//		A utility function used by some of the RE generators. The
-	//		subexpressions are constructed by the function, re, in the second
-	//		parameter.  re builds one subexpression for each elem in the array
-	//		a, in the first parameter. Returns a string for a regular
-	//		expression that groups all the subexpressions.
-	// arr:
-	//		A single value or an array of values.
-	// re:
-	//		A function. Takes one parameter and converts it to a regular
-	//		expression.
-	// nonCapture:
-	//		If true, uses non-capturing match, otherwise matches are retained
-	//		by regular expression. Defaults to false
-
-	// case 1: a is a single value.
-	if(!(arr instanceof Array)){
-		return re(arr); // String
-	}
-
-	// case 2: a is an array
-	var b = [];
-	for(var i = 0; i < arr.length; i++){
-		// convert each elem to a RE
-		b.push(re(arr[i]));
-	}
-
-	 // join the REs as alternatives in a RE group.
-	return regexp.group(b.join("|"), nonCapture); // String
-};
-
-regexp.group = function(/*String*/expression, /*Boolean?*/nonCapture){
-	// summary:
-	//		adds group match to expression
-	// nonCapture:
-	//		If true, uses non-capturing match, otherwise matches are retained
-	//		by regular expression.
-	return "(" + (nonCapture ? "?:":"") + expression + ")"; // String
-};
-
-return regexp;
-});
-
-},
-'dojo/string':function(){
-define([
-	"./_base/kernel",	// kernel.global
-	"./_base/lang"
-], function(kernel, lang){
-
-// module:
-//		dojo/string
-
-var string = {
-	// summary:
-	//		String utilities for Dojo
-};
-lang.setObject("dojo.string", string);
-
-string.rep = function(/*String*/str, /*Integer*/num){
-	// summary:
-	//		Efficiently replicate a string `n` times.
-	// str:
-	//		the string to replicate
-	// num:
-	//		number of times to replicate the string
-
-	if(num <= 0 || !str){ return ""; }
-
-	var buf = [];
-	for(;;){
-		if(num & 1){
-			buf.push(str);
-		}
-		if(!(num >>= 1)){ break; }
-		str += str;
-	}
-	return buf.join("");	// String
-};
-
-string.pad = function(/*String*/text, /*Integer*/size, /*String?*/ch, /*Boolean?*/end){
-	// summary:
-	//		Pad a string to guarantee that it is at least `size` length by
-	//		filling with the character `ch` at either the start or end of the
-	//		string. Pads at the start, by default.
-	// text:
-	//		the string to pad
-	// size:
-	//		length to provide padding
-	// ch:
-	//		character to pad, defaults to '0'
-	// end:
-	//		adds padding at the end if true, otherwise pads at start
-	// example:
-	//	|	// Fill the string to length 10 with "+" characters on the right.  Yields "Dojo++++++".
-	//	|	string.pad("Dojo", 10, "+", true);
-
-	if(!ch){
-		ch = '0';
-	}
-	var out = String(text),
-		pad = string.rep(ch, Math.ceil((size - out.length) / ch.length));
-	return end ? out + pad : pad + out;	// String
-};
-
-string.substitute = function(	/*String*/		template,
-									/*Object|Array*/map,
-									/*Function?*/	transform,
-									/*Object?*/		thisObject){
-	// summary:
-	//		Performs parameterized substitutions on a string. Throws an
-	//		exception if any parameter is unmatched.
-	// template:
-	//		a string with expressions in the form `${key}` to be replaced or
-	//		`${key:format}` which specifies a format function. keys are case-sensitive.
-	// map:
-	//		hash to search for substitutions
-	// transform:
-	//		a function to process all parameters before substitution takes
-	//		place, e.g. mylib.encodeXML
-	// thisObject:
-	//		where to look for optional format function; default to the global
-	//		namespace
-	// example:
-	//		Substitutes two expressions in a string from an Array or Object
-	//	|	// returns "File 'foo.html' is not found in directory '/temp'."
-	//	|	// by providing substitution data in an Array
-	//	|	string.substitute(
-	//	|		"File '${0}' is not found in directory '${1}'.",
-	//	|		["foo.html","/temp"]
-	//	|	);
-	//	|
-	//	|	// also returns "File 'foo.html' is not found in directory '/temp'."
-	//	|	// but provides substitution data in an Object structure.  Dotted
-	//	|	// notation may be used to traverse the structure.
-	//	|	string.substitute(
-	//	|		"File '${name}' is not found in directory '${info.dir}'.",
-	//	|		{ name: "foo.html", info: { dir: "/temp" } }
-	//	|	);
-	// example:
-	//		Use a transform function to modify the values:
-	//	|	// returns "file 'foo.html' is not found in directory '/temp'."
-	//	|	string.substitute(
-	//	|		"${0} is not found in ${1}.",
-	//	|		["foo.html","/temp"],
-	//	|		function(str){
-	//	|			// try to figure out the type
-	//	|			var prefix = (str.charAt(0) == "/") ? "directory": "file";
-	//	|			return prefix + " '" + str + "'";
-	//	|		}
-	//	|	);
-	// example:
-	//		Use a formatter
-	//	|	// returns "thinger -- howdy"
-	//	|	string.substitute(
-	//	|		"${0:postfix}", ["thinger"], null, {
-	//	|			postfix: function(value, key){
-	//	|				return value + " -- howdy";
-	//	|			}
-	//	|		}
-	//	|	);
-
-	thisObject = thisObject || kernel.global;
-	transform = transform ?
-		lang.hitch(thisObject, transform) : function(v){ return v; };
-
-	return template.replace(/\$\{([^\s\:\}]+)(?:\:([^\s\:\}]+))?\}/g,
-		function(match, key, format){
-			var value = lang.getObject(key, false, map);
-			if(format){
-				value = lang.getObject(format, false, thisObject).call(thisObject, value, key);
-			}
-			return transform(value, key).toString();
-		}); // String
-};
-
-string.trim = String.prototype.trim ?
-	lang.trim : // aliasing to the native function
-	function(str){
-		str = str.replace(/^\s+/, '');
-		for(var i = str.length - 1; i >= 0; i--){
-			if(/\S/.test(str.charAt(i))){
-				str = str.substring(0, i + 1);
-				break;
-			}
-		}
-		return str;
-	};
-
-/*=====
- string.trim = function(str){
-	 // summary:
-	 //		Trims whitespace from both sides of the string
-	 // str: String
-	 //		String to be trimmed
-	 // returns: String
-	 //		Returns the trimmed string
-	 // description:
-	 //		This version of trim() was taken from [Steven Levithan's blog](http://blog.stevenlevithan.com/archives/faster-trim-javascript).
-	 //		The short yet performant version of this function is dojo.trim(),
-	 //		which is part of Dojo base.  Uses String.prototype.trim instead, if available.
-	 return "";	// String
- };
- =====*/
-
-	return string;
-});
-
-},
-'dojo/request/script':function(){
-define([
-	'module',
-	'./watch',
-	'./util',
-	'../_base/array',
-	'../_base/lang',
-	'../on',
-	'../dom',
-	'../dom-construct',
-	'../has',
-	'../_base/window'/*=====,
-	'../request',
-	'../_base/declare' =====*/
-], function(module, watch, util, array, lang, on, dom, domConstruct, has, win/*=====, request, declare =====*/){
-	has.add('script-readystatechange', function(global, document){
-		var script = document.createElement('script');
-		return typeof script['onreadystatechange'] !== 'undefined' &&
-			(typeof global['opera'] === 'undefined' || global['opera'].toString() !== '[object Opera]');
-	});
-
-	var mid = module.id.replace(/[\/\.\-]/g, '_'),
-		counter = 0,
-		loadEvent = has('script-readystatechange') ? 'readystatechange' : 'load',
-		readyRegExp = /complete|loaded/,
-		callbacks = this[mid + '_callbacks'] = {},
-		deadScripts = [];
-
-	function attach(id, url, frameDoc){
-		var doc = (frameDoc || win.doc),
-			element = doc.createElement('script');
-
-		element.type = 'text/javascript';
-		element.src = url;
-		element.id = id;
-		element.async = true;
-		element.charset = 'utf-8';
-
-		return doc.getElementsByTagName('head')[0].appendChild(element);
-	}
-
-	function remove(id, frameDoc, cleanup){
-		domConstruct.destroy(dom.byId(id, frameDoc));
-
-		if(callbacks[id]){
-			if(cleanup){
-				// set callback to a function that deletes itself so requests that
-				// are in-flight don't error out when returning and also
-				// clean up after themselves
-				callbacks[id] = function(){
-					delete callbacks[id];
-				};
-			}else{
-				delete callbacks[id];
-			}
-		}
-	}
-
-	function _addDeadScript(dfd){
-		// Be sure to check ioArgs because it can dynamically change in the dojox/io plugins.
-		// See http://bugs.dojotoolkit.org/ticket/15890.
-		var options = dfd.response.options,
-			frameDoc = options.ioArgs ? options.ioArgs.frameDoc : options.frameDoc;
-
-		deadScripts.push({ id: dfd.id, frameDoc: frameDoc });
-
-		if(options.ioArgs){
-			options.ioArgs.frameDoc = null;
-		}
-		options.frameDoc = null;
-	}
-
-	function canceler(dfd, response){
-		if(dfd.canDelete){
-			//For timeouts and cancels, remove the script element immediately to
-			//avoid a response from it coming back later and causing trouble.
-			script._remove(dfd.id, response.options.frameDoc, true);
-		}
-	}
-	function isValid(response){
-		//Do script cleanup here. We wait for one inflight pass
-		//to make sure we don't get any weird things by trying to remove a script
-		//tag that is part of the call chain (IE 6 has been known to
-		//crash in that case).
-		if(deadScripts && deadScripts.length){
-			array.forEach(deadScripts, function(_script){
-				script._remove(_script.id, _script.frameDoc);
-				_script.frameDoc = null;
-			});
-			deadScripts = [];
-		}
-
-		return response.options.jsonp ? !response.data : true;
-	}
-	function isReadyScript(response){
-		return !!this.scriptLoaded;
-	}
-	function isReadyCheckString(response){
-		var checkString = response.options.checkString;
-
-		return checkString && eval('typeof(' + checkString + ') !== "undefined"');
-	}
-	function handleResponse(response, error){
-		if(this.canDelete){
-			_addDeadScript(this);
-		}
-		if(error){
-			this.reject(error);
-		}else{
-			this.resolve(response);
-		}
-	}
-
-	function script(url, options, returnDeferred){
-		var response = util.parseArgs(url, util.deepCopy({}, options));
-		url = response.url;
-		options = response.options;
-
-		var dfd = util.deferred(
-			response,
-			canceler,
-			isValid,
-			options.jsonp ? null : (options.checkString ? isReadyCheckString : isReadyScript),
-			handleResponse
-		);
-
-		lang.mixin(dfd, {
-			id: mid + (counter++),
-			canDelete: false
-		});
-
-		if(options.jsonp){
-			var queryParameter = new RegExp('[?&]' + options.jsonp + '=');
-			if(!queryParameter.test(url)){
-				url += (~url.indexOf('?') ? '&' : '?') +
-					options.jsonp + '=' +
-					(options.frameDoc ? 'parent.' : '') +
-					mid + '_callbacks.' + dfd.id;
-			}
-
-			dfd.canDelete = true;
-			callbacks[dfd.id] = function(json){
-				response.data = json;
-				dfd.handleResponse(response);
-			};
-		}
-
-		if(util.notify){
-			util.notify.emit('send', response, dfd.promise.cancel);
-		}
-
-		if(!options.canAttach || options.canAttach(dfd)){
-			var node = script._attach(dfd.id, url, options.frameDoc);
-
-			if(!options.jsonp && !options.checkString){
-				var handle = on(node, loadEvent, function(evt){
-					if(evt.type === 'load' || readyRegExp.test(node.readyState)){
-						handle.remove();
-						dfd.scriptLoaded = evt;
-					}
-				});
-			}
-		}
-
-		watch(dfd);
-
-		return returnDeferred ? dfd : dfd.promise;
-	}
-	script.get = script;
-	/*=====
-	script = function(url, options){
-		// summary:
-		//		Sends a request using a script element with the given URL and options.
-		// url: String
-		//		URL to request
-		// options: dojo/request/script.__Options?
-		//		Options for the request.
-		// returns: dojo/request.__Promise
-	};
-	script.__BaseOptions = declare(request.__BaseOptions, {
-		// jsonp: String?
-		//		The URL parameter name that indicates the JSONP callback string.
-		//		For instance, when using Yahoo JSONP calls it is normally,
-		//		jsonp: "callback". For AOL JSONP calls it is normally
-		//		jsonp: "c".
-		// checkString: String?
-		//		A string of JavaScript that when evaluated like so:
-		//		"typeof(" + checkString + ") != 'undefined'"
-		//		being true means that the script fetched has been loaded.
-		//		Do not use this if doing a JSONP type of call (use `jsonp` instead).
-		// frameDoc: Document?
-		//		The Document object of a child iframe. If this is passed in, the script
-		//		will be attached to that document. This can be helpful in some comet long-polling
-		//		scenarios with Firefox and Opera.
-	});
-	script.__MethodOptions = declare(null, {
-		// method: String?
-		//		This option is ignored. All requests using this transport are
-		//		GET requests.
-	});
-	script.__Options = declare([script.__BaseOptions, script.__MethodOptions]);
-
-	script.get = function(url, options){
-		// summary:
-		//		Send an HTTP GET request using a script element with the given URL and options.
-		// url: String
-		//		URL to request
-		// options: dojo/request/script.__BaseOptions?
-		//		Options for the request.
-		// returns: dojo/request.__Promise
-	};
-	=====*/
-
-	// TODO: Remove in 2.0
-	script._attach = attach;
-	script._remove = remove;
-	script._callbacksProperty = mid + '_callbacks';
-
-	return script;
 });
 
 },
@@ -16157,6 +11924,229 @@ define("dojo/Evented", ["./aspect", "./on"], function(aspect, on){
 });
 
 },
+'dojo/aspect':function(){
+define("dojo/aspect", [], function(){
+
+	// module:
+	//		dojo/aspect
+
+	"use strict";
+	var undefined, nextId = 0;
+	function advise(dispatcher, type, advice, receiveArguments){
+		var previous = dispatcher[type];
+		var around = type == "around";
+		var signal;
+		if(around){
+			var advised = advice(function(){
+				return previous.advice(this, arguments);
+			});
+			signal = {
+				remove: function(){
+					signal.cancelled = true;
+				},
+				advice: function(target, args){
+					return signal.cancelled ?
+						previous.advice(target, args) : // cancelled, skip to next one
+						advised.apply(target, args);	// called the advised function
+				}
+			};
+		}else{
+			// create the remove handler
+			signal = {
+				remove: function(){
+					if(this.advice){
+						// remove the advice to signal that this signal has been removed
+						this.advice = null;
+						var previous = signal.previous;
+						var next = signal.next;
+						if(!next && !previous){
+							delete dispatcher[type];
+						}else{
+							if(previous){
+								previous.next = next;
+							}else{
+								dispatcher[type] = next;
+							}
+							if(next){
+								next.previous = previous;
+							}
+						}
+					}
+				},
+				id: nextId++,
+				advice: advice,
+				receiveArguments: receiveArguments
+			};
+		}
+		if(previous && !around){
+			if(type == "after"){
+				// add the listener to the end of the list
+				// note that we had to change this loop a little bit to workaround a bizarre IE10 JIT bug 
+				while(previous.next && (previous = previous.next)){}
+				previous.next = signal;
+				signal.previous = previous;
+			}else if(type == "before"){
+				// add to beginning
+				dispatcher[type] = signal;
+				signal.next = previous;
+				previous.previous = signal;
+			}
+		}else{
+			// around or first one just replaces
+			dispatcher[type] = signal;
+		}
+		return signal;
+	}
+	function aspect(type){
+		return function(target, methodName, advice, receiveArguments){
+			var existing = target[methodName], dispatcher;
+			if(!existing || existing.target != target){
+				// no dispatcher in place
+				target[methodName] = dispatcher = function(){
+					var executionId = nextId;
+					// before advice
+					var args = arguments;
+					var before = dispatcher.before;
+					while(before){
+						args = before.advice.apply(this, args) || args;
+						before = before.next;
+					}
+					// around advice
+					if(dispatcher.around){
+						var results = dispatcher.around.advice(this, args);
+					}
+					// after advice
+					var after = dispatcher.after;
+					while(after && after.id < executionId){
+						if(after.receiveArguments){
+							var newResults = after.advice.apply(this, args);
+							// change the return value only if a new value was returned
+							results = newResults === undefined ? results : newResults;
+						}else{
+							results = after.advice.call(this, results, args);
+						}
+						after = after.next;
+					}
+					return results;
+				};
+				if(existing){
+					dispatcher.around = {advice: function(target, args){
+						return existing.apply(target, args);
+					}};
+				}
+				dispatcher.target = target;
+			}
+			var results = advise((dispatcher || existing), type, advice, receiveArguments);
+			advice = null;
+			return results;
+		};
+	}
+
+	// TODOC: after/before/around return object
+
+	var after = aspect("after");
+	/*=====
+	after = function(target, methodName, advice, receiveArguments){
+		// summary:
+		//		The "after" export of the aspect module is a function that can be used to attach
+		//		"after" advice to a method. This function will be executed after the original method
+		//		is executed. By default the function will be called with a single argument, the return
+		//		value of the original method, or the the return value of the last executed advice (if a previous one exists).
+		//		The fourth (optional) argument can be set to true to so the function receives the original
+		//		arguments (from when the original method was called) rather than the return value.
+		//		If there are multiple "after" advisors, they are executed in the order they were registered.
+		// target: Object
+		//		This is the target object
+		// methodName: String
+		//		This is the name of the method to attach to.
+		// advice: Function
+		//		This is function to be called after the original method
+		// receiveArguments: Boolean?
+		//		If this is set to true, the advice function receives the original arguments (from when the original mehtod
+		//		was called) rather than the return value of the original/previous method.
+		// returns:
+		//		A signal object that can be used to cancel the advice. If remove() is called on this signal object, it will
+		//		stop the advice function from being executed.
+	};
+	=====*/
+
+	var before = aspect("before");
+	/*=====
+	before = function(target, methodName, advice){
+		// summary:
+		//		The "before" export of the aspect module is a function that can be used to attach
+		//		"before" advice to a method. This function will be executed before the original method
+		//		is executed. This function will be called with the arguments used to call the method.
+		//		This function may optionally return an array as the new arguments to use to call
+		//		the original method (or the previous, next-to-execute before advice, if one exists).
+		//		If the before method doesn't return anything (returns undefined) the original arguments
+		//		will be preserved.
+		//		If there are multiple "before" advisors, they are executed in the reverse order they were registered.
+		// target: Object
+		//		This is the target object
+		// methodName: String
+		//		This is the name of the method to attach to.
+		// advice: Function
+		//		This is function to be called before the original method
+	};
+	=====*/
+
+	var around = aspect("around");
+	/*=====
+	 around = function(target, methodName, advice){
+		// summary:
+		//		The "around" export of the aspect module is a function that can be used to attach
+		//		"around" advice to a method. The advisor function is immediately executed when
+		//		the around() is called, is passed a single argument that is a function that can be
+		//		called to continue execution of the original method (or the next around advisor).
+		//		The advisor function should return a function, and this function will be called whenever
+		//		the method is called. It will be called with the arguments used to call the method.
+		//		Whatever this function returns will be returned as the result of the method call (unless after advise changes it).
+		// example:
+		//		If there are multiple "around" advisors, the most recent one is executed first,
+		//		which can then delegate to the next one and so on. For example:
+		//		|	around(obj, "foo", function(originalFoo){
+		//		|		return function(){
+		//		|			var start = new Date().getTime();
+		//		|			var results = originalFoo.apply(this, arguments); // call the original
+		//		|			var end = new Date().getTime();
+		//		|			0 && console.log("foo execution took " + (end - start) + " ms");
+		//		|			return results;
+		//		|		};
+		//		|	});
+		// target: Object
+		//		This is the target object
+		// methodName: String
+		//		This is the name of the method to attach to.
+		// advice: Function
+		//		This is function to be called around the original method
+	};
+	=====*/
+
+	return {
+		// summary:
+		//		provides aspect oriented programming functionality, allowing for
+		//		one to add before, around, or after advice on existing methods.
+		// example:
+		//	|	define(["dojo/aspect"], function(aspect){
+		//	|		var signal = aspect.after(targetObject, "methodName", function(someArgument){
+		//	|			this will be called when targetObject.methodName() is called, after the original function is called
+		//	|		});
+		//
+		// example:
+		//	The returned signal object can be used to cancel the advice.
+		//	|	signal.remove(); // this will stop the advice from being executed anymore
+		//	|	aspect.before(targetObject, "methodName", function(someArgument){
+		//	|		// this will be called when targetObject.methodName() is called, before the original function is called
+		//	|	 });
+
+		before: before,
+		around: around,
+		after: after
+	};
+});
+
+},
 'dojo/_base/event':function(){
 define(["./kernel", "../on", "../has", "../dom-geometry"], function(dojo, on, has, dom){
 	// module:
@@ -17001,6 +12991,105 @@ define(["./_base/kernel", "./on", "./has", "./dom", "./_base/window"], function(
 });
 
 },
+'dojo/_base/sniff':function(){
+define(["./kernel", "./lang", "../sniff"], function(dojo, lang, has){
+	// module:
+	//		dojo/_base/sniff
+
+	/*=====
+	return {
+		// summary:
+		//		Deprecated.   New code should use dojo/sniff.
+		//		This module populates the dojo browser version sniffing properties like dojo.isIE.
+	};
+	=====*/
+
+	if(! 1 ){
+		return has;
+	}
+
+	// no idea what this is for, or if it's used
+	dojo._name = "browser";
+
+	lang.mixin(dojo, {
+		// isBrowser: Boolean
+		//		True if the client is a web-browser
+		isBrowser: true,
+
+		// isFF: Number|undefined
+		//		Version as a Number if client is FireFox. undefined otherwise. Corresponds to
+		//		major detected FireFox version (1.5, 2, 3, etc.)
+		isFF: has("ff"),
+
+		// isIE: Number|undefined
+		//		Version as a Number if client is MSIE(PC). undefined otherwise. Corresponds to
+		//		major detected IE version (6, 7, 8, etc.)
+		isIE: has("ie"),
+
+		// isKhtml: Number|undefined
+		//		Version as a Number if client is a KHTML browser. undefined otherwise. Corresponds to major
+		//		detected version.
+		isKhtml: has("khtml"),
+
+		// isWebKit: Number|undefined
+		//		Version as a Number if client is a WebKit-derived browser (Konqueror,
+		//		Safari, Chrome, etc.). undefined otherwise.
+		isWebKit: has("webkit"),
+
+		// isMozilla: Number|undefined
+		//		Version as a Number if client is a Mozilla-based browser (Firefox,
+		//		SeaMonkey). undefined otherwise. Corresponds to major detected version.
+		isMozilla: has("mozilla"),
+		// isMoz: Number|undefined
+		//		Version as a Number if client is a Mozilla-based browser (Firefox,
+		//		SeaMonkey). undefined otherwise. Corresponds to major detected version.
+		isMoz: has("mozilla"),
+
+		// isOpera: Number|undefined
+		//		Version as a Number if client is Opera. undefined otherwise. Corresponds to
+		//		major detected version.
+		isOpera: has("opera"),
+
+		// isSafari: Number|undefined
+		//		Version as a Number if client is Safari or iPhone. undefined otherwise.
+		isSafari: has("safari"),
+
+		// isChrome: Number|undefined
+		//		Version as a Number if client is Chrome browser. undefined otherwise.
+		isChrome: has("chrome"),
+
+		// isMac: Boolean
+		//		True if the client runs on Mac
+		isMac: has("mac"),
+
+		// isIos: Boolean
+		//		True if client is iPhone, iPod, or iPad
+		isIos: has("ios"),
+
+		// isAndroid: Number|undefined
+		//		Version as a Number if client is android browser. undefined otherwise.
+		isAndroid: has("android"),
+
+		// isWii: Boolean
+		//		True if client is Wii
+		isWii: has("wii"),
+
+		// isQuirks: Boolean
+		//		Page is in quirks mode.
+		isQuirks: has("quirks"),
+
+		// isAir: Boolean
+		//		True if client is Adobe Air
+		isAir: has("air")
+	});
+
+
+	dojo.locale = dojo.locale || (has("ie") ? navigator.userLanguage : navigator.language).toLowerCase();
+
+	return has;
+});
+
+},
 'dojo/keys':function(){
 define(["./_base/kernel", "./sniff"], function(dojo, has){
 
@@ -17247,180 +13336,6 @@ define(["./_base/kernel", "./sniff"], function(dojo, has){
 }.call(this));
 
 },
-'dojo/domReady':function(){
-define(['./has'], function(has){
-	var global = this,
-		doc = document,
-		readyStates = { 'loaded': 1, 'complete': 1 },
-		fixReadyState = typeof doc.readyState != "string",
-		ready = !!readyStates[doc.readyState],
-		readyQ = [],
-		recursiveGuard;
-
-	function domReady(callback){
-		// summary:
-		//		Plugin to delay require()/define() callback from firing until the DOM has finished loading.
-		readyQ.push(callback);
-		if(ready){ processQ(); }
-	}
-	domReady.load = function(id, req, load){
-		domReady(load);
-	};
-
-	// Export queue so that ready() can check if it's empty or not.
-	domReady._Q = readyQ;
-	domReady._onQEmpty = function(){
-		// summary:
-		//		Private method overridden by dojo/ready, to notify when everything in the
-		//		domReady queue has been processed.  Do not use directly.
-		//		Will be removed in 2.0, along with domReady._Q.
-	};
-
-	// For FF <= 3.5
-	if(fixReadyState){ doc.readyState = "loading"; }
-
-	function processQ(){
-		// Calls all functions in the queue in order, unless processQ() is already running, in which case just return
-
-		if(recursiveGuard){ return; }
-		recursiveGuard = true;
-
-		while(readyQ.length){
-			try{
-				(readyQ.shift())(doc);
-			}catch(err){
-				0 && console.log("Error on domReady callback: " + err);
-			}
-		}
-
-		recursiveGuard = false;
-
-		// Notification for dojo/ready.  Remove for 2.0.
-		// Note that this could add more tasks to the ready queue.
-		domReady._onQEmpty();
-	}
-
-	if(!ready){
-		var tests = [],
-			detectReady = function(evt){
-				evt = evt || global.event;
-				if(ready || (evt.type == "readystatechange" && !readyStates[doc.readyState])){ return; }
-
-				// For FF <= 3.5
-				if(fixReadyState){ doc.readyState = "complete"; }
-
-				ready = 1;
-				processQ();
-			},
-			on = function(node, event){
-				node.addEventListener(event, detectReady, false);
-				readyQ.push(function(){ node.removeEventListener(event, detectReady, false); });
-			};
-
-		if(!has("dom-addeventlistener")){
-			on = function(node, event){
-				event = "on" + event;
-				node.attachEvent(event, detectReady);
-				readyQ.push(function(){ node.detachEvent(event, detectReady); });
-			};
-
-			var div = doc.createElement("div");
-			try{
-				if(div.doScroll && global.frameElement === null){
-					// the doScroll test is only useful if we're in the top-most frame
-					tests.push(function(){
-						// Derived with permission from Diego Perini's IEContentLoaded
-						// http://javascript.nwbox.com/IEContentLoaded/
-						try{
-							div.doScroll("left");
-							return 1;
-						}catch(e){}
-					});
-				}
-			}catch(e){}
-		}
-
-		on(doc, "DOMContentLoaded");
-		on(global, "load");
-
-		if("onreadystatechange" in doc){
-			on(doc, "readystatechange");
-		}else if(!fixReadyState){
-			// if the ready state property exists and there's
-			// no readystatechange event, poll for the state
-			// to change
-			tests.push(function(){
-				return readyStates[doc.readyState];
-			});
-		}
-
-		if(tests.length){
-			var poller = function(){
-				if(ready){ return; }
-				var i = tests.length;
-				while(i--){
-					if(tests[i]()){
-						detectReady("poller");
-						return;
-					}
-				}
-				setTimeout(poller, 30);
-			};
-			poller();
-		}
-	}
-
-	return domReady;
-});
-
-},
-'hsl/flickr':function(){
-define([
-  'lodash',
-  'dojo/dom',
-  'dojo/request/script',
-  './lodash.templates'
-], function(_, dom, request){
-
-  'use strict';
-
-  0 && console.log("Flickr init...");
-
-  var url = 'https://api.flickr.com/services/rest/';
-
-  return request.get(url, {
-    jsonp: 'jsoncallback',
-    query: {
-      method: 'flickr.photos.search',
-      api_key: 'bec64c9c0f28889dc6e0c5ef7be3511f',
-      user_id: '60827818@N07',
-      tags: 'publish',
-      format: 'json'
-    }
-  }).then(function(data){
-    0 && console.log('Flickr loaded: ', data.photos.photo);
-
-    var photos = _.map(data.photos.photo, function(photo){
-      return {
-        image_url: _.templates.flickr_img_url(photo),
-        title: photo.title,
-        link: _.templates.flickr_link(photo),
-        description: ""
-      };
-    });
-
-    //for now just use the first image we got back from flickr
-    var flickrImage = dom.byId('main_image');
-    if(flickrImage){
-      flickrImage.innerHTML = _.templates.flickr(photos[0]);
-    }
-
-    return photos;
-  });
-
-});
-
-},
 'hsl/door_status':function(){
 define([
   'lodash',
@@ -17577,56 +13492,130 @@ define([
 });
 
 },
-'hsl/blogs':function(){
-define([
-  './replaceTags',
-  'lodash',
-  'dojo/dom',
-  'dojo/request/script',
-  './lodash.templates',
-  'dojo/domReady!'
-], function(replaceTags, _, dom, request){
+'dojo/domReady':function(){
+define(['./has'], function(has){
+	var global = this,
+		doc = document,
+		readyStates = { 'loaded': 1, 'complete': 1 },
+		fixReadyState = typeof doc.readyState != "string",
+		ready = !!readyStates[doc.readyState],
+		readyQ = [],
+		recursiveGuard;
 
-  'use strict';
+	function domReady(callback){
+		// summary:
+		//		Plugin to delay require()/define() callback from firing until the DOM has finished loading.
+		readyQ.push(callback);
+		if(ready){ processQ(); }
+	}
+	domReady.load = function(id, req, load){
+		domReady(load);
+	};
 
-  var url = 'http://pipes.yahoo.com/pipes/pipe.run';
+	// Export queue so that ready() can check if it's empty or not.
+	domReady._Q = readyQ;
+	domReady._onQEmpty = function(){
+		// summary:
+		//		Private method overridden by dojo/ready, to notify when everything in the
+		//		domReady queue has been processed.  Do not use directly.
+		//		Will be removed in 2.0, along with domReady._Q.
+	};
 
-  var blogEntries = dom.byId('blog-container');
+	// For FF <= 3.5
+	if(fixReadyState){ doc.readyState = "loading"; }
 
-  return request.get(url, {
-    jsonp: '_callback',
-    query: {
-      _id: 'eb41a075801cf56d9a76ea48deea1612',
-      _render: 'json'
-    }
-  }).then(function(data){
-    var entries = _(data.value.items)
-      .filter(function(entry){
-        return entry.title && entry.description && entry.link;
-      })
-      .map(function(entry){
-        return {
-          title: replaceTags(entry.title),
-          link: entry.link,
-          snippet: replaceTags(entry.description).substring(0, 150) + '...'
-        };
-      })
-      .first(3)
-      .value();
+	function processQ(){
+		// Calls all functions in the queue in order, unless processQ() is already running, in which case just return
 
-    if(blogEntries){
-      blogEntries.innerHTML = _.templates.blogs({
-        entries: entries
-      });
-    }
+		if(recursiveGuard){ return; }
+		recursiveGuard = true;
 
-    return entries;
-  }, function(err){
-    0 && console.log('Error in Blogs', err);
-    // TODO: template an error message
-    blogEntries.innerHTML = 'Error Loading Blogs - Please Refresh the Page';
-  });
+		while(readyQ.length){
+			try{
+				(readyQ.shift())(doc);
+			}catch(err){
+				0 && console.log("Error on domReady callback: " + err);
+			}
+		}
 
+		recursiveGuard = false;
+
+		// Notification for dojo/ready.  Remove for 2.0.
+		// Note that this could add more tasks to the ready queue.
+		domReady._onQEmpty();
+	}
+
+	if(!ready){
+		var tests = [],
+			detectReady = function(evt){
+				evt = evt || global.event;
+				if(ready || (evt.type == "readystatechange" && !readyStates[doc.readyState])){ return; }
+
+				// For FF <= 3.5
+				if(fixReadyState){ doc.readyState = "complete"; }
+
+				ready = 1;
+				processQ();
+			},
+			on = function(node, event){
+				node.addEventListener(event, detectReady, false);
+				readyQ.push(function(){ node.removeEventListener(event, detectReady, false); });
+			};
+
+		if(!has("dom-addeventlistener")){
+			on = function(node, event){
+				event = "on" + event;
+				node.attachEvent(event, detectReady);
+				readyQ.push(function(){ node.detachEvent(event, detectReady); });
+			};
+
+			var div = doc.createElement("div");
+			try{
+				if(div.doScroll && global.frameElement === null){
+					// the doScroll test is only useful if we're in the top-most frame
+					tests.push(function(){
+						// Derived with permission from Diego Perini's IEContentLoaded
+						// http://javascript.nwbox.com/IEContentLoaded/
+						try{
+							div.doScroll("left");
+							return 1;
+						}catch(e){}
+					});
+				}
+			}catch(e){}
+		}
+
+		on(doc, "DOMContentLoaded");
+		on(global, "load");
+
+		if("onreadystatechange" in doc){
+			on(doc, "readystatechange");
+		}else if(!fixReadyState){
+			// if the ready state property exists and there's
+			// no readystatechange event, poll for the state
+			// to change
+			tests.push(function(){
+				return readyStates[doc.readyState];
+			});
+		}
+
+		if(tests.length){
+			var poller = function(){
+				if(ready){ return; }
+				var i = tests.length;
+				while(i--){
+					if(tests[i]()){
+						detectReady("poller");
+						return;
+					}
+				}
+				setTimeout(poller, 30);
+			};
+			poller();
+		}
+	}
+
+	return domReady;
 });
 
 },
@@ -17658,6 +13647,19 @@ define([
   });
 
   return defer;
+
+});
+
+},
+'hsl/replaceTags':function(){
+define(function(){
+
+  return function(str){
+    if (str == null){
+      return '';
+    }
+    return String(str).replace(/<\/?[^>]+>/g, ' ');
+  };
 
 });
 
@@ -17869,6 +13871,64 @@ define([
 			return deferred.isFulfilled();
 		});
 		return deferred.promise;	// dojo/promise/Promise
+	};
+});
+
+},
+'dojo/when':function(){
+define([
+	"./Deferred",
+	"./promise/Promise"
+], function(Deferred, Promise){
+	"use strict";
+
+	// module:
+	//		dojo/when
+
+	return function when(valueOrPromise, callback, errback, progback){
+		// summary:
+		//		Transparently applies callbacks to values and/or promises.
+		// description:
+		//		Accepts promises but also transparently handles non-promises. If no
+		//		callbacks are provided returns a promise, regardless of the initial
+		//		value. Foreign promises are converted.
+		//
+		//		If callbacks are provided and the initial value is not a promise,
+		//		the callback is executed immediately with no error handling. Returns
+		//		a promise if the initial value is a promise, or the result of the
+		//		callback otherwise.
+		// valueOrPromise:
+		//		Either a regular value or an object with a `then()` method that
+		//		follows the Promises/A specification.
+		// callback: Function?
+		//		Callback to be invoked when the promise is resolved, or a non-promise
+		//		is received.
+		// errback: Function?
+		//		Callback to be invoked when the promise is rejected.
+		// progback: Function?
+		//		Callback to be invoked when the promise emits a progress update.
+		// returns: dojo/promise/Promise
+		//		Promise, or if a callback is provided, the result of the callback.
+
+		var receivedPromise = valueOrPromise && typeof valueOrPromise.then === "function";
+		var nativePromise = receivedPromise && valueOrPromise instanceof Promise;
+
+		if(!receivedPromise){
+			if(callback){
+				return callback(valueOrPromise);
+			}else{
+				return new Deferred().resolve(valueOrPromise);
+			}
+		}else if(!nativePromise){
+			var deferred = new Deferred(valueOrPromise.cancel);
+			valueOrPromise.then(deferred.resolve, deferred.reject, deferred.progress);
+			valueOrPromise = deferred.promise;
+		}
+
+		if(callback || errback || progback){
+			return valueOrPromise.then(callback, errback, progback);
+		}
+		return valueOrPromise;
 	};
 });
 
@@ -21812,7 +17872,5 @@ define(function(){
   }
 
 });
-},
-'*now':function(r){r(['dojo/i18n!*preload*dist/nls/hsl*["ar","ca","cs","da","de","el","en-gb","en-us","es-es","fi-fi","fr-fr","he-il","hu","it-it","ja-jp","ko-kr","nl-nl","nb","pl","pt-br","pt-pt","ru","sk","sl","sv","th","tr","zh-tw","zh-cn","ROOT"]']);}
-}});
+}}});
 (function(){ require({cache:{}}); require.boot && require.apply(null, require.boot); })();
