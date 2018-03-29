@@ -3,7 +3,8 @@
   "version": "0.2.2",
   "scripts": {
     "build": "grunt",
-    "install": "volo add"
+    "install": "volo add",
+    "start": "ecstatic --port 1337 --cache 0"
   },
   "volo": {
     "baseUrl": "deps",
@@ -17,15 +18,17 @@
     }
   },
   "devDependencies": {
+    "ecstatic": "^3.2.0",
     "grunt": "~0.4.1",
     "grunt-cli": "~0.1.9",
-    "grunt-dojo": "~0.2.4",
-    "grunt-contrib-watch": "~0.5.3",
-    "lodash-cli": "~2.2.1",
-    "grunt-lodash": "~0.3.0",
     "grunt-contrib-cssmin": "~0.6.2",
     "grunt-contrib-jshint": "~0.7.0",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-dojo": "~0.2.4",
+    "grunt-lodash": "~0.3.0",
+    "lodash-cli": "~2.2.1",
     "volo": "~0.3.0"
   },
-  "dojoBuild": "hsl.profile.js"
+  "dojoBuild": "hsl.profile.js",
+  "dependencies": {}
 }

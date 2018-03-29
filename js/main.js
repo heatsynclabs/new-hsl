@@ -3,14 +3,14 @@ define([
   './flickr',
   './door_status',
   // './blogs',
-  './mailing_list',
+  // './mailing_list',
   'dojo/promise/all',
   'dojo/on',
   'dojo/query',
   'require',
   'dojo/NodeList-manipulate',
   'dojo/domReady!'
-], function(flickr, door_status, mailing_list, all, on, query, require){
+], function(flickr, door_status, all, on, query, require){
 
   'use strict';
 
@@ -19,9 +19,9 @@ define([
   all({
 //    calendar: calendar,
     flickr: flickr,
-    door_status: door_status,
+    door_status: door_status
     // blogs: blogs,
-    mailing_list: mailing_list
+    // mailing_list: mailing_list
   }).then(function(results){
     // Debugging
     console.log('dogs');
@@ -29,7 +29,7 @@ define([
     console.log('flickr', results.flickr);
     console.log('door_status', results.door_status);
     console.log('blogs', results.blogs);
-    console.log('mailing_list', results.mailing_list);
+    // console.log('mailing_list', results.mailing_list);
 
     // Wait until everything else is done before loading cams
     require(['hsl/cams']);
