@@ -1943,14 +1943,14 @@ define([
   './flickr',
   './door_status',
   // './blogs',
-  './mailing_list',
+  // './mailing_list',
   'dojo/promise/all',
   'dojo/on',
   'dojo/query',
   'require',
   'dojo/NodeList-manipulate',
   'dojo/domReady!'
-], function(flickr, door_status, mailing_list, all, on, query, require){
+], function(flickr, door_status, all, on, query, require){
 
   'use strict';
 
@@ -1959,9 +1959,9 @@ define([
   all({
 //    calendar: calendar,
     flickr: flickr,
-    door_status: door_status,
+    door_status: door_status
     // blogs: blogs,
-    mailing_list: mailing_list
+    // mailing_list: mailing_list
   }).then(function(results){
     // Debugging
     console.log('dogs');
@@ -1969,7 +1969,7 @@ define([
     console.log('flickr', results.flickr);
     console.log('door_status', results.door_status);
     console.log('blogs', results.blogs);
-    console.log('mailing_list', results.mailing_list);
+    // console.log('mailing_list', results.mailing_list);
 
     // Wait until everything else is done before loading cams
     require(['hsl/cams']);
@@ -13616,183 +13616,6 @@ define(['./has'], function(has){
 	}
 
 	return domReady;
-});
-
-},
-'hsl/mailing_list':function(){
-define([
-  './replaceTags',
-  'lodash',
-  'dojo/dom',
-  'dojo/Deferred',
-  './lodash.templates',
-  'goog!feeds,1'
-], function(replaceTags, _, dom, Deferred){
-
-  'use strict';
-
-  var defer = new Deferred();
-
-  var feed = new google.feeds.Feed('https://groups.google.com/group/heatsynclabs/feed/rss_v2_0_topics.xml');
-  feed.setNumEntries(3);
-  feed.load(function(result) {
-    if (!result.error) {
-      console.log('Mailing List Entries: ', result.feed.entries);
-      var discussionContainer = dom.byId('discussion-container');
-      if(discussionContainer){
-        discussionContainer.innerHTML = _.templates.discussion(result.feed);
-      }
-      defer.resolve(result.feed);
-    }
-  });
-
-  return defer;
-
-});
-
-},
-'hsl/replaceTags':function(){
-define(function(){
-
-  return function(str){
-    if (str == null){
-      return '';
-    }
-    return String(str).replace(/<\/?[^>]+>/g, ' ');
-  };
-
-});
-
-},
-'goog/goog':function(){
-/** @license
- * RequireJS plugin for loading Google Ajax API modules thru `google.load`
- * Author: Miller Medeiros
- * Version: 0.2.0 (2011/12/06)
- * Released under the MIT license
- */
-define(['./async', './propertyParser'], function (async, propertyParser) {
-
-    var rParts = /^([^,]+)(?:,([^,]+))?(?:,(.+))?/;
-
-    function parseName(name){
-        var match = rParts.exec(name),
-            data = {
-                moduleName : match[1],
-                version : match[2] || '1'
-            };
-        data.settings = propertyParser.parseProperties(match[3]);
-        return data;
-    }
-
-    return {
-        load : function(name, req, onLoad, config){
-            if (config && config.isBuild) {
-                onLoad(null); //avoid errors on the optimizer
-            } else {
-                var data = parseName(name),
-                    settings = data.settings;
-
-                settings.callback = onLoad;
-
-                req(['goog/async!'+ (document.location.protocol === 'https:'? 'https' : 'http') +'://www.google.com/jsapi'], function(){
-                    google.load(data.moduleName, data.version, settings);
-                });
-            }
-        }
-    };
-
-});
-
-},
-'goog/async':function(){
-/** @license
- * RequireJS plugin for async dependency load like JSONP and Google Maps
- * Author: Miller Medeiros
- * Version: 0.1.1 (2011/11/17)
- * Released under the MIT license
- */
-define(function(){
-
-    var DEFAULT_PARAM_NAME = 'callback',
-        _uid = 0;
-
-    function injectScript(src){
-        var s, t;
-        s = document.createElement('script'); s.type = 'text/javascript'; s.async = true; s.src = src;
-        t = document.getElementsByTagName('script')[0]; t.parentNode.insertBefore(s,t);
-    }
-
-    function formatUrl(name, id){
-        var paramRegex = /!(.+)/,
-            url = name.replace(paramRegex, ''),
-            param = (paramRegex.test(name))? name.replace(/.+!/, '') : DEFAULT_PARAM_NAME;
-        url += (url.indexOf('?') < 0)? '?' : '&';
-        return url + param +'='+ id;
-    }
-
-    function uid() {
-        _uid += 1;
-        return '__async_req_'+ _uid +'__';
-    }
-
-    return{
-        load : function(name, req, onLoad, config){
-            if(config && config.isBuild){
-                onLoad(null); //avoid errors on the optimizer
-            }else{
-                var id = uid();
-                window[id] = onLoad; //create a global variable that stores onLoad so callback function can define new module after async load
-                injectScript(formatUrl(name, id));
-            }
-        }
-    };
-});
-
-},
-'goog/propertyParser':function(){
-/**
- * Basic parser for URL properties
- * @author Miller Medeiros
- * @version 0.1.0 (2011/12/06)
- * MIT license
- */
-define(function(){
-
-    var rProps = /([\w-]+)\s*:\s*(?:(\[[^\]]+\])|([^,]+)),?/g, //match "foo:bar" and "lorem:[ipsum,dolor]" capturing name as $1 and val as $2 or $3
-        rArr = /^\[([^\]]+)\]$/; //match "[foo,bar]" capturing "foo,bar"
-
-    function parseProperties(str){
-        var match, obj = {};
-        while (match = rProps.exec(str)) {
-            obj[ match[1] ] = typecastVal(match[2] || match[3]);
-        }
-        return obj;
-    }
-
-    function typecastVal(val){
-        if (rArr.test(val)){
-            val = val.replace(rArr, '$1').split(',');
-        } else if (val === 'null'){
-            val = null;
-        } else if (val === 'false'){
-            val = false;
-        } else if (val === 'true'){
-            val = true;
-        } else if (val === '' || val === "''" || val === '""'){
-            val = '';
-        } else if (! isNaN(val)) {
-            //isNaN('') == false
-            val = +val;
-        }
-        return val;
-    }
-
-    //API
-    return {
-        parseProperties : parseProperties,
-        typecastVal : typecastVal
-    };
 });
 
 },
