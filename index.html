@@ -34,21 +34,6 @@
       })();
 
     </script>
-
-    <script type="text/javascript">
-      var dojoConfig = {
-        baseUrl: '/',
-        packages: [
-          { name: 'dojo', location: 'deps/dojo' },
-          { name: 'lodash', location: 'deps/lodash', main: 'lodash'},
-          { name: 'goog', location: 'deps/requirejs-plugins/src', main: 'goog' },
-          { name: 'hsl', location: 'js' }
-        ],
-        deps: ['hsl/main'],
-        async: true
-      };
-    </script>
-    <script src="/dist/hsl.js" type="text/javascript"></script>
     <!-- For Development, use line below and comment out line above -->
     <!-- // <script src="/deps/dojo/dojo.js" type="text/javascript"></script> -->
   </head>
@@ -84,6 +69,7 @@
                   <i class="icon-spinner icon-spin"></i>
                 </span>
               </li>
+            </ul>
           </div>
           <div class="donation">
             <h3>
@@ -200,5 +186,6 @@ a.src=document.location.protocol+"//dnn506yrbagrg.cloudfront.net/pages/scripts/0
 a.async=true;a.type="text/javascript";b.parentNode.insertBefore(a,b)}, 1);
 </script>
 <!-- End ClickTale heatmapping -->
+<script src="/dist/main.bundle.js" type="text/javascript"></script>
   </body>
 </html>

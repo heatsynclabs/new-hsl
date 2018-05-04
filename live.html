@@ -3,17 +3,7 @@
 <html>
 
 <head>
-    <script type="text/javascript">
-        function refresh() {
-            for (var i = 1; i <= 4; i++) {
-                document.getElementById("livestream" + i).src = "http://live.heatsynclabs.org/snapshot.php?camera=" + i + "&time=" + new Date();
-                document.getElementById("lsAnchor" + i).href = "http://live.heatsynclabs.org/snapshot.php?camera=" + i + "&time=" + new Date();
-            }
-        }
-        function pageLoad() {
-            setInterval(refresh, 10000);
-        }
-    </script>
+
     <style type="text/css">
         body {
             background-color: #2C2C29;
@@ -24,6 +14,16 @@
             padding: 0;
         }
 
+        .open{
+        	color: green;
+        	display:inline;
+        }
+
+        .closed{
+        	color:red;
+        	display:inline;
+        }
+        
         #wrapper {
             width: 811px;
             margin: 0 auto;
@@ -77,7 +77,7 @@
     </style>
 </head>
 
-<body onLoad="pageLoad()">
+<body>
     <div id="wrapper">
         <a href="http://www.heatsynclabs.org">
             <img src="img/logo-light.png" height="116" />
@@ -115,8 +115,17 @@
                     <img id="livestream4" src="http://live.heatsynclabs.org/snapshot.php?camera=4" width="320" height="240" />
                 </a>
             </div>
+          <ul>
+            <li>doors currently:
+              <span id="door_status">
+                <i class="icon-spinner icon-spin"></i>
+              </span>
+            </li>
+          </ul>
         </div>
     </div>
+
+    <script src="/dist/live.bundle.js"></script>
 </body>
 
 </html>
