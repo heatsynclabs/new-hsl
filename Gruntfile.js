@@ -10,50 +10,21 @@ module.exports = function(grunt) {
         }
       }
     },
-    dojo: {
-      hsl: {
-        options: {
-          dojo: 'deps/dojo/dojo.js',
-          profile: 'hsl.profile.js',
-          'package': './',
-          cwd: './'
-        }
-      }
-    },
     watch: {
       hsl: {
-        files: ['index.html', 'js/**/*', 'css/**/*', 'dist/*.js'],
+        files: ['index.html', 'src/**/*', 'css/**/*', 'dist/*.js'],
         tasks: ['default'],
         options: {
           livereload: true
         }
       }
     },
-    jshint: {
-      hsl: ['Gruntfile.js', 'js/**/*.js', '!js/lodash.templates.js'],
-      options: {
-        jshintrc: '.jshintrc'
-      }
-    },
-    lodash: {
-      hsl: {
-        dest: 'js/lodash.templates.js',
-        options: {
-          exports: ['amd'],
-          template: 'templates/*.jst',
-          flags: ['debug']
-        }
-      }
-    }
   });
 
-  grunt.loadNpmTasks('grunt-dojo');
-  grunt.loadNpmTasks('grunt-lodash');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'lodash', 'cssmin', 'dojo']);
-  grunt.registerTask('template', ['lodash', 'dojo']);
+  grunt.registerTask('default', ['cssmin']);
+
 
 };
