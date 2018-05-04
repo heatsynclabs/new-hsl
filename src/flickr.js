@@ -5,7 +5,7 @@ const client = jsonp({ callback: { param: 'jsoncallback' } });
 
 module.exports = () => {
   return client({
-    path: 'https://api.flickr.com/services/rest/?tags=publish&format=json&method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818@N07',
+    path: 'https://api.flickr.com/services/rest/?tags=publish&format=json&method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818@N07&per_page=20',
   }).then((response) => {
     console.log('response', response);
     const data = response.entity;
