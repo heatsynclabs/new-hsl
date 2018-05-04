@@ -2,7 +2,7 @@
   "name": "hsl",
   "version": "0.2.2",
   "scripts": {
-    "build": "eslint src/; grunt; webpack; workbox generateSW workbox-config.js",
+    "build": "eslint src/; grunt; webpack",
     "start": "ecstatic --port 1337 --cache 0",
     "lint": "eslint src/"
   },
