@@ -11,9 +11,9 @@ module.exports = () => {
     const data = response.entity;
     const photos = _.map(data.photos.photo, (photo) => {
       return {
-        image_url: `http://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`,
+        image_url: `https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`,
         title: photo.title,
-        link: `http://www.flickr.com/photos/hslphotosync/${photo.id}/in/photostream`,
+        link: `https://www.flickr.com/photos/hslphotosync/${photo.id}/in/photostream`,
         description: '',
       };
     });

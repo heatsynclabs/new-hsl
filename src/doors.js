@@ -5,7 +5,7 @@ const client = rest.wrap(mime);
 module.exports = () => {
   const doorStatus = document.getElementById('door_status');
   return client({
-    path: 'http://members.heatsynclabs.org/space_api.json',
+    path: 'https://members.heatsynclabs.org/space_api.json',
   })
   .then((response) => {
     console.log('door response', response);
