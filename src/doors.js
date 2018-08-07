@@ -21,9 +21,5 @@ module.exports = () => {
   .catch((err) => {
     console.log('Did not get door data.', err);
     doorStatus.innerHTML = 'Error occurred while fetching status, please refresh.';
-  })
-  .then(() => {
-    // temporary hack
-    doorStatus.innerHTML = 'Check the Calendar';
   });
 };
