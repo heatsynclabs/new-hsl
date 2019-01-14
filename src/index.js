@@ -9,6 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check that service workers are registered
   if ('serviceWorker' in navigator) {
     // we need better SSL accross the board before this
-    // navigator.serviceWorker.register('/dist/sw.js');
+    navigator.serviceWorker.register('/dist/sw.js');
   }
 });

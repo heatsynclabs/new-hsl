@@ -2,8 +2,13 @@ const doors = require('./doors');
 
 function refresh() {
   for (let i = 1; i <= 4; i++) {
-    document.getElementById('livestream' + i).src = `http://live.heatsynclabs.org/snapshot.php?camera=${i}&time=${new Date()}`;
-    document.getElementById('lsAnchor' + i).href = `http://live.heatsynclabs.org/snapshot.php?camera=${i}&time=${new Date()}`;
+    const url = `http://live.heatsynclabs.org/snapshot.php?camera=${i}&time=${Date.now()}`;
+    const img = new Image();
+    img.onload = () => {
+      document.getElementById('livestream' + i).src = url;
+      document.getElementById('lsAnchor' + i).href = url;
+    };
+    img.src = url;
   }
 }
 

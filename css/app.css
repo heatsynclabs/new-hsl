@@ -164,3 +164,9 @@ footer {
 .register iframe, .classes iframe {
 	height: 100vh;
 }
+
+@media (max-width: 767px) {
+  .social-container{
+    padding-top: 0;
+  }
+}
