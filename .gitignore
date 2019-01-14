@@ -4,3 +4,5 @@ libs/
 deps/util/
 *~
 *.log
+package-lock.json
+

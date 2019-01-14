@@ -11,7 +11,7 @@
  * See https://goo.gl/2aRDsh
  */
 
-importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.2.0/workbox-sw.js");
+importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 /**
  * The workboxSW.precacheAndRoute() method efficiently caches and responds to
@@ -20,28 +20,88 @@ importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.2.0/workbox
  */
 self.__precacheManifest = [
   {
-    "url": "css/app-responsive.css",
-    "revision": "991037550729c901a1686c1dd706f9df"
+    "url": "classes.html",
+    "revision": "4623331c61322501313685e4b6c45cba"
   },
   {
     "url": "css/app.css",
-    "revision": "95709cd757e6f45c2557adfd0381a148"
-  },
-  {
-    "url": "css/hsl.css",
-    "revision": "7db7bf96e462809cd7a92a4733c52d9d"
+    "revision": "6b3061bae5fcd587d06f28b65847edba"
   },
   {
     "url": "css/wordpress.css",
     "revision": "c68f117fa5d69062612c3dac08ae3890"
   },
   {
+    "url": "deps/bootstrap/css/bootstrap-responsive.css",
+    "revision": "b626be49731b63affaa1bd71fed6f8b8"
+  },
+  {
+    "url": "deps/bootstrap/css/bootstrap-responsive.min.css",
+    "revision": "f8001b8e103a12ca7ada1b9df7eda7aa"
+  },
+  {
+    "url": "deps/bootstrap/css/bootstrap.css",
+    "revision": "101205d0b6e392c86bbf404a7190dd3c"
+  },
+  {
+    "url": "deps/bootstrap/css/bootstrap.min.css",
+    "revision": "2d0e36535246fd6757ec0a0cd1757d0f"
+  },
+  {
+    "url": "deps/bootstrap/img/glyphicons-halflings-white.png",
+    "revision": "9bbc6e9602998a385c2ea13df56470fd"
+  },
+  {
+    "url": "deps/bootstrap/img/glyphicons-halflings.png",
+    "revision": "2516339970d710819585f90773aebe0a"
+  },
+  {
+    "url": "deps/bootstrap/js/bootstrap.js",
+    "revision": "cbbf80e1733d43795c2beb41dff8068a"
+  },
+  {
+    "url": "deps/bootstrap/js/bootstrap.min.js",
+    "revision": "9e8a05ab617c7e403be79e42f09107fe"
+  },
+  {
+    "url": "deps/Font-Awesome/css/font-awesome-ie7.min.css",
+    "revision": "db46d4cc8adf660c24e2a3b89464dc3e"
+  },
+  {
+    "url": "deps/Font-Awesome/css/font-awesome.css",
+    "revision": "4c71f11781e5ada4d70db2da584f08b0"
+  },
+  {
+    "url": "deps/Font-Awesome/css/font-awesome.min.css",
+    "revision": "c8595bd4b0ed08844f2cf3f730e7d4ca"
+  },
+  {
+    "url": "deps/Font-Awesome/font/fontawesome-webfont.eot",
+    "revision": "455808250694e5760bd92b3ce1f070b6"
+  },
+  {
+    "url": "deps/Font-Awesome/font/fontawesome-webfont.svg",
+    "revision": "b8e4dbe6872f049283c54da9d94a7b7a"
+  },
+  {
+    "url": "deps/Font-Awesome/font/fontawesome-webfont.ttf",
+    "revision": "bb72c5142ae2ae4ca0f9c0653a09871c"
+  },
+  {
+    "url": "deps/Font-Awesome/font/fontawesome-webfont.woff",
+    "revision": "21f212f94a9db6a0e3847c921842aa19"
+  },
+  {
+    "url": "deps/Font-Awesome/font/FontAwesome.otf",
+    "revision": "59dc59981f8221f5409f1abbca3fd077"
+  },
+  {
     "url": "dist/live.bundle.js",
-    "revision": "0bccfa60d9174c6506893f4691a45e08"
+    "revision": "f55476ca1cb693c0cb3ab2206dd2d6cf"
   },
   {
     "url": "dist/main.bundle.js",
-    "revision": "63ff0e3691eaaa754bf0d8c603e81508"
+    "revision": "59ec38eabe0b0a0f7d7d9b735de3210e"
   },
   {
     "url": "donate.html",
@@ -74,6 +134,10 @@ self.__precacheManifest = [
   {
     "url": "font/FontAwesome.otf",
     "revision": "59dc59981f8221f5409f1abbca3fd077"
+  },
+  {
+    "url": "Gruntfile.js",
+    "revision": "e195e531b7678facf9cae8af8e5ee2ca"
   },
   {
     "url": "img/donationMatch.png",
@@ -165,11 +229,15 @@ self.__precacheManifest = [
   },
   {
     "url": "index.html",
-    "revision": "32afee11cb84b66213f99c066b0eb962"
+    "revision": "cbb36d343edfd3145bee9b27eb96050f"
   },
   {
     "url": "live.html",
-    "revision": "215709563edf80c11fafa229cfca5e6f"
+    "revision": "8a961f2392825d195645586e2be4f1bb"
+  },
+  {
+    "url": "register.html",
+    "revision": "2c226f04d11292214c42709627a80e58"
   }
 ].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();

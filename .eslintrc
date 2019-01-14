@@ -16,6 +16,7 @@
     "FormData": true,
     "importScripts": true,
     "workbox": true,
+    "Image": true
   },
   "rules": {
     no-console: "off",

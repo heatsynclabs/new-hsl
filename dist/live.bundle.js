@@ -36,17 +36,32 @@
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -379,7 +394,7 @@ eval("\n\nvar rest = __webpack_require__(/*! rest */ \"./node_modules/rest/brows
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nvar doors = __webpack_require__(/*! ./doors */ \"./src/doors.js\");\n\nfunction refresh() {\n  for (var i = 1; i <= 4; i++) {\n    document.getElementById('livestream' + i).src = 'http://live.heatsynclabs.org/snapshot.php?camera=' + i + '&time=' + new Date();\n    document.getElementById('lsAnchor' + i).href = 'http://live.heatsynclabs.org/snapshot.php?camera=' + i + '&time=' + new Date();\n  }\n}\n\ndocument.addEventListener('DOMContentLoaded', function () {\n  setInterval(refresh, 10000);\n\n  Promise.all([doors()]).then(console.log).catch(console.error);\n});\n\n//# sourceURL=webpack:///./src/live.js?");
+eval("\n\nvar doors = __webpack_require__(/*! ./doors */ \"./src/doors.js\");\n\nfunction refresh() {\n  var _loop = function _loop(i) {\n    var url = 'http://live.heatsynclabs.org/snapshot.php?camera=' + i + '&time=' + Date.now();\n    var img = new Image();\n    img.onload = function () {\n      document.getElementById('livestream' + i).src = url;\n      document.getElementById('lsAnchor' + i).href = url;\n    };\n    img.src = url;\n  };\n\n  for (var i = 1; i <= 4; i++) {\n    _loop(i);\n  }\n}\n\ndocument.addEventListener('DOMContentLoaded', function () {\n  setInterval(refresh, 10000);\n\n  Promise.all([doors()]).then(console.log).catch(console.error);\n});\n\n//# sourceURL=webpack:///./src/live.js?");
 
 /***/ })
 

@@ -6,10 +6,8 @@ module.exports = {
   "swDest": "dist/sw.js",
   "globIgnores": [
     'node_modules/**/*',
-    'deps/**/*',
     'src/**/*',
     'webpack.config.js',
-    'Gruntfile.js',
     'workbox-config.js'
   ]
 };
