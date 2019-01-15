@@ -23,7 +23,7 @@ module.exports = () => {
       const p = _.sample(photos.slice(0, 15));
 
       flickrImage.innerHTML = `
-        <a href="${p.link}" target="_blank"><img src="${p.image_url}"</a>
+        <a href="${p.link}" target="_blank"><img src="${p.image_url}" alt="flickr feed"></a>
         <a href="${p.link}" target="_blank" class="caption" id="main_image_caption">${p.title}<i class="icon-chevron-right"></i></a>
       `;
     }
