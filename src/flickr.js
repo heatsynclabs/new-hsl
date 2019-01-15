@@ -24,7 +24,7 @@ module.exports = () => {
 
       flickrImage.innerHTML = `
         <a href="${p.link}" target="_blank" rel="noreferrer"><img src="${p.image_url}" alt="flickr feed"></a>
-        <a href="${p.link}" target="_blank" class="caption" id="main_image_caption rel="noreferrer">${p.title}<i class="icon-chevron-right"></i></a>
+        <a href="${p.link}" target="_blank" class="caption" id="main_image_caption" rel="noreferrer">${p.title}<i class="icon-chevron-right"></i></a>
       `;
     }
 

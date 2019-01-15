@@ -21,7 +21,7 @@ importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox
 self.__precacheManifest = [
   {
     "url": "classes.html",
-    "revision": "fa9b08f63813163da3093dbdeb330bf7"
+    "revision": "e4a9bb3f1dfffcb285805df8beafb888"
   },
   {
     "url": "css/app.css",
@@ -101,7 +101,7 @@ self.__precacheManifest = [
   },
   {
     "url": "dist/main.bundle.js",
-    "revision": "bb7dff1b840b0e55eba8752511d5a546"
+    "revision": "072ae895c0c58e300a16a8704f4714ae"
   },
   {
     "url": "donate.html",
@@ -162,6 +162,14 @@ self.__precacheManifest = [
   {
     "url": "img/map.png",
     "revision": "fa05dee16306586aed33be6eae37d8be"
+  },
+  {
+    "url": "img/meatball_192.png",
+    "revision": "028bb9720ac98e95e2fcc56c0eff4b5c"
+  },
+  {
+    "url": "img/meatball_512.png",
+    "revision": "814d38208df5ee6bc292a0602f05f701"
   },
   {
     "url": "img/slack.png",
@@ -229,19 +237,19 @@ self.__precacheManifest = [
   },
   {
     "url": "index.html",
-    "revision": "35a2b0fa3ec77c53ae1e1eee1922b79b"
+    "revision": "12e2efb4f3c8f37ab218ddddaf997270"
   },
   {
     "url": "live.html",
-    "revision": "faf7c517bf13195b32d388862856a5c4"
+    "revision": "0b99a23098325d4896fd2c31c0355b8f"
   },
   {
     "url": "manifest.json",
-    "revision": "403d1b1dfad34e7779c4ef95b07421c5"
+    "revision": "67f33d748d6e3486745f0d0cf1279271"
   },
   {
     "url": "register.html",
-    "revision": "4ba8f3bcf5121c87bf50d32c11311a79"
+    "revision": "4378e95b87bcb25576bc7b90063f75d4"
   }
 ].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
