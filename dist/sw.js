@@ -101,7 +101,7 @@ self.__precacheManifest = [
   },
   {
     "url": "dist/main.bundle.js",
-    "revision": "4fe8ccd0827d8233555e15d67dd5a82e"
+    "revision": "bb7dff1b840b0e55eba8752511d5a546"
   },
   {
     "url": "donate.html",
@@ -229,7 +229,7 @@ self.__precacheManifest = [
   },
   {
     "url": "index.html",
-    "revision": "7005d975feb359831243d0ffe1b714d4"
+    "revision": "35a2b0fa3ec77c53ae1e1eee1922b79b"
   },
   {
     "url": "live.html",
