@@ -463,7 +463,7 @@ eval("\n\nvar _ = __webpack_require__(/*! lodash */ \"./node_modules/lodash/loda
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nvar flickr = __webpack_require__(/*! ./flickr */ \"./src/flickr.js\");\nvar doors = __webpack_require__(/*! ./doors */ \"./src/doors.js\");\n\ndocument.addEventListener('DOMContentLoaded', function () {\n  Promise.all([doors(), flickr()]).then(console.log).catch(console.error);\n\n  // Check that service workers are registered\n  if ('serviceWorker' in navigator) {\n    // we need better SSL accross the board before this\n    navigator.serviceWorker.register('/dist/sw.js');\n  }\n});\n\n//# sourceURL=webpack:///./src/index.js?");
+eval("\n\nvar flickr = __webpack_require__(/*! ./flickr */ \"./src/flickr.js\");\nvar doors = __webpack_require__(/*! ./doors */ \"./src/doors.js\");\n\ndocument.addEventListener('DOMContentLoaded', function () {\n  Promise.all([doors(), flickr()]).then(console.log).catch(console.error);\n\n  // Check that service workers are registered\n  if ('serviceWorker' in navigator) {\n    // we need better SSL accross the board before this\n    navigator.serviceWorker.register('/sw.bundle.js', { scope: '/' });\n  }\n});\n\n//# sourceURL=webpack:///./src/index.js?");
 
 /***/ })
 

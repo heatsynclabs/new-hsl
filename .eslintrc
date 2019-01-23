@@ -16,7 +16,9 @@
     "FormData": true,
     "importScripts": true,
     "workbox": true,
-    "Image": true
+    "Image": true,
+    "self": true,
+    "caches": true
   },
   "rules": {
     no-console: "off",

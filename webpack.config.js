@@ -5,10 +5,11 @@ module.exports = {
   entry: {
     main: path.join(__dirname, './src/index.js'),
     live: path.join(__dirname, './src/live.js'),
+    sw: path.join(__dirname, './src/sw.js'),
   },
   output: {
     filename: '[name].bundle.js',
-    path: path.join(__dirname, './dist/')
+    path: path.join(__dirname, './')
   },
   module: {
     rules: [
