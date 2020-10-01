@@ -1,4 +1,4 @@
-# HeatSync Labs Website
+# HeatSync Labs Website An Amazing Project
 
 ## Contributing
 
