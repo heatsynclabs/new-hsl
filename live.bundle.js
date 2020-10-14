@@ -394,7 +394,7 @@ eval("\n\nvar rest = __webpack_require__(/*! rest */ \"./node_modules/rest/brows
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nvar doors = __webpack_require__(/*! ./doors */ \"./src/doors.js\");\n\nfunction refresh() {\n  var _loop = function _loop(i) {\n    var url = 'http://live.heatsynclabs.org/snapshot.php?camera=' + i + '&time=' + Date.now();\n    var img = new Image();\n    img.onload = function () {\n      document.getElementById('livestream' + i).src = url;\n      document.getElementById('lsAnchor' + i).href = url;\n    };\n    img.src = url;\n  };\n\n  for (var i = 1; i <= 4; i++) {\n    _loop(i);\n  }\n}\n\ndocument.addEventListener('DOMContentLoaded', function () {\n  setInterval(refresh, 10000);\n\n  Promise.all([doors()]).then(console.log).catch(console.error);\n});\n\n//# sourceURL=webpack:///./src/live.js?");
+eval("\n\nvar doors = __webpack_require__(/*! ./doors */ \"./src/doors.js\");\n\nfunction refresh() {\n  var _loop = function _loop(i) {\n    var url = 'https://live.heatsynclabs.org/snapshot.php?camera=' + i + '&time=' + Date.now();\n    var img = new Image();\n    img.onload = function () {\n      document.getElementById('livestream' + i).src = url;\n      document.getElementById('lsAnchor' + i).href = url;\n    };\n    img.src = url;\n  };\n\n  for (var i = 1; i <= 4; i++) {\n    _loop(i);\n  }\n}\n\ndocument.addEventListener('DOMContentLoaded', function () {\n  setInterval(refresh, 10000);\n\n  Promise.all([doors()]).then(console.log).catch(console.error);\n});\n\n//# sourceURL=webpack:///./src/live.js?");
 
 /***/ })
 
