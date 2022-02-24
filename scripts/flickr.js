@@ -1,15 +1,6 @@
-const _ = require('lodash');
-const jsonp = require('rest/interceptor/jsonp');
-
-const client = jsonp({ callback: { param: 'jsoncallback' } });
-
-module.exports = () => {
-  return client({
-    path: 'https://api.flickr.com/services/rest/?tags=publish&format=json&method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818@N07&per_page=20',
-  }).then((response) => {
-    console.log('response', response);
-    const data = response.entity;
-    const photos = _.map(data.photos.photo, (photo) => {
+window.flickr = () => {
+  if (window.HSL && window.HSL.flickr) {
+    const photos = (window.HSL.flickr.photos.photo || []).map((photo) => {
       return {
         image_url: `https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`,
         title: photo.title,
@@ -20,15 +11,15 @@ module.exports = () => {
 
     const flickrImage = document.getElementById('main_image');
     if (flickrImage) {
-      const p = _.sample(photos.slice(0, 15));
+      const randIndex = Math.floor(Math.random() * photos.length);
+      const p = photos[randIndex];
 
       flickrImage.innerHTML = `
         <a href="${p.link}" target="_blank" rel="noreferrer"><img src="${p.image_url}" alt="flickr feed"></a>
         <a href="${p.link}" target="_blank" class="caption" id="main_image_caption" rel="noreferrer">${p.title}<i class="icon-chevron-right"></i></a>
       `;
     }
-
-    console.log('photos');
     return photos;
-  });
+  }
+  return null;
 };
