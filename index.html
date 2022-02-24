@@ -15,18 +15,36 @@
     <link href="/css/app.css" rel="stylesheet" type="text/css">
     <meta name="theme-color" content="#f99b0c">
     <script type="text/javascript">
-
+      
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-12598372-1']);
       _gaq.push(['_setDomainName', 'heatsynclabs.org']);
       _gaq.push(['_trackPageview']);
-
+      
       (function() {
         var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
         ga.src = 'https://ssl.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
+      const HSL = {};
+      window.HSL = HSL;
+      function hslflickr(data) {
+        console.log('hslflickr', data);
+        HSL.flickr = data;
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+        flickr();
+        doors();
+        // Check that service workers are registered
+        if ('serviceWorker' in navigator) {
+          // we need better SSL accross the board before this
+          navigator.serviceWorker.register('/sw.js', { scope: '/' });
+        }
+      });
     </script>
+    <script type="text/javascript" src="https://api.flickr.com/services/rest/?tags=publish&format=json&method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818@N07&per_page=20&jsoncallback=hslflickr"></script>
+    <script type="text/javascript" src="/scripts/doors.js"></script>
+    <script type="text/javascript" src="/scripts/flickr.js"></script>
   </head>
   <body>
     <div class="container">
@@ -153,17 +171,5 @@
         </div>
       </div>
     </div>
-
-    <!-- Modals at the bottom -->
-    <div id="calendar-popup" class="modal hide">
-      <div class="modal-header">
-        <button type="button" class="close" aria-hidden="true">&times;</button>
-        <h3>Calendar</h3>
-      </div>
-      <div class="modal-body">
-        <iframe src="https://www.google.com/calendar/hosted/heatsynclabs.org/embed?src=heatsynclabs.org_p9rcn09d64q56m7rg07jptmrqc%40group.calendar.google.com&amp;ctz=America/Phoenix" frameborder="0" scrolling="no" width="530" height="480" title="calendar"></iframe>
-      </div>
-    </div>
-<script src="/main.bundle.js" type="text/javascript"></script>
   </body>
 </html>

@@ -1,5 +1,3 @@
-import { startsWith } from 'lodash';
-
 const CACHE_NAME = 'static-v1';
 console.log('im the service worker ok!');
 
@@ -21,7 +19,7 @@ self.addEventListener('fetch', (event) => {
   }
   const cacheRequest = request.clone();
   const inspectRequest = request.clone();
-  if (!startsWith(request.url, request.referrer)) {
+  if (!request.url.startsWith(request.referrer)) {
     return;
   }
   console.log('inspectRequest', inspectRequest);
