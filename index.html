@@ -31,9 +31,9 @@
       function hslflickr(data) {
         console.log('hslflickr', data);
         HSL.flickr = data;
+        flickr();
       }
       document.addEventListener('DOMContentLoaded', () => {
-        flickr();
         doors();
         // Check that service workers are registered
         if ('serviceWorker' in navigator) {
@@ -42,15 +42,12 @@
         }
       });
     </script>
-    <script type="text/javascript" src="https://api.flickr.com/services/rest/?tags=publish&format=json&method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818@N07&per_page=20&jsoncallback=hslflickr"></script>
-    <script type="text/javascript" src="/scripts/doors.js"></script>
-    <script type="text/javascript" src="/scripts/flickr.js"></script>
   </head>
   <body>
     <div class="container">
       <div class="row">
         <div class="span8 logo">
-          <a href="/"><img src="/img/logo.png" title="HeatSync Labs" alt="HeatSync Labs"></a>
+          <a href="/"><img src="/img/logo.webp" title="HeatSync Labs" alt="HeatSync Labs"></a>
         </div>
         <div class="social-container span4">
           <a href="https://www.youtube.com/heatsynclabs" rel="noreferrer" title="YouTube Channel" alt="YouTube Channel" class="social-logo youtube" target="_blank"></a>
@@ -171,5 +168,8 @@
         </div>
       </div>
     </div>
+    <script async type="text/javascript" src="https://api.flickr.com/services/rest/?tags=publish&format=json&method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818@N07&per_page=20&jsoncallback=hslflickr"></script>
+    <script type="text/javascript" src="/scripts/doors.js"></script>
+    <script type="text/javascript" src="/scripts/flickr.js"></script>
   </body>
 </html>
