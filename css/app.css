@@ -154,15 +154,24 @@ footer {
 	max-height: 500px;
 }
 
-.register, .classes {
-	overflow: hidden;
+.classes, .register {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	gap: 1rem;
 }
 
-.register .container-fluid, .classes .container-fluid {
-	padding: 0;
+.classes .container-fluid, .register .container-fluid {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	height: 100%;
 }
-.register iframe, .classes iframe {
-	height: 100vh;
+
+.classes iframe.airtable-embed, .register iframe.airtable-embed {
+	height: 100%;
+	background: transparent;
+	border: 1px solid #ccc;
 }
 
 @media (max-width: 767px) {
