@@ -61,11 +61,9 @@ body {
 }
 
 .orange-button, .orange-button:hover{
-	font-color:#000000;
 	background-color: hsl(36, 100%, 53%) !important;
 	background-repeat: repeat-x;
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ffc775", endColorstr="#ff9f0f");
-	background-image: -khtml-gradient(linear, left top, left bottom, from(#ffc775), to(#ff9f0f));
 	background-image: -moz-linear-gradient(top, #ffc775, #ff9f0f);
 	background-image: -ms-linear-gradient(top, #ffc775, #ff9f0f);
 	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffc775), color-stop(100%, #ff9f0f));
