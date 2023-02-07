@@ -11,9 +11,11 @@
     <meta name="author" content="">
     <link href="/deps/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
     <link href="/deps/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" type="text/css">
+    <script src="https://kit.fontawesome.com/daeb911119.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="/deps/Font-Awesome/css/font-awesome.min.css">
     <link href="/css/app.css" rel="stylesheet" type="text/css">
     <meta name="theme-color" content="#f99b0c">
+
     <script type="text/javascript">
 
       var _gaq = _gaq || [];
@@ -50,13 +52,22 @@
           <a href="/"><img src="/img/logo.webp" title="HeatSync Labs" alt="HeatSync Labs"></a>
         </div>
         <div class="social-container span4">
-          <a href="https://www.youtube.com/results?search_query=heatsync+labs" rel="noreferrer" title="YouTube Channel" alt="YouTube Channel" class="social-logo youtube" target="_blank"></a>
-          <a href="https://www.facebook.com/HeatSyncLabs/" rel="noreferrer" title="Facebook Group" alt="Facebook Group" class="social-logo facebook" target="_blank"></a>
-          <a href="https://www.twitter.com/heatsynclabs" rel="noreferrer" title="Twitter" alt="Twitter" class="social-logo twitter" target="_blank"></a>
-          <a href="https://www.flickr.com/photos/hslphotosync/" rel="noreferrer" title="HSL PhotoSync" alt="HSL PhotoSync" class="social-logo flickr" target="_blank"></a>
-          <a href="https://www.github.com/heatsynclabs" rel="noreferrer" title="Github" alt="Github" class="social-logo github" target="_blank"></a>
+          <a href="https://www.facebook.com/HeatSyncLabs/" rel="noreferrer" title="Facebook Group" alt="Facebook Group" class="social-logo" target="_blank">
+            <i class="fa-3x fa-brands fa-square-facebook"></i>
+          </a>
+          <a href="https://www.twitter.com/heatsynclabs" rel="noreferrer" title="Twitter" alt="Twitter" class="social-logo" target="_blank">
+            <i class="fa-3x fa-brands fa-square-twitter"></i>
+          </a>
+          <a href="https://www.github.com/heatsynclabs" rel="noreferrer" title="Github" alt="Github" class="social-logo" target="_blank">
+            <i class="fa-3x fa-brands fa-square-github"></i>
+          </a>
+          <a href="https://www.flickr.com/photos/hslphotosync/" rel="noreferrer" title="HSL PhotoSync" alt="HSL PhotoSync" class="social-logo" target="_blank">
+            <i class="fa-3x fa-brands fa-flickr"></i>
+          </a>
         </div>
       </div>
+
+
       <div class="row">
         <div class="span3 sidebar-nav">
           <div class="left-info">
@@ -64,13 +75,11 @@
               We are:
             </h3>
             <ul>
-              <li>A place where you can make things. We call it a hackerspace.</li>
-              <li>A grassroots co-op of volunteers&mdash; No staff.</li>
+              <li>A place where you can make things. We call it a makerspace. We are a grassroots co-op of volunteers&mdash; No staff.</li>
               <li>Located at:<br>
                 <a href='https://goo.gl/maps/5oo83'>108 West Main St.<br>Downtown Mesa</a></li>
-              <li>Open for everyone during public hours and events. Check our <a href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs" target="_blank" rel="noreferrer">discussion group</a> for details and updates.</strong><br><br></li>
+              <li>Open for everyone during public hours and events. Check our <a href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs" target="_blank" rel="noreferrer">discussion group</a> for details and updates.</strong></li>
               <li><strong>Hosting free public hours</strong><br>Monday, Tuesday, Wednesday<br>7pm - 10pm<br>Saturday noon - 5pm</li>
-              <li><strong>Parking during construction:</strong><br><a href='https://downtownmesa.com/parking/orange-lot'>Orange Lot<br>139 West Mahoney St.<br>Downtown Mesa</a></li>
               <li><strong>Our doors are currently:</strong>
                 <span id="door_status">
                   <i class="icon-spinner icon-spin"></i>
@@ -96,13 +105,7 @@
 	  	    </div>
         </div>
       </div>
-      <div class="row">
-        <div id="classes">
-          <h3>Interested in Classes?</h3>
-          <p><a href="/register">Register</a> to get notifications on classes you are interested in.</p>
-          <p>Check out <a href="/classes">all our classes</a> to see what's available.</p>
-        </div>
-      </div>
+
       <div class="row">
         <div id="google-calendar" class="calendar-info">
           <h3 class="calendar-link">
@@ -116,13 +119,27 @@
         </div>
 
       </div>
-      <div class="row">
-        <h3 class="hide-link">
-          <img src="img/google-groups.png" alt="google groups"> <a href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs" target="_blank" rel="noreferrer">Official Discussion Groups</a>
-        </h3>
-        <h3 class="hide-link">
-          <img src="img/slack.png" alt="slack"> <a href="http://bit.ly/hslslack" target="_blank" rel="noreferrer">Slack channel</a>
-        </h3>
+      <div class="connect-container">
+        <div class="row">
+          <div id="classes">
+            <h3>Interested in Classes?</h3>
+            <p><a href="/register">Register</a> to get notifications on classes you are interested in.</p>
+            <p>Check out <a href="/classes">all our classes</a> to see what's available.</p>
+          </div>
+        </div>
+        <div class="row">
+          <h3 class="hide-link">
+            <a href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs" alt="HSL Google Group" target="_blank" rel="noreferrer" class="social-logo">
+              <i class="fa-1x fa-fw fa-solid fa-user-group"></i>Discussion Group
+            </a>
+          </h3>
+          <h3 class="hide-link">
+            <a href="http://bit.ly/hslslack" alt="Slack" target="_blank" rel="noreferrer" class="social-logo">
+              <i class="fa-1x fa-fw fa-brands fa-slack"></i>Slack Channel
+            </a>
+          </h3>
+        </div>
+
       </div>
     </div>
     <div class="footer">
@@ -167,7 +184,9 @@
       </div>
     </div>
     <script async type="text/javascript" src="https://api.flickr.com/services/rest/?tags=publish&format=json&method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818@N07&per_page=20&jsoncallback=hslflickr"></script>
+
     <script type="text/javascript" src="/scripts/doors.js"></script>
     <script type="text/javascript" src="/scripts/flickr.js"></script>
+
   </body>
 </html>
