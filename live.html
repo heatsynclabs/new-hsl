@@ -1,159 +1,192 @@
-<!DOCTYPE html
-    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
-
-<head>
-    <link rel="manifest" href="manifest.json">
-    <meta name="Description" content="HeatSync Labs. Arizona's greatest hackerspace.">
+  <head>
+    <link rel="manifest" href="manifest.json" />
+    <meta
+      name="Description"
+      content="HeatSync Labs. Arizona's greatest hackerspace."
+    />
     <style type="text/css">
-        body {
-            background-color: #2C2C29;
-            color: #2C2C29;
-            font-family: Tahoma;
-            font-size: 11px;
-            margin: 0;
-            padding: 0;
-        }
+      body {
+        background-color: #2c2c29;
+        color: #2c2c29;
+        font-family: Tahoma;
+        font-size: 11px;
+        margin: 0;
+        padding: 0;
+      }
 
-        .open {
-            color: green;
-            display: inline;
-        }
+      .open {
+        color: green;
+        display: inline;
+      }
 
-        .closed {
-            color: red;
-            display: inline;
-        }
+      .closed {
+        color: red;
+        display: inline;
+      }
 
-        #wrapper {
-            width: 811px;
-            margin: 0 auto;
-        }
+      #wrapper {
+        width: 811px;
+        margin: 0 auto;
+      }
 
-        #top span {
-            display: none;
-        }
+      #top span {
+        display: none;
+      }
 
-        #content {
-            background-color: #fff;
-            padding: 1em;
-            font-size: 1.2em;
-        }
+      #content {
+        background-color: #fff;
+        padding: 1em;
+        font-size: 1.2em;
+      }
 
-        .caption {
-            background-color: #F3F3F3;
-            border: 1px solid #DDD;
-            padding: 4px;
-            margin: 0 0 0 30px;
-            width: 320px;
-            display: inline-block;
-        }
+      .caption {
+        background-color: #f3f3f3;
+        border: 1px solid #ddd;
+        padding: 4px;
+        margin: 0 0 0 30px;
+        width: 320px;
+        display: inline-block;
+      }
 
-        .footer {
-            clear: both;
-        }
+      .footer {
+        clear: both;
+      }
 
-        h1,
-        h2,
-        h3,
-        h4 {
-            font-family: Helvetica, Georgia;
-            font-size: 24px;
-            letter-spacing: -1px;
-            margin: 0px 0px 10px;
-            border-bottom: 1px solid #DCDCDB;
-        }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: Helvetica, Georgia;
+        font-size: 24px;
+        letter-spacing: -1px;
+        margin: 0px 0px 10px;
+        border-bottom: 1px solid #dcdcdb;
+      }
 
-        h2 {
-            font-size: 22px;
-        }
+      h2 {
+        font-size: 22px;
+      }
 
-        h3 {
-            font-size: 20px;
-        }
+      h3 {
+        font-size: 20px;
+      }
 
-        h4 {
-            font-size: 18px;
-        }
+      h4 {
+        font-size: 18px;
+      }
     </style>
-    <meta name="theme-color" content="#f99b0c">
-</head>
+    <meta name="theme-color" content="#f99b0c" />
+  </head>
 
-<body>
+  <body>
     <div id="wrapper">
-        <a href="http://www.heatsynclabs.org">
-            <img src="img/logo-light.png" height="116" />
-        </a>
+      <a href="http://www.heatsynclabs.org">
+        <img src="img/logo-light.png" height="116" />
+      </a>
 
-        <div id="content">
-            <h2>HeatSync Labs Live Webcams</h2>
-            <p>See if there are people in the lab!
-                <br />The camera views refresh at least every 10 seconds, though you may not be able to tell if
-                nothing's moving.
-                <br /> If the cameras are broken, please tweet <a href="https://twitter.com/Citizen4110">@Citizen4110</a> or email gabe at heatsynclabs dot org.</p>
-            <p>Nobody here? Check the
-                <a href="http://twitter.com/heatsyncstatus">HeatSyncStatus</a> feed. See when the next event is
-                scheduled at the
-                <a href="http://www.heatsynclabs.org">HeatSync Website</a>.</p>
+      <div id="content">
+        <h2>HeatSync Labs Live Webcams</h2>
+        <p>
+          See if there are people in the lab! <br />The camera views refresh at
+          least every 10 seconds, though you may not be able to tell if
+          nothing's moving. <br />
+          If the cameras are broken, please tweet
+          <a href="https://twitter.com/Citizen4110">@Citizen4110</a> or email
+          gabe at heatsynclabs dot org.
+        </p>
+        <p>
+          Nobody here? Check the
+          <a href="http://twitter.com/heatsyncstatus">HeatSyncStatus</a> feed.
+          See when the next event is scheduled at the
+          <a href="http://www.heatsynclabs.org">HeatSync Website</a>.
+        </p>
 
-            <div class="caption">
-                <a id="lsAnchor1" href="https://live.heatsynclabs.org/snapshot.php?camera=1">
-                    <img id="livestream1" src="https://live.heatsynclabs.org/snapshot.php?camera=1" width="320"
-                        height="240" />
-                </a>
-            </div>
-
-            <div class="caption">
-                <a id="lsAnchor2" href="https://live.heatsynclabs.org/snapshot.php?camera=2">
-                    <img id="livestream2" src="https://live.heatsynclabs.org/snapshot.php?camera=2" width="320"
-                        height="240" />
-                </a>
-            </div>
-
-            <div class="caption">
-                <a id="lsAnchor3" href="https://live.heatsynclabs.org/snapshot.php?camera=3">
-                    <img id="livestream3" src="https://live.heatsynclabs.org/snapshot.php?camera=3" width="320"
-                        height="240" />
-                </a>
-            </div>
-
-            <div class="caption">
-                <a id="lsAnchor4" href="https://live.heatsynclabs.org/snapshot.php?camera=4">
-                    <img id="livestream4" src="https://live.heatsynclabs.org/snapshot.php?camera=4" width="320"
-                        height="240" />
-                </a>
-            </div>
-            <ul>
-                <li>doors currently:
-                    <span id="door_status">
-                        <i class="icon-spinner icon-spin"></i>
-                    </span>
-                </li>
-            </ul>
+        <div class="caption">
+          <a
+            id="lsAnchor1"
+            href="https://live.heatsynclabs.org/snapshot.php?camera=1"
+          >
+            <img
+              id="livestream1"
+              src="https://live.heatsynclabs.org/snapshot.php?camera=1"
+              width="320"
+              height="240"
+            />
+          </a>
         </div>
-    </div>
-    <script type="text/javascript" src="/scripts/doors.js"></script>
-    <script type="text/javascript">
-        function refresh() {
-            for (let i = 1; i <= 4; i++) {
-                const url = `https://live.heatsynclabs.org/snapshot.php?camera=${i}&time=${Date.now()}`;
-                const img = new Image();
-                img.onload = () => {
-                document.getElementById('livestream' + i).src = url;
-                document.getElementById('lsAnchor' + i).href = url;
-                };
-                img.src = url;
-            }
-        }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        <div class="caption">
+          <a
+            id="lsAnchor2"
+            href="https://live.heatsynclabs.org/snapshot.php?camera=2"
+          >
+            <img
+              id="livestream2"
+              src="https://live.heatsynclabs.org/snapshot.php?camera=2"
+              width="320"
+              height="240"
+            />
+          </a>
+        </div>
+
+        <div class="caption">
+          <a
+            id="lsAnchor3"
+            href="https://live.heatsynclabs.org/snapshot.php?camera=3"
+          >
+            <img
+              id="livestream3"
+              src="https://live.heatsynclabs.org/snapshot.php?camera=3"
+              width="320"
+              height="240"
+            />
+          </a>
+        </div>
+
+        <div class="caption">
+          <a
+            id="lsAnchor4"
+            href="https://live.heatsynclabs.org/snapshot.php?camera=4"
+          >
+            <img
+              id="livestream4"
+              src="https://live.heatsynclabs.org/snapshot.php?camera=4"
+              width="320"
+              height="240"
+            />
+          </a>
+        </div>
+        <ul>
+          <li>
+            doors currently:
+            <span id="door_status">
+              <i class="icon-spinner icon-spin"></i>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <script type="text/javascript" src="scripts/doors.js"></script>
+    <script type="text/javascript">
+      function refresh() {
+        for (let i = 1; i <= 4; i++) {
+          const url = `https://live.heatsynclabs.org/snapshot.php?camera=${i}&time=${Date.now()}`;
+          const img = new Image();
+          img.onload = () => {
+            document.getElementById("livestream" + i).src = url;
+            document.getElementById("lsAnchor" + i).href = url;
+          };
+          img.src = url;
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
         setInterval(refresh, 10000);
 
-        doors()
-            .then(console.log)
-            .catch(console.error);
-        });
+        doors().then(console.log).catch(console.error);
+      });
     </script>
-</body>
-
+  </body>
 </html>
