@@ -20,7 +20,6 @@
       rel="stylesheet"
       type="text/css"
     />
-    <link rel="stylesheet" href="deps/Font-Awesome/css/font-awesome.min.css" />
     <link href="css/app.css" rel="stylesheet" type="text/css" />
     <meta name="theme-color" content="#f99b0c" />
 
@@ -44,15 +43,70 @@
     </script>
   </head>
   <body class="register">
-    <div class="container">
-      <div class="row">
-        <div class="span8 logo">
-          <a href="/"
-            ><img src="img/logo.webp" title="HeatSync Labs" alt="HeatSync Labs"
-          /></a>
-        </div>
+    <nav>
+      <div class="logo">
+        <a href="/"
+          ><img
+            src="img/heatsync-labs-logo__white.png"
+            title="HeatSync Labs"
+            alt="HeatSync Labs"
+        /></a>
       </div>
-    </div>
+      <input id="menu-toggle" type="checkbox" />
+      <label class="menu-button-container" for="menu-toggle">
+        <div class="menu-button"></div>
+      </label>
+      <ul class="social-container">
+        <li>
+          <a
+            href="https://www.facebook.com/HeatSyncLabs/"
+            rel="noreferrer"
+            title="Facebook Group"
+            alt="Facebook Group"
+            class="social-logo"
+            target="_blank"
+          >
+            <i class="fa-2x fa-brands fa-square-facebook"></i>
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://www.twitter.com/heatsynclabs"
+            rel="noreferrer"
+            title="Twitter"
+            alt="Twitter"
+            class="social-logo"
+            target="_blank"
+          >
+            <i class="fa-2x fa-brands fa-square-twitter"></i>
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://www.github.com/heatsynclabs"
+            rel="noreferrer"
+            title="Github"
+            alt="Github"
+            class="social-logo"
+            target="_blank"
+          >
+            <i class="fa-2x fa-brands fa-square-github"></i>
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://www.flickr.com/photos/hslphotosync/"
+            rel="noreferrer"
+            title="HSL PhotoSync"
+            alt="HSL PhotoSync"
+            class="social-logo"
+            target="_blank"
+          >
+            <i class="fa-2x fa-brands fa-flickr"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
     <div class="container-fluid">
       <iframe
         class="airtable-embed"
@@ -61,5 +115,10 @@
         height="533"
       ></iframe>
     </div>
+
+    <script
+      src="https://kit.fontawesome.com/daeb911119.js"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>

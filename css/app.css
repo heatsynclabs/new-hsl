@@ -7,26 +7,123 @@
   --gray-400: #aeaeae;
   --gray-200: #e6e6e6;
   --gray-900: #2c2c29;
-  --black: #071108;
+  --hsl-black: #071108;
+  --black: #000000;
+  --white: #ffffff;
   --text-base: 1rem;
   --text-base-height: 1.5rem;
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
+  --space-1: 8px;
+  --space-2: 12px;
+  --space-3: 16px;
+  --space-4: 20px;
+  --space-5: 28px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --width-5: 240px;
 }
 
 body {
-  background-image: url("/img/light_checkered.webp");
-  background-repeat: repeat;
   font-size: var(--text-base);
   line-height: var(--text-base-height);
+  color: var(--black);
+  padding: 0;
+}
+
+nav {
+  background-color: var(--black);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: solid 2px var(--orange);
+  padding: var(--space-2);
+  margin-bottom: var(--space-1);
+  color: var(--orange);
+}
+
+.menu-button-container {
+  display: none;
+  height: 100%;
+  width: 30px;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#menu-toggle {
+  display: none;
+}
+
+.menu-button,
+.menu-button::before,
+.menu-button::after {
+  display: block;
+  background-color: var(--orange);
+  position: absolute;
+  height: 4px;
+  width: 30px;
+  transition: transform 400ms cubic-bezier(0.23, 1, 0.32, 1);
+  border-radius: 2px;
+}
+
+.menu-button::before {
+  content: "";
+  margin-top: -8px;
+}
+
+.menu-button::after {
+  content: "";
+  margin-top: var(--space-1);
+}
+
+#menu-toggle:checked + .menu-button-container .menu-button::before {
+  margin-top: 0px;
+  transform: rotate(405deg);
+}
+
+#menu-toggle:checked + .menu-button-container .menu-button {
+  background: rgba(255, 255, 255, 0);
+}
+
+#menu-toggle:checked + .menu-button-container .menu-button::after {
+  margin-top: 0px;
+  transform: rotate(-405deg);
+}
+
+.logo {
+  display: block;
+}
+
+.logo a img {
+  width: 100%;
+  max-width: var(--width-5);
+  height: auto;
 }
 
 .social-container {
-  padding-top: 10%;
   display: flex;
+  flex-direction: row;
   justify-content: flex-end;
-  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.social-container > li {
+  margin: 0 var(--space-1);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.social-container > li a {
+  display: flex;
+  align-items: center;
+  color: var(--white);
+  text-decoration: none;
 }
 
 .social-logo,
@@ -35,17 +132,13 @@ body {
   color: var(--orange);
 }
 
-.social-logo i {
-  padding-right: var(--space-2);
-}
-
 .social-logo:hover,
 .social-logo:hover i {
   color: var(--orange-600);
 }
 
-.logo {
-  padding-top: 17px;
+.container {
+  padding: 0 var(--space-4);
 }
 
 .open {
@@ -88,6 +181,10 @@ body {
 .hide-link a {
   color: #333333;
   text-decoration: underline;
+}
+
+.hide-link a i {
+  padding-right: var(--space-1);
 }
 
 .orange-button a {
@@ -150,7 +247,7 @@ h3.calendar-link {
 }
 
 .footer {
-  background-color: white;
+  /* background-color: white; */
 }
 
 .title {
@@ -190,8 +287,57 @@ footer {
   border: 1px solid #ccc;
 }
 
-@media (max-width: 767px) {
+@media only screen and (max-width: 768px) {
+  .logo a img {
+    max-width: var(--space-9);
+  }
+
+  .menu-button-container {
+    display: flex;
+  }
+
   .social-container {
-    padding-top: 0;
+    position: absolute;
+    top: 0;
+    margin-top: 50px;
+    left: 0;
+    flex-direction: column;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #menu-toggle ~ .social-container li {
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    transition: height 400ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  #menu-toggle ~ .social-container li a i::before {
+    height: 0;
+    overflow: hidden;
+  }
+
+  #menu-toggle:checked ~ .social-container li {
+    border: 1px solid var(--gray);
+    height: 2.5em;
+    padding: 0.5em;
+    transition: height 400ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .social-container > li {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    padding: 0.5em 0;
+    width: 100%;
+    color: white;
+    background-color: var(--gray-900);
+  }
+
+  .social-container > li:not(:last-child) {
+    border-bottom: 1px solid var(--gray);
   }
 }
