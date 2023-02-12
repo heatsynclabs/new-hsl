@@ -76,7 +76,7 @@ nav {
   transform: rotate(-405deg);
 }
 
-.social-container {
+.menu {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
@@ -86,14 +86,14 @@ nav {
   box-shadow: 0 1px 8px var(--black);
 }
 
-.social-container > li {
+.menu > li {
   margin: 0 var(--space-1);
   overflow: hidden;
   display: flex;
   align-items: center;
 }
 
-.social-container > li a {
+.menu > li a {
   display: flex;
   align-items: center;
   color: var(--white);
@@ -101,11 +101,11 @@ nav {
   transition: color var(--theme-transition-ms);
 }
 
-.social-container > li a {
+.menu > li a {
   padding: 0 var(--space-1);
 }
 
-.social-container > li a:hover {
+.menu > li a:hover {
   color: var(--gray-400);
 }
 
@@ -122,7 +122,7 @@ nav {
     display: flex;
   }
 
-  .social-container {
+  .menu {
     position: absolute;
     top: 0;
     margin-top: var(--theme-navbar-height);
@@ -133,7 +133,7 @@ nav {
     align-items: center;
   }
 
-  #menu-toggle ~ .social-container li {
+  #menu-toggle ~ .menu li {
     height: 0;
     margin: 0;
     padding: 0;
@@ -141,19 +141,19 @@ nav {
     transition: height 400ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  #menu-toggle ~ .social-container li a i::before {
+  #menu-toggle ~ .menu li a i::before {
     height: 0;
     overflow: hidden;
   }
 
-  #menu-toggle:checked ~ .social-container li {
+  #menu-toggle:checked ~ .menu li {
     border: 1px solid var(--gray);
     height: 2.5em;
     padding: 0.5em;
     transition: height 400ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  .social-container > li {
+  .menu > li {
     display: flex;
     justify-content: center;
     margin: 0;
@@ -163,7 +163,7 @@ nav {
     background-color: var(--gray-900);
   }
 
-  .social-container > li:not(:last-child) {
+  .menu > li:not(:last-child) {
     border-bottom: 1px solid var(--gray);
   }
 }

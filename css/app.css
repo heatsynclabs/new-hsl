@@ -28,6 +28,8 @@
 }
 
 body {
+  background-image: url("/img/light_checkered.webp");
+  background-repeat: repeat;
   font-size: var(--text-base);
   line-height: var(--text-base-height);
   color: var(--black);
