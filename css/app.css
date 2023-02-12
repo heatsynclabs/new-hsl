@@ -44,7 +44,8 @@ body {
 .social-logo:hover i {
   color: var(--orange-600);
 }
-.container {
+
+.main {
   padding: 0 var(--space-4);
 }
 
