@@ -101,6 +101,10 @@ nav {
   transition: color var(--theme-transition-ms);
 }
 
+.social-container > li a {
+  padding: 0 var(--space-1);
+}
+
 .social-container > li a:hover {
   color: var(--gray-400);
 }
