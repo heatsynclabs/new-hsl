@@ -53,7 +53,7 @@ body {
 
 main {
   position: relative;
-  margin-top: calc(var(--theme-navbar-height) + var(--space-4));
+  margin-top: var(--space-4);
 }
 
 .open {

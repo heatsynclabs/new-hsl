@@ -1,5 +1,6 @@
 nav {
-  position: fixed;
+  position: sticky;
+  top: 0;
   min-width: auto;
   width: 100%;
   background-color: var(--black);
