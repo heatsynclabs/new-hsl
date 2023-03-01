@@ -1,9 +1,10 @@
+name: Static Build and Deploy
 on:
   # Runs on pushes targeting the default branch
   push:
     branches: [ "gh-pages" ]
   pull_request:
-    branches: [ "gh-pages" ]
+    branches: [ "dev" ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
