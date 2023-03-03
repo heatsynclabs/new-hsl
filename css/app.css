@@ -115,6 +115,12 @@ main {
   margin-top: 7px;
 }
 
+.paypal-donate-img {
+  border: none;
+  border-radius: 5rem;
+  background: none;
+}
+
 h3.calendar-link {
   text-decoration: underline;
   cursor: pointer;
