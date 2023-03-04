@@ -11,7 +11,9 @@
 
 This project uses [Vite](https://vitejs.dev/) to serve and build for production. Vite requires Node.js version 14.18+, 16+. Please upgrade if your package manager warns about it.
 
-In the project directory, run `npm install` to get development dependencies.
+In the project directory, run `npm ci` to install dependencies.
+
+> Information on why `npm ci` is recommended over `npm install` when not adding new dependencies can be found in [NPM's docs](https://docs.npmjs.com/cli/v6/commands/npm-ci#description).
 
 ## Running locally
 
