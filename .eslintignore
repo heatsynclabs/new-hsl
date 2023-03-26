@@ -2,7 +2,8 @@
 libs/
 deps/util/
 *~
-# package-lock.json
+package-lock.json
+deps/
 
 # Logs
 logs

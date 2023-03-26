@@ -9,12 +9,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="Description" content="HeatSync Labs. Arizona's greatest hackerspace.">
     <meta name="author" content="">
-    <link href="deps/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
-    <link href="deps/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" type="text/css">
-    <link href="deps/Font-Awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="/deps/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="/deps/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" type="text/css">
+    <link href="/deps/Font-Awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <script src="https://kit.fontawesome.com/daeb911119.js" crossorigin="anonymous"></script>
-    <link href="css/app.css" rel="stylesheet" type="text/css">
-    <link href="css/nav.css" rel="stylesheet" type="text/css">
+    <link href="/css/app.css" rel="stylesheet" type="text/css">
+    <link href="/css/nav.css" rel="stylesheet" type="text/css">
     <meta name="theme-color" content="#f99b0c">
 
     <script type="text/javascript">
@@ -57,7 +57,7 @@
         </label>
         <ul class="menu">
           <li>
-            <a href="/classes" title="Classes">Classes</a>
+            <a href="classes" title="Classes">Classes</a>
           </li>
           <li>
             <a href="https://members.heatsynclabs.org/" rel="noreferrer" title="Member Site" target="_blank">Membership</a>
@@ -115,7 +115,9 @@
                 <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
                   <input type="hidden" name="cmd" value="_s-xclick">
                   <input type="hidden" name="hosted_button_id" value="7596RGJWUWZZ4">
-                  <input type="image" src="img/btn_donate_LG.gif" border="0" name="submit" alt="Donate to HeatSync Labs">
+                  <button class="paypal-donate-img">
+                    <image type="image" src="img/btn_donate_LG.gif" border="0" name="submit" alt="Donate to HeatSync Labs">
+                  </button>
                   <img alt="spacer" border="0" src="img/pixel.gif" width="1" height="1">
                 </form>
             </div>
@@ -144,8 +146,8 @@
           <div class="row">
             <div id="classes">
               <h3>Interested in Classes?</h3>
-              <p><a href="/register">Register</a> to get notifications on classes you are interested in.</p>
-              <p>Check out <a href="/classes">all our classes</a> to see what's available.</p>
+              <p><a href="register">Register</a> to get notifications on classes you are interested in.</p>
+              <p>Check out <a href="classes">all our classes</a> to see what's available.</p>
             </div>
           </div>
           <div class="row">
@@ -194,9 +196,9 @@
                 </div>
                 <div class="span4 hide-link camera-container">
                   <h3>
-                    <a href="/live">Live</a>
+                    <a href="live">Live</a>
                   </h3>
-                  <a href="/live">
+                  <a href="live">
                     <img src="https://live.heatsynclabs.org/snapshot.php?camera=1" alt="live webcam">
                   </a>
                 </div>
@@ -206,10 +208,10 @@
         </div>
       </div>
 
-    <script async type="text/javascript" src="https://api.flickr.com/services/rest/?tags=publish&format=json&method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818@N07&per_page=20&jsoncallback=hslflickr"></script>
-
-    <script type="text/javascript" src="scripts/doors.js"></script>
-    <script type="text/javascript" src="scripts/flickr.js"></script>
+          
+      <script async type="text/javascript" src="https://api.flickr.com/services/rest/?tags=publish&format=json&method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818@N07&per_page=20&jsoncallback=hslflickr"></script>
+      <script type="module" src="/src/scripts/doors.js"></script>
+      <script type="module" src="/src/scripts/flickr.js"></script>
 
   </body>
 </html>
