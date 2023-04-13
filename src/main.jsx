@@ -39,16 +39,16 @@ const router = createBrowserRouter([
         element: <RegisterPage />,
       },
       {
-        path: "register",
-        element: <RegisterPage />,
-      },
-      {
         path: "events",
         element: <EventsPage />,
       },
       {
         path: "fscalendar",
         element: <FsCalendarPage />,
+      },
+      {
+        path: "history",
+        element: <HistoryPage />,
       },
     ],
   },

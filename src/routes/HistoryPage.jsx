@@ -8,8 +8,8 @@ export default function HistoryPage() {
   // Blame me for the music via embedded video bit
   return (
     <div className="history">
-      <div style="overflow:hidden; position:absolute; left:0; top:0; width:50px; height:25px;">
-        <div style="margin-top:-290px;">
+      <div className="wrapper">
+        <div className="inner">
           <object width="420" height="315">
             <param
               name="movie"
