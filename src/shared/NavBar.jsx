@@ -1,4 +1,3 @@
-import logoUrl from "./img/";
 import "./NavBar.css";
 
 export default function NavBar() {
