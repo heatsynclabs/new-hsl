@@ -1,12 +1,11 @@
 .fscalendar {
   margin: 0;
-  padding: 0;
-  height: 100%;
+  padding: var(--space-4);
+  height: calc(100vh - var(--theme-navbar-height));
 }
 
 .fscalendar #wrapper {
   margin: 0 auto;
-  position: fixed;
   width: 100%;
   height: 100%;
 }

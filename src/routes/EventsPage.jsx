@@ -30,7 +30,7 @@ export default function EventsPage() {
       <h2>Event Calendar</h2>
       <p>
         <iframe
-          style="border: 0;"
+          style={{ border: 0 }}
           src="https://www.google.com/calendar/hosted/heatsynclabs.org/embed?src=heatsynclabs.org_p9rcn09d64q56m7rg07jptmrqc%40group.calendar.google.com&amp;ctz=America/Phoenix"
           frameborder="0"
           scrolling="no"
