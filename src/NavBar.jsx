@@ -6,7 +6,7 @@ export default function NavBar() {
       <div className="logo">
         <a href="/">
           <img
-            src="img/heatsync-labs-logo__white.png"
+            src="./heatsync-labs-logo__white.png"
             title="HeatSync Labs"
             alt="HeatSync Labs"
           />
