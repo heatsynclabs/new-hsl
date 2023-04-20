@@ -29,7 +29,6 @@
       src="https://kit.fontawesome.com/daeb911119.js"
       crossorigin="anonymous"
     ></script>
-    <link href="/css/app.css" rel="stylesheet" type="text/css" />
     <meta name="theme-color" content="#f99b0c" />
 
     <script type="text/javascript">
@@ -58,7 +57,9 @@
         // Check that service workers are registered
         if ("serviceWorker" in navigator) {
           // we need better SSL accross the board before this
-          navigator.serviceWorker.register("/sw.js", { scope: "/" });
+          navigator.serviceWorker.register("./src/scripts/sw.js", {
+            scope: "/",
+          });
         }
       });
     </script>

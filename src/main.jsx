@@ -11,48 +11,54 @@ import RegisterPage from "./routes/RegisterPage";
 import HistoryPage from "./routes/HistoryPage";
 import FsCalendarPage from "./routes/FsCalendarPage";
 import EventsPage from "./routes/EventsPage";
+import "./index.css";
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <Root />,
+      errorElement: <ErrorPage />,
+      children: [
+        {
+          path: "",
+          element: <HomePage />,
+        },
+        {
+          path: "classes",
+          element: <ClassesPage />,
+        },
+        {
+          path: "donate",
+          element: <DonationPage />,
+        },
+        {
+          path: "live",
+          element: <LivePage />,
+        },
+        {
+          path: "register",
+          element: <RegisterPage />,
+        },
+        {
+          path: "events",
+          element: <EventsPage />,
+        },
+        {
+          path: "fscalendar",
+          element: <FsCalendarPage />,
+        },
+        {
+          path: "history",
+          element: <HistoryPage />,
+        },
+      ],
+    },
+  ],
   {
-    path: "/",
-    element: <Root />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        path: "",
-        element: <HomePage />,
-      },
-      {
-        path: "classes",
-        element: <ClassesPage />,
-      },
-      {
-        path: "donate",
-        element: <DonationPage />,
-      },
-      {
-        path: "live",
-        element: <LivePage />,
-      },
-      {
-        path: "register",
-        element: <RegisterPage />,
-      },
-      {
-        path: "events",
-        element: <EventsPage />,
-      },
-      {
-        path: "fscalendar",
-        element: <FsCalendarPage />,
-      },
-      {
-        path: "history",
-        element: <HistoryPage />,
-      },
-    ],
-  },
-]);
+    basename: import.meta.env.BASE_URL ?? "",
+  }
+);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

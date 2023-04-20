@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function HomePage() {
   return (
     <>
@@ -111,7 +113,7 @@ export default function HomePage() {
               <div id="classes">
                 <h3>Interested in Classes?</h3>
                 <p>
-                  <a href="register">Register</a> to get notifications on
+                  <Link to="register">Register</Link> to get notifications on
                   classes you are interested in.
                 </p>
                 <p>

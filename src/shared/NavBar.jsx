@@ -1,16 +1,17 @@
+import { Link } from "react-router-dom";
 import "./NavBar.css";
 
 export default function NavBar() {
   return (
     <nav>
       <div className="logo">
-        <a href="/">
+        <Link to="/">
           <img
-            src="/heatsync-labs-logo__white.png"
+            src="./heatsync-labs-logo__white.png"
             title="HeatSync Labs"
             alt="HeatSync Labs"
           />
-        </a>
+        </Link>
       </div>
       <input id="menu-toggle" type="checkbox" />
       <label className="menu-button-container" for="menu-toggle">
@@ -18,9 +19,7 @@ export default function NavBar() {
       </label>
       <ul className="menu">
         <li>
-          <a href="classes" title="Classes">
-            Classes
-          </a>
+          <Link to="classes">Classes</Link>
         </li>
         <li>
           <a
