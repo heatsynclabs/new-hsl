@@ -3,8 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <title>HeatSync Labs</title>
-    <link rel="manifest" href="manifest.json" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="mask-icon" href="/logo-color.svg" color="#5bbad5" />
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
     <meta
       name="Description"
       content="HeatSync Labs. Arizona's greatest hackerspace."
@@ -30,49 +35,29 @@
       crossorigin="anonymous"
     ></script>
     <meta name="theme-color" content="#f99b0c" />
-
-    <script type="text/javascript">
-      var _gaq = _gaq || [];
-      _gaq.push(["_setAccount", "UA-12598372-1"]);
-      _gaq.push(["_setDomainName", "heatsynclabs.org"]);
-      _gaq.push(["_trackPageview"]);
-
-      (function () {
-        var ga = document.createElement("script");
-        ga.type = "text/javascript";
-        ga.async = true;
-        ga.src = "https://ssl.google-analytics.com/ga.js";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(ga, s);
-      })();
-      const HSL = {};
-      window.HSL = HSL;
-      function hslflickr(data) {
-        console.log("hslflickr", data);
-        HSL.flickr = data;
-        flickr();
-      }
-      document.addEventListener("DOMContentLoaded", () => {
-        doors();
-        // Check that service workers are registered
-        if ("serviceWorker" in navigator) {
-          // we need better SSL accross the board before this
-          navigator.serviceWorker.register("./src/scripts/sw.js", {
-            scope: "/",
-          });
-        }
-      });
-    </script>
+    <script type="module" src="/src/scripts/loadscript.js"></script>
   </head>
   <body>
+    <noscript>
+      <h1>HeatSync Labs</h1>
+      <h2>Hacking Arizona Since 2009</h2>
+      <main>
+        <p>You need to enable JavaScript to run this app.</p>
+        <p>
+          We are a place where you can make things run by grassroots co-op of
+          volunteers. We call it a hackerspace. Our space is open for everyone
+          during public hours and events. Check our
+          <a
+            href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs"
+            target="_blank"
+            rel="noreferrer"
+            >discussion group</a
+          >
+          for details and updates.
+        </p>
+      </main>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script
-      async
-      type="text/javascript"
-      src="https://api.flickr.com/services/rest/?tags=publish&format=json&method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818@N07&per_page=20&jsoncallback=hslflickr"
-    ></script>
-    <script type="module" src="/src/scripts/doors.js"></script>
-    <script type="module" src="/src/scripts/flickr.js"></script>
   </body>
 </html>

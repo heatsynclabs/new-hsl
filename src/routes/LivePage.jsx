@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import "./LivePage.css";
+import DoorStatus from "../shared/DoorStatus";
 
 export default function LivePage() {
   useEffect(() => {
@@ -111,9 +112,7 @@ export default function LivePage() {
           <ul>
             <li>
               doors currently:
-              <span id="door_status">
-                <i className="icon-spinner icon-spin"></i>
-              </span>
+              <DoorStatus />
             </li>
           </ul>
         </div>

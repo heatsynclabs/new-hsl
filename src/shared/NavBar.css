@@ -38,7 +38,7 @@ nav .menu-button-container {
   padding-right: var(--space-2);
 }
 
-nav #menu-toggle {
+#menu-toggle {
   display: none;
 }
 
@@ -64,16 +64,16 @@ nav .menu-button::after {
   margin-top: var(--space-1);
 }
 
-nav #menu-toggle:checked + nav .menu-button-container .menu-button::before {
+#menu-toggle:checked + nav .menu-button-container .menu-button::before {
   margin-top: 0px;
   transform: rotate(405deg);
 }
 
-nav #menu-toggle:checked + nav .menu-button-container .menu-button {
+#menu-toggle:checked + nav .menu-button-container .menu-button {
   background: rgba(255, 255, 255, 0);
 }
 
-nav #menu-toggle:checked + nav .menu-button-container .menu-button::after {
+#menu-toggle:checked + nav .menu-button-container .menu-button::after {
   margin-top: 0px;
   transform: rotate(-405deg);
 }
@@ -131,7 +131,7 @@ nav .menu > li a:hover {
     align-items: center;
   }
 
-  nav #menu-toggle ~ .menu li {
+  #menu-toggle ~ .menu li {
     height: 0;
     margin: 0;
     padding: 0;
@@ -139,12 +139,12 @@ nav .menu > li a:hover {
     transition: height 400ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  nav #menu-toggle ~ .menu li a i::before {
+  #menu-toggle ~ .menu li a i::before {
     height: 0;
     overflow: hidden;
   }
 
-  nav #menu-toggle:checked ~ .menu li {
+  #menu-toggle:checked ~ .menu li {
     box-sizing: border-box;
     border: 1px solid var(--gray);
     height: 48px;

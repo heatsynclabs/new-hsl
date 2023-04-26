@@ -1,4 +1,7 @@
 import { Link } from "react-router-dom";
+import MainImage from "../shared/MainImage";
+import DoorStatus from "../shared/DoorStatus";
+import "./HomePage.css";
 
 export default function HomePage() {
   return (
@@ -45,9 +48,7 @@ export default function HomePage() {
                   </li>
                   <li>
                     <strong>Our doors are currently:</strong>
-                    <span id="door_status">
-                      <i className="icon-spinner icon-spin"></i>
-                    </span>
+                    <DoorStatus />
                   </li>
                 </ul>
               </div>
@@ -84,11 +85,7 @@ export default function HomePage() {
               </div>
             </div>
             <div className="span9">
-              <div id="main_image">
-                <div className="spinner">
-                  <i className="icon-spinner icon-spin icon-3x"></i>
-                </div>
-              </div>
+              <MainImage />
             </div>
           </div>
 
@@ -98,9 +95,8 @@ export default function HomePage() {
 
               <div id="calendar-entries">
                 <iframe
+                  id="google-calendar-embed"
                   src="https://calendar.google.com/calendar/embed?src=heatsynclabs.org_p9rcn09d64q56m7rg07jptmrqc%40group.calendar.google.com&ctz=America%2FPhoenix"
-                  frameborder="0"
-                  scrolling="no"
                   width="100%"
                   height="640"
                   title="calendar entries"
