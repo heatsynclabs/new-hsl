@@ -1,217 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <title>
-      HeatSync Labs
-    </title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="Description" content="HeatSync Labs. Arizona's greatest hackerspace.">
-    <meta name="author" content="">
-    <link href="/deps/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css">
-    <link href="/deps/bootstrap/css/bootstrap-responsive.css" rel="stylesheet" type="text/css">
-    <link href="/deps/Font-Awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <script src="https://kit.fontawesome.com/daeb911119.js" crossorigin="anonymous"></script>
-    <link href="/css/app.css" rel="stylesheet" type="text/css">
-    <link href="/css/nav.css" rel="stylesheet" type="text/css">
-    <meta name="theme-color" content="#f99b0c">
-
-    <script type="text/javascript">
-
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-12598372-1']);
-      _gaq.push(['_setDomainName', 'heatsynclabs.org']);
-      _gaq.push(['_trackPageview']);
-
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = 'https://ssl.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-      const HSL = {};
-      window.HSL = HSL;
-      function hslflickr(data) {
-        console.log('hslflickr', data);
-        HSL.flickr = data;
-        flickr();
-      }
-      document.addEventListener('DOMContentLoaded', () => {
-        doors();
-        // Check that service workers are registered
-        if ('serviceWorker' in navigator) {
-          // we need better SSL accross the board before this
-          navigator.serviceWorker.register('/sw.js', { scope: '/' });
-        }
-      });
-    </script>
+    <meta charset="utf-8" />
+    <title>HeatSync Labs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="mask-icon" href="/logo-color.svg" color="#5bbad5" />
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta
+      name="Description"
+      content="HeatSync Labs. Arizona's greatest hackerspace."
+    />
+    <meta name="author" content="" />
+    <link
+      href="/deps/bootstrap/css/bootstrap.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="/deps/bootstrap/css/bootstrap-responsive.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="/deps/Font-Awesome/css/font-awesome.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script
+      src="https://kit.fontawesome.com/daeb911119.js"
+      crossorigin="anonymous"
+    ></script>
+    <meta name="theme-color" content="#f99b0c" />
+    <script type="module" src="/src/scripts/loadscript.js"></script>
   </head>
   <body>
-    <nav>
-        <div class="logo">
-          <a href="/"><img src="img/heatsync-labs-logo__white.png" title="HeatSync Labs" alt="HeatSync Labs"></a>
-        </div>
-        <input id="menu-toggle" type="checkbox" />
-        <label class='menu-button-container' for="menu-toggle">
-          <div class='menu-button'></div>
-        </label>
-        <ul class="menu">
-          <li>
-            <a href="classes" title="Classes">Classes</a>
-          </li>
-          <li>
-            <a href="https://members.heatsynclabs.org/" rel="noreferrer" title="Member Site" target="_blank">Membership</a>
-          </li>
-          <li>
-            <a href="https://wiki.heatsynclabs.org/wiki/Main_Page" rel="noreferrer" title="Wiki" target="_blank">Wiki</a>
-          </li>
-          <li>
-            <a href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs" alt="HSL Google Group" target="_blank" rel="noreferrer">Discussion Group</a>
-          </li>
-          <li>
-            <a href="https://www.facebook.com/HeatSyncLabs/" rel="noreferrer" title="Facebook Group" alt="Facebook Group" class="social-logo" target="_blank">
-              <i class="fa-2x fa-brands fa-square-facebook"></i>
-            </a>
-            <a href="http://bit.ly/hslslack" rel="noreferrer" title="Slack" alt="Slack" class="social-logo" target="_blank">
-              <i class="fa-2x fa-brands fa-slack"></i>
-            </a>
-            <a href="https://www.twitter.com/heatsynclabs" rel="noreferrer" title="Twitter" alt="Twitter" class="social-logo" target="_blank">
-              <i class="fa-2x fa-brands fa-square-twitter"></i>
-            </a>
-            <a href="https://www.github.com/heatsynclabs" rel="noreferrer" title="Github" alt="Github" class="social-logo" target="_blank">
-              <i class="fa-2x fa-brands fa-square-github"></i>
-            </a>
-            <a href="https://www.flickr.com/photos/hslphotosync/" rel="noreferrer" title="HSL PhotoSync" alt="HSL PhotoSync" class="social-logo" target="_blank">
-              <i class="fa-2x fa-brands fa-flickr"></i>
-            </a>
-          </li>
-        </ul>
-    </nav>
-    <div class="container main">
+    <noscript>
+      <h1>HeatSync Labs</h1>
+      <h2>Hacking Arizona Since 2009</h2>
       <main>
-        <div class="row">
-          <div class="span3 sidebar-nav">
-            <div class="left-info">
-              <h3>
-                We are:
-              </h3>
-              <ul>
-                <li>A place where you can make things. We call it a hackerspace. We are a grassroots co-op of volunteers&mdash; No staff.</li>
-                <li>Located at:<br>
-                  <a href='https://goo.gl/maps/5oo83'>108 West Main St.<br>Downtown Mesa</a></li>
-                <li>Open for everyone during public hours and events. Check our <a href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs" target="_blank" rel="noreferrer">discussion group</a> for details and updates.</strong></li>
-                <li><strong>Hosting free public hours</strong><br>Monday, Tuesday, Wednesday<br>7pm - 10pm<br>Saturday noon - 5pm</li>
-                <li><strong>Our doors are currently:</strong>
-                  <span id="door_status">
-                    <i class="icon-spinner icon-spin"></i>
-                  </span>
-                </li>
-              </ul>
-            </div>
-            <div class="donation">
-              <h3>
-                Support us!
-              </h3>
-                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-                  <input type="hidden" name="cmd" value="_s-xclick">
-                  <input type="hidden" name="hosted_button_id" value="7596RGJWUWZZ4">
-                  <button class="paypal-donate-img">
-                    <image type="image" src="img/btn_donate_LG.gif" border="0" name="submit" alt="Donate to HeatSync Labs">
-                  </button>
-                  <img alt="spacer" border="0" src="img/pixel.gif" width="1" height="1">
-                </form>
-            </div>
-          </div>
-          <div class="span9">
-            <div id="main_image">
-              <div class="spinner"><i class="icon-spinner icon-spin icon-3x"></i></div>
-            </div>
-          </div>
-        </div>
-  
-        <div class="row">
-          <div id="google-calendar" class="calendar-info">
-            <h3 class="calendar-link">
-              Calendar
-            </h3>
-  
-            <div id="calendar-entries">
-              <iframe src="https://calendar.google.com/calendar/embed?src=heatsynclabs.org_p9rcn09d64q56m7rg07jptmrqc%40group.calendar.google.com&ctz=America%2FPhoenix"  frameborder="0" scrolling="no" width="100%" height="640" title="calendar entries"></iframe>
-            </div>
-  
-          </div>
-  
-        </div>
-        <div class="connect-container">
-          <div class="row">
-            <div id="classes">
-              <h3>Interested in Classes?</h3>
-              <p><a href="register">Register</a> to get notifications on classes you are interested in.</p>
-              <p>Check out <a href="classes">all our classes</a> to see what's available.</p>
-            </div>
-          </div>
-          <div class="row">
-            <h3 class="hide-link">
-              <a href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs" alt="HSL Google Group" target="_blank" rel="noreferrer" class="social-logo">
-                <i class="fa-1x fa-fw fa-solid fa-user-group"></i>Discussion Group
-              </a>
-            </h3>
-            <h3 class="hide-link">
-              <a href="http://bit.ly/hslslack" alt="Slack" target="_blank" rel="noreferrer" class="social-logo">
-                <i class="fa-1x fa-fw fa-brands fa-slack"></i>Slack Channel
-              </a>
-            </h3>
-          </div>
-  
-        </div>
+        <p>You need to enable JavaScript to run this app.</p>
+        <p>
+          We are a place where you can make things run by grassroots co-op of
+          volunteers. We call it a hackerspace. Our space is open for everyone
+          during public hours and events. Check our
+          <a
+            href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs"
+            target="_blank"
+            rel="noreferrer"
+            >discussion group</a
+          >
+          for details and updates.
+        </p>
       </main>
-    </div>
-      <div class="footer">
-        <div class="container">
-          <div class="row">
-            <div class="span12">
-              <div class="row">
-                <div class="span4">
-                  <h3>
-                    Get Involved
-                  </h3>
-                  <p>
-                    HeatSync Labs is a community-driven 501(c)3 non-profit shop and workspace where engineers, artists, students, and hobbyists come to make prototypes, art, and other creative projects.
-                  </p>
-                  <p>
-                    It is a workshop for mad scientists, artists and anyone creating or making! We make tools, resources, and skills available to you.
-                  </p>
-                  <div class="btn btn-primary btn-large orange-button"><a href="https://members.heatsynclabs.org/">Members' site</a></div>
-                </div>
-                <div class="span4">
-                  <h3>
-                    Membership
-                  </h3>
-                  <p>
-                    You don't need to be a member to come and make stuff, but we are member-supported and member-driven so your support is appreciated! We encourage you to bring your projects during public hours so you get a feel for the place first.
-                  </p>
-                  <p>
-                  To learn more about how we work behind the scenes, check out the <a href="https://members.heatsynclabs.org/">Members Website.</a></p>
-                  <div class="btn btn-primary btn-large orange-button"><a href="https://members.heatsynclabs.org/users/sign_up">Become a Supporting Member!</a></div>
-                </div>
-                <div class="span4 hide-link camera-container">
-                  <h3>
-                    <a href="live">Live</a>
-                  </h3>
-                  <a href="live">
-                    <img src="https://live.heatsynclabs.org/snapshot.php?camera=1" alt="live webcam">
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-          
-      <script async type="text/javascript" src="https://api.flickr.com/services/rest/?tags=publish&format=json&method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818@N07&per_page=20&jsoncallback=hslflickr"></script>
-      <script type="module" src="/src/scripts/doors.js"></script>
-      <script type="module" src="/src/scripts/flickr.js"></script>
-
+    </noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

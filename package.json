@@ -9,11 +9,10 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.10.0"
   },
   "devDependencies": {
-    "@types/react": "^18.0.27",
-    "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react": "^3.1.0",
     "eslint": "^8.34.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -21,6 +20,7 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.32.2",
-    "vite": "^4.1.4"
+    "vite": "^4.1.4",
+    "vite-plugin-pwa": "^0.14.7"
   }
 }

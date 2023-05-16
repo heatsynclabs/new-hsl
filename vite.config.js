@@ -1,32 +1,54 @@
 import { defineConfig, loadEnv } from "vite";
-import { resolve } from "path";
 import react from "@vitejs/plugin-react";
-import forwardToTrailingSlashPlugin from "./forward-to-trailing-slash-plugin";
-
-const build = {
-  rollupOptions: {
-    input: {
-      main: resolve(__dirname, "index.html"),
-      classes: resolve(__dirname, "classes/index.html"),
-      donate: resolve(__dirname, "donate/index.html"),
-      live: resolve(__dirname, "live/index.html"),
-      register: resolve(__dirname, "register/index.html"),
-      history: resolve(__dirname, "history/index.html"),
-      fscalendar: resolve(__dirname, "fscalendar/index.html"),
-    },
-  },
-};
+import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   return {
     plugins: [
-      forwardToTrailingSlashPlugin(Object.keys(build.rollupOptions.input)),
       react(),
+      /*
+       * VitePWA takes care of passing all PWA checks
+       * More info at
+       * https://vite-pwa-org.netlify.app/guide/
+       */
+      VitePWA({
+        registerType: "autoUpdate",
+        workbox: {
+          globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+        },
+        manifest: {
+          short_name: "HeatSyncLabs",
+          name: "HeatSync Labs",
+          description: "Website for HeatSync Labs, a makerspace in Mesa, AZ.",
+          theme_color: "#f99b0c",
+          icons: [
+            {
+              src: "/android-chrome-192x192.png",
+              sizes: "192x192",
+              type: "image/png",
+            },
+            {
+              src: "/android-chrome-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+            },
+            {
+              src: "/logo-color.svg",
+              sizes: "512x512",
+              type: "image/svg",
+              purpose: "any maskable",
+            },
+          ],
+          display: "standalone",
+          background_color: "#f99b0c",
+        },
+        devOptions: {
+          enabled: true,
+        },
+      }),
     ],
     base: env.VITE_BASE ?? "/",
-    appType: "mpa",
-    build,
   };
 });
