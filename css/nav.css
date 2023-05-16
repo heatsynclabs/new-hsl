@@ -16,18 +16,18 @@ nav {
   min-width: 240px;
 }
 
-nav .logo {
+.logo {
   display: block;
   padding-left: var(--space-2);
 }
 
-nav .logo a img {
+.logo a img {
   min-width: 42px;
   max-width: var(--width-5);
   height: auto;
 }
 
-nav .menu-button-container {
+.menu-button-container {
   display: none;
   height: 100%;
   width: 30px;
@@ -42,9 +42,9 @@ nav .menu-button-container {
   display: none;
 }
 
-nav .menu-button,
-nav .menu-button::before,
-nav .menu-button::after {
+.menu-button,
+.menu-button::before,
+.menu-button::after {
   display: block;
   background-color: var(--orange);
   position: absolute;
@@ -54,31 +54,31 @@ nav .menu-button::after {
   border-radius: 2px;
 }
 
-nav .menu-button::before {
+.menu-button::before {
   content: "";
   margin-top: -8px;
 }
 
-nav .menu-button::after {
+.menu-button::after {
   content: "";
   margin-top: var(--space-1);
 }
 
-#menu-toggle:checked + nav .menu-button-container .menu-button::before {
+#menu-toggle:checked + .menu-button-container .menu-button::before {
   margin-top: 0px;
   transform: rotate(405deg);
 }
 
-#menu-toggle:checked + nav .menu-button-container .menu-button {
+#menu-toggle:checked + .menu-button-container .menu-button {
   background: rgba(255, 255, 255, 0);
 }
 
-#menu-toggle:checked + nav .menu-button-container .menu-button::after {
+#menu-toggle:checked + .menu-button-container .menu-button::after {
   margin-top: 0px;
   transform: rotate(-405deg);
 }
 
-nav .menu {
+.menu {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
@@ -88,14 +88,14 @@ nav .menu {
   box-shadow: 0 1px 8px var(--black);
 }
 
-nav .menu > li {
+.menu > li {
   margin: 0 var(--space-1);
   overflow: hidden;
   display: flex;
   align-items: center;
 }
 
-nav .menu > li a {
+.menu > li a {
   display: flex;
   align-items: center;
   color: var(--white);
@@ -103,24 +103,28 @@ nav .menu > li a {
   transition: color var(--theme-transition-ms);
 }
 
-nav .menu > li a {
+.menu > li a {
   padding: 0 var(--space-1);
 }
 
-nav .menu > li a:hover {
+.menu > li a:hover {
   color: var(--gray-400);
 }
 
 @media only screen and (max-width: 768px) {
-  nav .logo a img {
+  :root {
+    --theme-navbar-height: 65px;
+  }
+
+  .logo a img {
     max-width: var(--width-4);
   }
 
-  nav .menu-button-container {
+  .menu-button-container {
     display: flex;
   }
 
-  nav .menu {
+  .menu {
     position: absolute;
     top: 0;
     margin-top: var(--theme-navbar-height);
@@ -152,7 +156,7 @@ nav .menu > li a:hover {
     transition: height 400ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  nav .menu > li {
+  .menu > li {
     display: flex;
     justify-content: center;
     margin: 0;
@@ -162,7 +166,7 @@ nav .menu > li a:hover {
     background-color: var(--gray-900);
   }
 
-  nav .menu > li:not(:last-child) {
+  .menu > li:not(:last-child) {
     border-bottom: 1px solid var(--gray);
   }
 }

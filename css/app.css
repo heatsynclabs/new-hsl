@@ -27,12 +27,6 @@
   --theme-transition-ms: 150ms;
 }
 
-@media only screen and (max-width: 768px) {
-  :root {
-    --theme-navbar-height: 65px;
-  }
-}
-
 body {
   background-image: url("/img/light_checkered.webp");
   background-repeat: repeat;
@@ -190,4 +184,29 @@ footer {
 
 .modal-body {
   max-height: 500px;
+}
+
+.classes,
+.register {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  gap: 1rem;
+}
+
+.classes .container-fluid,
+.register .container-fluid {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  height: 100%;
+  padding-top: var(--space-4);
+  margin-top: var(--theme-navbar-height);
+}
+
+.classes iframe.airtable-embed,
+.register iframe.airtable-embed {
+  height: 100%;
+  background: transparent;
+  border: 1px solid #ccc;
 }
