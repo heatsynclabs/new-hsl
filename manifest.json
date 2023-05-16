@@ -1,0 +1,20 @@
+{
+  "short_name": "HeatSyncLabs",
+  "name": "HeatSync Labs",
+  "icons": [
+    {
+      "src": "/img/meatball_192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/img/meatball_512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "display": "standalone",
+  "start_url": "/",
+  "theme_color": "#f99b0c",
+  "background_color": "#f99b0c"
+}
