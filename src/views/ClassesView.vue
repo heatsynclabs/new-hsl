@@ -1,0 +1,100 @@
+<template>
+  <div class="classes-page">
+    <BaseContainer>
+      <div class="classes-header">
+        <h1 class="classes-title">Available Classes</h1>
+        <p class="classes-subtitle">
+          Learn new skills and get certified on our equipment. Browse our available classes and register to attend.
+        </p>
+        <BaseButton
+          variant="primary"
+          to="/register"
+          class="register-button"
+        >
+          Register for Classes
+        </BaseButton>
+      </div>
+
+      <div class="airtable-embed">
+        <iframe
+          class="airtable-embed__iframe"
+          src="https://airtable.com/embed/appa4ZMOs3fcejTSw/shrCG4aqAtGZwVmbk/tblZDTb6sjSVFD724?viewControls=on"
+          frameborder="0"
+          onmousewheel=""
+          width="100%"
+          height="533"
+          style="background: transparent; border: 1px solid #ccc;"
+        ></iframe>
+      </div>
+    </BaseContainer>
+  </div>
+</template>
+
+<script setup lang="ts">
+import BaseContainer from '../components/base/BaseContainer.vue'
+import BaseButton from '../components/base/BaseButton.vue'
+</script>
+
+<style scoped>
+.classes-page {
+  flex: 1;
+  padding: var(--space-8) 0;
+}
+
+.classes-header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.classes-title {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-light);
+  margin-bottom: var(--space-4);
+  color: var(--ink-black);
+  font-family: var(--font-sans);
+}
+
+.classes-subtitle {
+  font-size: var(--text-lg);
+  color: var(--warm-gray);
+  font-family: var(--font-sans);
+  max-width: 600px;
+  margin: 0 auto var(--space-6);
+  line-height: var(--leading-relaxed);
+}
+
+.register-button {
+  margin-bottom: var(--space-8);
+}
+
+.airtable-embed {
+  background: var(--paper-white);
+  border-radius: var(--radius-base);
+  overflow: hidden;
+  box-shadow: 0 4px 6px var(--shadow-light);
+}
+
+.airtable-embed__iframe {
+  display: block;
+  border-radius: var(--radius-base);
+  min-height: 600px;
+}
+
+@media (max-width: 768px) {
+  .classes-page {
+    padding: var(--space-4) 0;
+  }
+
+  .classes-title {
+    font-size: var(--text-3xl);
+  }
+
+  .classes-subtitle {
+    font-size: var(--text-base);
+  }
+
+  .airtable-embed__iframe {
+    min-height: 500px;
+  }
+}
+</style>

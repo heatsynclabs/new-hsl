@@ -1,0 +1,105 @@
+/* Design Tokens - HeatSync Labs Design System */
+
+:root {
+  /* Color Palette - Muted, sophisticated palette inspired by paper and ink */
+  --ink-black: #1a1918;
+  --graphite: #3e3d3c;
+  --warm-gray: #6b6866;
+  --paper-white: #f9f7f5;
+  --cream: #fefcfa;
+  --accent-rust: #a85a3c;
+  --accent-sage: #7a8b7f;
+  --off-white: #fcfcfc;
+  --success-green: #10b981;
+  --error-red: #ef4444;
+
+  /* Shadows for material depth */
+  --shadow-light: rgba(26, 25, 24, 0.08);
+  --shadow-medium: rgba(26, 25, 24, 0.12);
+  --shadow-heavy: rgba(26, 25, 24, 0.16);
+
+  /* Typography Scale */
+  --font-mono: 'IBM Plex Mono', 'SF Mono', 'Consolas', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Font Sizes */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 28px;
+  --text-4xl: 32px;
+  --text-5xl: 40px;
+  --text-6xl: 48px;
+  --text-7xl: 56px;
+
+  /* Font Weights */
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* Letter Spacing */
+  --tracking-tight: -1px;
+  --tracking-normal: 0;
+  --tracking-wide: 0.5px;
+  --tracking-wider: 1px;
+
+  /* Line Heights */
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.6;
+  --leading-loose: 1.8;
+
+  /* Spacing Scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* Border Radius */
+  --radius-none: 0;
+  --radius-sm: 2px;
+  --radius-base: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Container Sizes */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1200px;
+
+  /* Z-Index Scale */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-overlay: 50;
+  --z-modal: 100;
+  --z-toast: 1000;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Component Specific */
+  --header-height: 72px;
+  --card-padding: var(--space-8);
+  --button-height: 48px;
+}
+
+/* Keep light theme only - no dark mode */

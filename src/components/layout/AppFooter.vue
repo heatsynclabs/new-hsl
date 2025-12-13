@@ -1,0 +1,149 @@
+<template>
+  <footer class="footer">
+    <BaseContainer>
+      <div class="footer__content">
+        <div class="footer__section">
+          <h4 class="footer__title">Location</h4>
+          <p class="footer__text">
+            108 W Main St<br>
+            Mesa, AZ 85201
+          </p>
+        </div>
+
+        <div class="footer__section">
+          <h4 class="footer__title">Connect</h4>
+          <nav class="footer__nav">
+            <a href="http://bit.ly/hslslack" class="footer__link" target="_blank" rel="noopener">Slack</a>
+            <a href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs" class="footer__link" target="_blank" rel="noopener">Mailing List</a>
+            <a href="https://www.instagram.com/heatsynclabs/?hl=en" class="footer__link" target="_blank" rel="noopener">Instagram</a>
+            <a href="https://www.facebook.com/HeatSyncLabs/" class="footer__link" target="_blank" rel="noopener">Facebook</a>
+            <a href="https://github.com/heatsynclabs" class="footer__link" target="_blank" rel="noopener">GitHub</a>
+          </nav>
+        </div>
+
+        <div class="footer__section">
+          <h4 class="footer__title">Resources</h4>
+          <nav class="footer__nav">
+            <a href="https://wiki.heatsynclabs.org" class="footer__link" target="_blank" rel="noopener">Wiki</a>
+            <a href="https://members.heatsynclabs.org/resources" class="footer__link" target="_blank" rel="noopener">Equipment List</a>
+            <a href="https://www.flickr.com/people/hslphotosync/" class="footer__link" target="_blank" rel="noopener">Project Gallery</a>
+            <a href="https://members.heatsynclabs.org" class="footer__link" target="_blank" rel="noopener">Member Portal</a>
+          </nav>
+        </div>
+
+        <div class="footer__section">
+          <h4 class="footer__title">Support</h4>
+          <nav class="footer__nav">
+            <router-link to="/membership" class="footer__link">Become a Member</router-link>
+            <a href="https://www.zeffy.com/en-US/donation-form/donate-to-heatsync" class="footer__link" target="_blank" rel="noopener">Donate</a>
+            <a href="#" class="footer__link">Sponsor</a>
+            <a href="#" class="footer__link">Volunteer</a>
+          </nav>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <p class="footer__copyright">
+          © {{ currentYear }} HeatSync Labs · A 501(c)3 Non-Profit Organization
+        </p>
+      </div>
+    </BaseContainer>
+  </footer>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import BaseContainer from '../base/BaseContainer.vue'
+
+const currentYear = computed(() => new Date().getFullYear())
+</script>
+
+<style scoped>
+.footer {
+  background: var(--ink-black);
+  color: var(--paper-white);
+  padding: var(--space-12) 0 var(--space-6);
+  margin-top: auto;
+}
+
+.footer__content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-12);
+  margin-bottom: var(--space-8);
+}
+
+.footer__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.footer__title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--accent-sage);
+  font-family: var(--font-mono);
+}
+
+.footer__text {
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+  line-height: var(--leading-relaxed);
+  color: var(--paper-white);
+  opacity: 0.9;
+}
+
+.footer__nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.footer__link {
+  color: var(--paper-white);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+  opacity: 0.8;
+  transition: opacity var(--transition-base);
+}
+
+.footer__link:hover {
+  opacity: 1;
+}
+
+.footer__bottom {
+  border-top: 1px solid var(--graphite);
+  padding-top: var(--space-6);
+  text-align: center;
+}
+
+.footer__copyright {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  opacity: 0.6;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .footer {
+    padding: var(--space-8) 0 var(--space-4);
+  }
+
+  .footer__content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-8);
+  }
+}
+
+@media (max-width: 480px) {
+  .footer__content {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+}
+</style>
