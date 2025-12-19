@@ -44,15 +44,6 @@
           // we need better SSL accross the board before this
           navigator.serviceWorker.register('/sw.js', { scope: '/' });
         }
-        const cam1 = new MatrixCam({
-          name: 'CAM1',
-          width: 1280,
-          height: 720,
-          backroundImg: '/img/backgrounds/snapshot1.jpg',
-          canvas: document.getElementById('livestream1'),
-        });
-
-        const matrix = new MatrixLauncher({ io, cams: [cam1] });
       });
     </script>
   </head>
@@ -147,13 +138,10 @@
             <h3 class="calendar-link">
               Calendar
             </h3>
-  
             <div id="calendar-entries">
               <iframe src="https://calendar.google.com/calendar/embed?src=heatsynclabs.org_p9rcn09d64q56m7rg07jptmrqc%40group.calendar.google.com&ctz=America%2FPhoenix"  frameborder="0" scrolling="no" width="100%" height="640" title="calendar entries"></iframe>
             </div>
-  
           </div>
-  
         </div>
         <div class="connect-container">
           <div class="row">
@@ -175,7 +163,6 @@
               </a>
             </h3>
           </div>
-  
         </div>
       </main>
     </div>
@@ -207,7 +194,6 @@
                   To learn more about how we work behind the scenes, check out the <a href="https://members.heatsynclabs.org/">Members Website.</a></p>
                   <div class="btn btn-primary btn-large orange-button"><a href="https://members.heatsynclabs.org/users/sign_up">Become a Supporting Member!</a></div>
                 </div>
-
               </div>
             </div>
           </div>
@@ -216,9 +202,7 @@
 
           
       <script async type="text/javascript" src="https://api.flickr.com/services/rest/?tags=publish&format=json&method=flickr.photos.search&api_key=bec64c9c0f28889dc6e0c5ef7be3511f&user_id=60827818@N07&per_page=20&jsoncallback=hslflickr"></script>
-      <script src="https://unpkg.com/socket.io-client@4.8.1/dist/socket.io.min.js"></script>
       <script type="module" src="/src/scripts/doors.js"></script>
       <script type="module" src="/src/scripts/flickr.js"></script>
-      <script type="module" src="/src/scripts/matrix.js"></script>
   </body>
 </html>
