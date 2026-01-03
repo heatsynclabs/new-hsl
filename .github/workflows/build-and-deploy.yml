@@ -21,11 +21,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  # Build job runs on all branches
+  build:
     runs-on: ubuntu-latest
     env:
       VITE_BASE: ${{ vars.VITE_BASE }}
@@ -41,13 +38,24 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
       - name: Upload artifact
+        if: github.ref == 'refs/heads/gh-pages' && github.event_name == 'push'
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload dist repository
           path: "./dist"
+
+  # Deploy job only runs on gh-pages branch pushes
+  deploy:
+    if: github.ref == 'refs/heads/gh-pages' && github.event_name == 'push'
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
