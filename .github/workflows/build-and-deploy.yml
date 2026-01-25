@@ -1,53 +1,60 @@
-name: Static Build and Deploy
-on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["gh-pages"]
-  pull_request:
-    branches: ["dev"]
+name: Deploy to GitHub Pages
 
-  # Allows you to run this workflow manually from the Actions tab
+on:
+  push:
+    branches: [ welcome-to-2025, main, gh-pages, update-from-heatsynclabs-org ]
+  pull_request:
+    branches: [ welcome-to-2025, main, gh-pages ]
   workflow_dispatch:
 
-# Sets the GITHUB_TOKEN permissions to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build with Astro
+        run: npm run build
+        env:
+          PUBLIC_GOOGLE_API_KEY: ${{ secrets.PUBLIC_GOOGLE_API_KEY }}
+          PUBLIC_CALENDAR_ID: ${{ secrets.PUBLIC_CALENDAR_ID }}
+          VITE_CALENDAR_API_URL: ${{ secrets.VITE_CALENDAR_API_URL }}
+          VITE_FLICKR_API_URL: ${{ secrets.VITE_FLICKR_API_URL }}
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    env:
-      VITE_BASE: ${{ vars.VITE_BASE }}
+    needs: build
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: "npm"
-      - name: Install dependencies
-        run: npm ci
-      - name: Build
-        run: npm run build
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload dist repository
-          path: "./dist"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

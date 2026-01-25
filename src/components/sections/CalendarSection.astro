@@ -1,0 +1,19 @@
+---
+import BaseContainer from '../base/BaseContainer.astro';
+import BaseButton from '../base/BaseButton.astro';
+import CalendarSection from './CalendarSection.vue';
+---
+
+<section class="calendar-section">
+  <BaseContainer>
+    <CalendarSection client:load />
+  </BaseContainer>
+</section>
+
+<style>
+  .calendar-section {
+    padding: var(--space-12) 0;
+    background: var(--paper-white);
+  }
+</style>
+

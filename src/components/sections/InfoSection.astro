@@ -1,0 +1,80 @@
+---
+import BaseContainer from '../base/BaseContainer.astro';
+import BaseCard from '../base/BaseCard.astro';
+
+const infoItems = [
+  {
+    title: 'Open Workshop',
+    description: '3,200 square feet of workspace equipped with 3D printers, laser cutters, electronics workbenches, and traditional tools for woodworking and metalworking.',
+  },
+  {
+    title: 'Community Driven',
+    description: 'Member-owned and operated since 2009. We\'re a 501(c)3 non-profit dedicated to fostering creativity and technical education.',
+  },
+  {
+    title: 'Learn & Share',
+    description: 'Regular workshops, hackathons, and skill-sharing sessions. From Arduino basics to advanced fabrication techniques, there\'s always something new.',
+  },
+];
+---
+
+<section class="info-section">
+  <BaseContainer>
+    <h2 class="section-header">About Us</h2>
+    <div class="info-grid">
+      {infoItems.map((item) => (
+        <BaseCard hoverable class="info-card">
+          <h3 class="info-card__title">{item.title}</h3>
+          <p class="info-card__description">{item.description}</p>
+        </BaseCard>
+      ))}
+    </div>
+  </BaseContainer>
+</section>
+
+<style>
+  .info-section {
+    padding: var(--space-2) 0 var(--space-12) 0;
+  }
+
+  .section-header {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-normal);
+    margin-bottom: var(--space-4);
+    text-align: center;
+    color: var(--ink-black);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-8);
+  }
+
+  .info-card__title {
+    font-size: var(--text-xl);
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-3);
+    font-family: var(--font-mono);
+    color: var(--color-text-primary);
+  }
+
+  .info-card__description {
+    color: var(--color-text-tertiary);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: var(--leading-loose);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .info-section {
+      padding: var(--space-12) 0;
+    }
+
+    .info-grid {
+      gap: var(--space-6);
+    }
+  }
+</style>
+

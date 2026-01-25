@@ -1,0 +1,663 @@
+---
+import BaseContainer from '../base/BaseContainer.astro';
+import BaseButton from '../base/BaseButton.astro';
+import PhotoCollage from '../graphics/HeroPhotoCollage.vue';
+import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
+---
+
+<section class="hero">
+  <BaseContainer>
+    <div class="hero__wrapper">
+      <div class="hero__content">
+        <!-- Prominent Hero Logo -->
+        <a href="/" class="hero__logo" id="hero-logo">
+          <img src="/hsl-logo.png" alt="HeatSync Labs" class="hero__logo-mark" />
+          <span class="hero__logo-text">HeatSync Labs</span>
+        </a>
+
+        <!-- Status indicator below logo -->
+        <div class="hero__status" id="hero-status">
+          <LabStatusIndicator client:load />
+        </div>
+
+        <span class="hero__label">
+          <a href="https://maps.app.goo.gl/Qh3wZuQuik4U7niE6" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            108 W Main St, Downtown Mesa, AZ
+          </a>
+        </span>
+
+        <h1 class="hero__headline">
+          <strong>Make</strong> things.<br>
+          Break things.<br>
+          Learn things.
+        </h1>
+
+        <p class="hero__subtitle">
+          Arizona's original hackerspace for mad scientists and curious makers.
+        </p>
+
+        <p class="hero__pitch">
+          We're a <strong>community workshop</strong>, not a business. Show up with an idea, a broken gadget, or just curiosity. We've got the tools and people who want to help. <a href="/about" class="welcome-link"><strong style="color: var(--color-accent-primary);">And everyone is welcome.</strong></a>
+        </p>
+
+        <div class="hero__actions">
+          <BaseButton variant="primary" size="lg" href="http://bit.ly/hslslack" target="_blank" rel="noopener">
+            Join the Community
+          </BaseButton>
+          <BaseButton variant="secondary" size="lg" href="/about#visit-us">
+            Visit Us
+          </BaseButton>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat">
+            <div class="stat-value">15+</div>
+            <div class="stat-label">Years Running</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">100+</div>
+            <div class="stat-label">Active Members</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">6,811</div>
+            <div class="stat-label">Total Events</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value">25,177</div>
+            <div class="stat-label">Hours Open</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Collage wrapper for desktop -->
+      <div class="collage-wrapper">
+        <div class="collage-backdrop">
+          <div class="corner tl"></div>
+          <div class="corner br"></div>
+        </div>
+
+        <div class="year-badge">Est. 2009</div>
+
+        <div class="photo-collage-container">
+          <PhotoCollage client:load />
+        </div>
+      </div>
+    </div>
+  </BaseContainer>
+</section>
+
+
+<script>
+  // Hero logo scroll animation (desktop only - mobile handled via CSS)
+  (() => {
+    const heroLogo = document.getElementById('hero-logo');
+    const heroStatus = document.getElementById('hero-status');
+    const headerLogo = document.querySelector('.nav__logo');
+
+    // Only run on pages with hero logo
+    if (!heroLogo || !headerLogo) return;
+
+    // Get the header logo element inside the anchor
+    const headerLogoInner = headerLogo.querySelector('.logo');
+    if (!headerLogoInner) return;
+
+    let isScrolled = false;
+    const scrollThreshold = 150; // pixels to scroll before logo transitions
+
+    const updateLogoState = () => {
+      const scrollY = window.scrollY;
+      const shouldBeScrolled = scrollY > scrollThreshold;
+
+      if (shouldBeScrolled !== isScrolled) {
+        isScrolled = shouldBeScrolled;
+
+        if (isScrolled) {
+          // Scrolled: Logo in header, hero status hidden
+          heroLogo.classList.add('hero__logo--hidden');
+          if (heroStatus) heroStatus.classList.add('hero__status--hidden');
+          headerLogoInner.classList.add('logo--visible');
+          headerLogoInner.classList.remove('logo--hidden');
+        } else {
+          // At top: Logo in hero, hero status visible
+          heroLogo.classList.remove('hero__logo--hidden');
+          if (heroStatus) heroStatus.classList.remove('hero__status--hidden');
+          headerLogoInner.classList.add('logo--hidden');
+          headerLogoInner.classList.remove('logo--visible');
+        }
+      }
+    };
+
+    // Initial state - hide header logo
+    headerLogoInner.classList.add('logo--hidden');
+
+    // Listen for scroll with throttling
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          updateLogoState();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // Initial check in case page loaded already scrolled
+    updateLogoState();
+  })();
+</script>
+
+<style>
+  /* Hero Logo Styles */
+  .hero__logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    text-decoration: none;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-6);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: top left;
+  }
+
+  .hero__logo:hover {
+    color: var(--color-accent-primary);
+  }
+
+  .hero__logo:hover .hero__logo-mark {
+    transform: rotate(72deg);
+  }
+
+  .hero__logo-mark {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hero__logo-text {
+    font-family: var(--font-serif);
+    font-size: clamp(36px, 5vw, 44px);
+    font-weight: var(--font-semibold);
+    letter-spacing: var(--tracking-tight);
+    white-space: nowrap;
+  }
+
+  /* Hidden state for hero logo when scrolled */
+  .hero__logo--hidden {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.5);
+    pointer-events: none;
+  }
+
+  /* Hero status indicator */
+  .hero__status {
+    margin-top: var(--space-4);
+    margin-bottom: var(--space-6);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hero__status--hidden {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+  }
+
+  /* Mobile adjustments for hero logo */
+  @media (max-width: 900px) {
+    .hero__logo {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero__logo {
+      display: none;
+    }
+
+    .hero__status {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .hero__logo-mark {
+      width: 56px;
+      height: 56px;
+    }
+
+    .hero__logo-text {
+      font-size: 28px;
+    }
+  }
+
+  .hero {
+    padding: var(--space-12) 0;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    background: var(--color-bg-primary);
+    transition: background-color var(--transition-base);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    z-index: 0;
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 35px,
+        rgba(255,255,255,.1) 35px,
+        rgba(255,255,255,.1) 70px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 35px,
+        rgba(0,0,0,.02) 35px,
+        rgba(0,0,0,.02) 70px
+      );
+    background-size: 100px 100px;
+    pointer-events: none;
+  }
+
+  :global([data-theme="dark"]) .hero::before {
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 35px,
+        rgba(255,255,255,.02) 35px,
+        rgba(255,255,255,.02) 70px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 35px,
+        rgba(255,255,255,.03) 35px,
+        rgba(255,255,255,.03) 70px
+      );
+    opacity: 0.3;
+  }
+
+  .hero .container {
+    position: relative;
+    z-index: var(--z-raised);
+  }
+
+  .hero__wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    align-items: center;
+    gap: var(--space-8);
+  }
+
+  .hero__content {
+    max-width: 520px;
+    position: relative;
+    z-index: var(--z-raised);
+  }
+
+  .hero__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-4);
+    font-family: var(--font-mono);
+  }
+
+  .hero__label svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .hero__headline {
+    font-size: clamp(28px, 4.5vw, 48px);
+    font-weight: var(--font-light);
+    line-height: 1.1;
+    margin-bottom: var(--space-1);
+    letter-spacing: var(--tracking-tight);
+    font-family: var(--font-sans);
+  }
+
+  .hero__headline strong {
+    font-weight: var(--font-semibold);
+    color: var(--color-accent-primary);
+    position: relative;
+    display: inline-block;
+  }
+
+  .hero__headline strong::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: -4px;
+    right: -4px;
+    height: 12px;
+    background: var(--color-highlight);
+    opacity: 0.5;
+    z-index: -1;
+    transform: rotate(-1deg);
+  }
+
+  .hero__subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-tertiary);
+    font-weight: var(--font-normal);
+    margin-bottom: var(--space-3);
+    line-height: 1.5;
+    font-family: var(--font-sans);
+  }
+
+  .hero__pitch {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-6);
+    font-family: var(--font-sans);
+  }
+
+  .hero__pitch strong {
+    color: var(--color-text-primary);
+    font-weight: var(--font-semibold);
+  }
+
+  .welcome-link {
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .welcome-link:hover {
+    opacity: 0.8;
+  }
+
+  .hero__actions {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: var(--space-6);
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: flex;
+    gap: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border-light);
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: var(--font-semibold);
+    color: var(--color-accent-primary);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: var(--font-sans);
+  }
+
+  /* Collage Wrapper */
+  .collage-wrapper {
+    position: relative;
+    height: 100%;
+    min-height: 550px;
+  }
+
+  .collage-backdrop {
+    position: absolute;
+    top: 0;
+    right: -60px;
+    bottom: 0;
+    left: -20px;
+    background: var(--accent-rust);
+    transform: rotate(2deg) skewY(-1deg);
+    border-radius: 2px 0 0 2px;
+    overflow: hidden;
+  }
+
+  .collage-backdrop::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    pointer-events: none;
+  }
+
+  .collage-backdrop::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -5px;
+    bottom: 0;
+    width: 20px;
+    background: var(--accent-rust);
+    clip-path: polygon(
+      100% 0%, 100% 100%,
+      60% 98%, 80% 95%, 50% 92%, 70% 88%, 40% 85%, 65% 82%, 55% 78%, 75% 74%, 45% 70%,
+      70% 66%, 50% 62%, 80% 58%, 40% 54%, 60% 50%, 45% 46%, 75% 42%, 55% 38%, 70% 34%,
+      40% 30%, 65% 26%, 50% 22%, 80% 18%, 45% 14%, 70% 10%, 55% 6%, 60% 2%, 50% 0%
+    );
+  }
+
+  .corner {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(255,255,255,0.25);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .corner.tl {
+    top: 20px;
+    left: 30px;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .corner.br {
+    bottom: 20px;
+    right: 20px;
+    border-left: none;
+    border-top: none;
+  }
+
+  .photo-collage-container {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    bottom: 30px;
+    left: 50px;
+    transform: rotate(-2deg) skewY(1deg);
+    z-index: 3;
+  }
+
+  .year-badge {
+    position: absolute;
+    top: 25px;
+    right: 40px;
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: var(--font-semibold);
+    letter-spacing: 0.5px;
+    transform: rotate(3deg);
+    z-index: 20;
+    box-shadow: 2px 2px 8px var(--color-shadow);
+    font-family: var(--font-mono);
+    transition: background-color var(--transition-base), color var(--transition-base);
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .hero__wrapper {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .collage-backdrop {
+      left: -10px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      padding: var(--space-6) 0 var(--space-4);
+      min-height: auto;
+    }
+
+    .hero__wrapper {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      gap: var(--space-6);
+    }
+
+    .hero__content {
+      order: 2;
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .hero__label {
+      justify-content: center;
+    }
+
+    .hero__actions {
+      justify-content: center;
+    }
+
+    .stats-row {
+      justify-content: center;
+    }
+
+    .collage-wrapper {
+      order: 1;
+      width: calc(100% + 3rem);
+      margin-left: -1.5rem;
+      margin-right: -1.5rem;
+      height: 380px;
+      min-height: 380px;
+    }
+
+    .collage-backdrop {
+      top: -20px;
+      right: -30px;
+      bottom: -20px;
+      left: -30px;
+      transform: rotate(1deg) skewY(-0.5deg);
+      border-radius: 0;
+    }
+
+    .photo-collage-container {
+      top: 20px;
+      right: 20px;
+      bottom: 20px;
+      left: 20px;
+      transform: rotate(-1deg) skewY(0.5deg);
+    }
+
+    .year-badge {
+      top: 15px;
+      right: 25px;
+      padding: 4px 8px;
+      font-size: 10px;
+    }
+
+    .corner { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    .hero {
+      padding: var(--space-4) 0;
+    }
+
+    .hero__wrapper {
+      gap: var(--space-5);
+    }
+
+    .hero__headline {
+      font-size: 24px;
+    }
+
+    .hero__subtitle {
+      font-size: var(--text-sm);
+    }
+
+    .hero__pitch {
+      font-size: 13px;
+      margin-bottom: var(--space-6);
+    }
+
+    .hero__actions {
+      margin-bottom: var(--space-8);
+    }
+
+    .collage-wrapper {
+      width: calc(100% + 2rem);
+      margin-left: -1rem;
+      margin-right: -1rem;
+      height: 320px;
+      min-height: 320px;
+    }
+
+    .collage-backdrop {
+      transform: rotate(0.5deg);
+    }
+
+    .photo-collage-container {
+      top: 15px;
+      right: 15px;
+      bottom: 15px;
+      left: 15px;
+      transform: rotate(-0.5deg);
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-4);
+      row-gap: var(--space-5);
+    }
+
+    .stat-value {
+      font-size: 16px;
+    }
+
+    .stat-label {
+      font-size: 9px;
+    }
+
+    .year-badge {
+      top: 10px;
+      right: 15px;
+    }
+  }
+</style>

@@ -1,0 +1,121 @@
+---
+interface Props {
+  variant?: 'primary' | 'secondary' | 'outline'
+  size?: 'sm' | 'md' | 'lg'
+  href?: string
+  disabled?: boolean
+}
+
+const { variant = 'primary', size = 'md', href, disabled } = Astro.props;
+const buttonClasses = [
+  'btn',
+  `btn--${variant}`,
+  `btn--${size}`,
+  disabled && 'btn--disabled',
+].filter(Boolean).join(' ');
+
+const Tag = href ? 'a' : 'button';
+const attrs = href ? { href } : {};
+---
+
+<Tag class={buttonClasses} {...attrs} disabled={disabled}>
+  <slot />
+</Tag>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-weight: var(--font-medium);
+    letter-spacing: var(--tracking-wide);
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--color-accent-primary);
+    outline-offset: 2px;
+  }
+
+  /* Sizes */
+  .btn--sm {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-xs);
+    min-height: 32px;
+  }
+
+  .btn--md {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-sm);
+    min-height: 40px;
+  }
+
+  .btn--lg {
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--text-base);
+    min-height: var(--button-height);
+  }
+
+  /* Variants */
+  .btn--primary {
+    background: var(--ink-black);
+    color: var(--cream);
+    box-shadow: 2px 2px 8px var(--color-shadow);
+  }
+
+  :global([data-theme="dark"]) .btn--primary {
+    background: var(--warm-cream);
+    color: var(--charcoal-deep);
+  }
+
+  .btn--primary:hover:not(.btn--disabled) {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 12px var(--color-shadow-medium);
+  }
+
+  .btn--secondary {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border-color: var(--color-text-secondary);
+  }
+
+  .btn--secondary:hover:not(.btn--disabled) {
+    background: var(--color-text-secondary);
+    color: var(--color-bg-secondary);
+  }
+
+  .btn--outline {
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
+    box-shadow: 2px 2px 8px var(--color-shadow);
+  }
+
+  .btn--outline:hover:not(.btn--disabled) {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 10px var(--color-shadow-medium);
+    border-color: var(--color-accent-primary);
+  }
+
+  /* Disabled state */
+  .btn--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* Active/pressed state */
+  .btn:active:not(.btn--disabled) {
+    transform: translate(0, 0);
+    box-shadow: 1px 1px 4px var(--color-shadow);
+  }
+</style>
+

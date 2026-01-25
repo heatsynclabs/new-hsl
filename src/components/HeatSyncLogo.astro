@@ -1,0 +1,121 @@
+---
+interface Props {
+  size?: 'sm' | 'md' | 'lg'
+  showText?: boolean
+  interactive?: boolean
+}
+
+const { size = 'md', showText = true, interactive = true } = Astro.props;
+const logoClasses = [
+  'logo',
+  `logo--${size}`,
+  interactive && 'logo--interactive',
+  !showText && 'logo--text-only',
+].filter(Boolean).join(' ');
+---
+
+<div class={logoClasses}>
+  <img src="/hsl-logo.png" alt="HeatSync Labs" class="logo__mark" />
+  {showText && <span class="logo__text">HeatSync Labs</span>}
+</div>
+
+<style>
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    font-weight: var(--font-semibold);
+    letter-spacing: var(--tracking-tight);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .logo__mark {
+    transition: transform var(--transition-base);
+    flex-shrink: 0;
+    object-fit: contain;
+  }
+
+  .logo__text {
+    white-space: nowrap;
+    font-family: var(--font-serif);
+    font-weight: var(--font-semibold);
+  }
+
+  /* Sizes */
+  .logo--sm .logo__mark {
+    width: 24px;
+    height: 24px;
+  }
+
+  .logo--sm .logo__text {
+    font-size: var(--text-base);
+  }
+
+  .logo--md .logo__mark {
+    width: 32px;
+    height: 32px;
+  }
+
+  .logo--md .logo__text {
+    font-size: var(--text-xl);
+  }
+
+  @media (max-width: 640px) {
+    .logo--md .logo__text {
+      font-size: var(--text-base);
+    }
+  }
+
+  .logo--lg .logo__mark {
+    width: 48px;
+    height: 48px;
+  }
+
+  .logo--lg .logo__text {
+    font-size: var(--text-2xl);
+  }
+
+  /* Interactive state */
+  .logo--interactive:hover .logo__mark {
+    transform: rotate(72deg);
+  }
+
+  .logo--interactive:hover {
+    color: var(--color-accent-primary);
+  }
+
+  /* Text-only variant */
+  .logo--text-only {
+    gap: 0;
+  }
+
+  .logo--text-only .logo__mark {
+    display: none;
+  }
+
+  /* Scroll animation states */
+  .logo--hidden {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.8);
+    pointer-events: none;
+  }
+
+  .logo--visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  /* On mobile, always show navbar logo */
+  @media (max-width: 768px) {
+    .logo--hidden {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+  }
+</style>
+

@@ -1,0 +1,536 @@
+---
+interface Props {
+  name: string
+  description: string
+  pros: string[]
+  cons: string[]
+  tips?: string[]
+  link?: string
+  linkText?: string
+  featured?: boolean
+  icon: string
+  recipient?: string
+  recipientLabel?: string
+  qrCode?: string
+}
+
+const {
+  name,
+  description,
+  pros,
+  cons,
+  tips = [],
+  link,
+  linkText = 'Pay Now',
+  featured = false,
+  icon,
+  recipient,
+  recipientLabel = 'Send to',
+  qrCode
+} = Astro.props;
+
+// Check if icon is a path (starts with '/') or inline SVG
+const isImagePath = icon.startsWith('/');
+---
+
+<div class:list={['payment-card', { 'payment-card--featured': featured }]}>
+  <div class="payment-card__header">
+    {isImagePath ? (
+      <img src={icon} alt={`${name} logo`} class="payment-card__icon payment-card__icon--image" />
+    ) : (
+      <div class="payment-card__icon" set:html={icon} />
+    )}
+    <h3 class="payment-card__name">{name}</h3>
+    {featured && <span class="payment-card__badge">Preferred</span>}
+  </div>
+
+  <p class="payment-card__description">{description}</p>
+
+  {recipient && (
+    <div class="payment-card__recipient">
+      <span class="payment-card__recipient-label">{recipientLabel}:</span>
+      <a href={`mailto:${recipient}`} class="payment-card__recipient-value">{recipient}</a>
+      <button class="payment-card__copy" data-copy={recipient} title="Copy to clipboard">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <span class="payment-card__copy-text">Copy</span>
+      </button>
+    </div>
+  )}
+
+  <div class="payment-card__details">
+    <div class="payment-card__pros">
+      <span class="payment-card__label payment-card__label--pros">Pros</span>
+      <ul>
+        {pros.map(pro => <li>{pro}</li>)}
+      </ul>
+    </div>
+
+    <div class="payment-card__cons">
+      <span class="payment-card__label payment-card__label--cons">Cons</span>
+      <ul>
+        {cons.map(con => <li>{con}</li>)}
+      </ul>
+    </div>
+  </div>
+
+  {tips.length > 0 && (
+    <div class="payment-card__tips">
+      <span class="payment-card__label payment-card__label--tips">Tips</span>
+      <ul>
+        {tips.map(tip => <li>{tip}</li>)}
+      </ul>
+    </div>
+  )}
+
+  {qrCode && !link && (
+    <div class="payment-card__qr payment-card__qr--static">
+      <img
+        src={qrCode}
+        alt={`QR code for ${name}`}
+        width="80"
+        height="80"
+      />
+      <span class="payment-card__qr-label">Scan to pay</span>
+    </div>
+  )}
+
+  {link && (
+    <div class="payment-card__action">
+      <a href={link} class="payment-card__button" target="_blank" rel="noopener noreferrer">
+        {linkText}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M7 17L17 7M17 7H7M17 7V17"/>
+        </svg>
+      </a>
+      <div class="payment-card__qr">
+        <img
+          src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(link)}`}
+          alt={`QR code for ${name}`}
+          width="80"
+          height="80"
+        />
+        <span class="payment-card__qr-label">Scan to pay</span>
+      </div>
+    </div>
+  )}
+</div>
+
+<style>
+  .payment-card {
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-base);
+    padding: var(--space-5);
+    position: relative;
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    box-shadow: 3px 3px 12px var(--color-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .payment-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--color-accent-secondary);
+    border-radius: var(--radius-base) var(--radius-base) 0 0;
+  }
+
+  .payment-card--featured {
+    box-shadow: 4px 4px 16px var(--color-shadow-medium);
+    border: 2px solid var(--color-accent-primary);
+  }
+
+  .payment-card--featured::before {
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-rust), var(--highlight));
+  }
+
+  .payment-card:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 16px var(--shadow-medium);
+  }
+
+  .payment-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .payment-card__icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .payment-card__icon :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .payment-card__icon--image {
+    max-width: 180px;
+    max-height: 48px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .payment-card__name {
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-primary);
+    margin: 0;
+    flex-grow: 1;
+  }
+
+  .payment-card__badge {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    color: var(--color-bg-secondary);
+    background: var(--color-accent-primary);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .payment-card__description {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+    margin: 0;
+  }
+
+  .payment-card__recipient {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--color-bg-primary);
+    border: 2px dashed var(--color-accent-primary);
+    border-radius: var(--radius-base);
+    padding: var(--space-3) var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .payment-card__recipient-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-secondary);
+  }
+
+  .payment-card__recipient-value {
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    font-weight: var(--font-bold);
+    color: var(--color-accent-primary);
+    text-decoration: none;
+    word-break: break-all;
+  }
+
+  .payment-card__recipient-value:hover {
+    text-decoration: underline;
+  }
+
+  .payment-card__copy {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--font-medium);
+    color: var(--color-bg-secondary);
+    background: var(--color-text-primary);
+    border: none;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-left: auto;
+  }
+
+  .payment-card__copy:hover {
+    background: var(--color-accent-primary);
+  }
+
+  .payment-card__copy-text {
+    display: inline;
+  }
+
+  .payment-card__action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: auto;
+  }
+
+  .payment-card__qr {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .payment-card__qr--static {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: auto;
+  }
+
+  .payment-card__qr img {
+    border: 1px solid var(--color-border);
+  }
+
+  .payment-card__qr-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+  }
+
+  .payment-card__details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  .payment-card__pros,
+  .payment-card__cons,
+  .payment-card__tips {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .payment-card__label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .payment-card__label--pros {
+    color: var(--success-green);
+  }
+
+  .payment-card__label--cons {
+    color: var(--error-red);
+  }
+
+  .payment-card__label--tips {
+    color: var(--color-accent-secondary);
+  }
+
+  .payment-card__pros ul,
+  .payment-card__cons ul,
+  .payment-card__tips ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .payment-card__pros li,
+  .payment-card__cons li,
+  .payment-card__tips li {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-normal);
+    padding-left: var(--space-3);
+    position: relative;
+  }
+
+  .payment-card__pros li::before {
+    content: '+';
+    position: absolute;
+    left: 0;
+    color: var(--success-green);
+    font-weight: var(--font-bold);
+  }
+
+  .payment-card__cons li::before {
+    content: '−';
+    position: absolute;
+    left: 0;
+    color: var(--error-red);
+    font-weight: var(--font-bold);
+  }
+
+  .payment-card__tips li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent-secondary);
+  }
+
+  .payment-card__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-bg-secondary);
+    background: var(--color-accent-primary);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-base);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .payment-card__button:hover {
+    background: var(--color-text-primary);
+    transform: translateY(-1px);
+  }
+
+  .payment-card__button svg {
+    transition: transform var(--transition-fast);
+  }
+
+  .payment-card__button:hover svg {
+    transform: translate(2px, -2px);
+  }
+
+  /* Print styles */
+  @media print {
+    .payment-card {
+      box-shadow: none;
+      border: 1px solid var(--warm-gray);
+      padding: var(--space-3);
+      gap: var(--space-2);
+      break-inside: avoid;
+    }
+
+    .payment-card--featured {
+      border: 2px solid var(--ink-black);
+    }
+
+    .payment-card::before {
+      display: none;
+    }
+
+    .payment-card__icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .payment-card__icon--image {
+      max-width: 120px;
+      max-height: 36px;
+      width: auto;
+      height: auto;
+    }
+
+    .payment-card__name {
+      font-size: var(--text-base);
+    }
+
+    .payment-card__badge {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color-adjust: exact;
+    }
+
+    .payment-card__description {
+      font-size: var(--text-xs);
+    }
+
+    .payment-card__tips {
+      margin-bottom: var(--space-4);
+    }
+
+    .payment-card__button {
+      background: transparent;
+      color: var(--ink-black);
+      border: 1px solid var(--ink-black);
+      padding: var(--space-1) var(--space-3);
+    }
+
+    .payment-card__button {
+      display: none;
+    }
+
+    .payment-card__recipient {
+      border: 1px solid var(--ink-black);
+      padding: var(--space-2);
+    }
+
+    .payment-card__copy {
+      display: none;
+    }
+
+    .payment-card__recipient-value {
+      color: var(--ink-black);
+    }
+
+    .payment-card__action {
+      padding-bottom: 95px;
+      position: relative;
+    }
+
+    .payment-card__qr {
+      display: flex;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
+    .payment-card__qr--static {
+      display: flex;
+      position: absolute;
+      bottom: var(--space-3);
+      left: var(--space-3);
+    }
+
+    /* Add padding for cards with static QR codes (compact mode only) */
+    body:not(.print-full-page) .payment-card:has(.payment-card__qr--static) {
+      padding-bottom: 100px;
+    }
+
+    .payment-card__qr img {
+      width: 80px;
+      height: 80px;
+    }
+
+    .payment-card__qr-label {
+      font-size: 10px;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll('.payment-card__copy').forEach(button => {
+    button.addEventListener('click', async () => {
+      const textToCopy = button.getAttribute('data-copy');
+      const textSpan = button.querySelector('.payment-card__copy-text');
+
+      try {
+        await navigator.clipboard.writeText(textToCopy || '');
+        if (textSpan) {
+          textSpan.textContent = 'Copied!';
+          setTimeout(() => {
+            textSpan.textContent = 'Copy';
+          }, 2000);
+        }
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    });
+  });
+</script>

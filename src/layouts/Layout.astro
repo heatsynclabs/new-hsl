@@ -1,0 +1,131 @@
+---
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/utilities.css';
+import AppHeader from '../components/layout/AppHeader.astro';
+import AppFooter from '../components/layout/AppFooter.astro';
+
+interface Props {
+  title?: string;
+}
+
+const { title = 'HeatSync Labs' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="HeatSync Labs - Arizona's Community Hackerspace" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+
+    <!-- Theme detection (runs before CSS to prevent flash) -->
+    <script is:inline>
+      (function() {
+        const stored = localStorage.getItem('theme-preference');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = stored || (systemDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&display=swap" rel="stylesheet" />
+
+    <title>{title}</title>
+  </head>
+  <body>
+    <div id="app">
+      <AppHeader />
+      <main class="main">
+        <slot />
+      </main>
+      <AppFooter />
+    </div>
+  </body>
+</html>
+
+<style>
+  html {
+    font-family: var(--font-mono);
+    transition: background-color var(--transition-base), color var(--transition-base);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    position: relative;
+    transition: background-color var(--transition-base), color var(--transition-base);
+  }
+
+  /* Paper texture overlay - light mode */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    z-index: -1;
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 35px,
+        rgba(255,255,255,.1) 35px,
+        rgba(255,255,255,.1) 70px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 35px,
+        rgba(0,0,0,.02) 35px,
+        rgba(0,0,0,.02) 70px
+      );
+    background-size: 100px 100px;
+    pointer-events: none;
+    transition: opacity var(--transition-base);
+  }
+
+  /* Paper texture overlay - dark mode (inverted) */
+  :global([data-theme="dark"]) body::before {
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 35px,
+        rgba(255,255,255,.02) 35px,
+        rgba(255,255,255,.02) 70px
+      ),
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 35px,
+        rgba(255,255,255,.03) 35px,
+        rgba(255,255,255,.03) 70px
+      );
+    opacity: 0.3;
+  }
+
+  #app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 0;
+  }
+
+  .main {
+    flex: 1;
+  }
+</style>

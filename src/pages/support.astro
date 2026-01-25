@@ -1,0 +1,13 @@
+---
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+import ContentLayout from '../components/content/ContentLayout.astro';
+import { getEntry } from 'astro:content';
+
+const contentEntry = await getEntry('pages', 'support');
+---
+
+<Layout title="Support Us - HeatSync Labs">
+  <ContentLayout contentEntry={contentEntry} />
+</Layout>
+

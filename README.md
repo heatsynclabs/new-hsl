@@ -1,62 +1,104 @@
 # HeatSync Labs Website
 
-## Contributing
+Mesa's Community Hackerspace website built with Astro and Bun.
 
-1. Fork this repository
-2. Clone locally
-3. Implement something
-4. Issue a pull request from your forked repo into the `gh-pages` branch on the original repo.
+## Technology Stack
 
-## Requirements
+- **Astro 4.x**: Static site generator with Vue islands for interactivity
+- **Vue 3**: Component framework for interactive parts
+- **Bun**: Runtime and package manager
+- **TypeScript**: Type safety
+- **date-fns**: Date manipulation
 
-This project uses [Vite](https://vitejs.dev/) to serve and build for production. Vite requires Node.js version 14.18+, 16+. Please upgrade if your package manager warns about it.
+## Project Structure
 
-In the project directory, run `npm ci` to install dependencies.
+```
+├── src/
+│   ├── components/          # Reusable components
+│   │   ├── base/           # Foundation components
+│   │   ├── calendar/       # Calendar components (Vue)
+│   │   ├── events/          # Event components (Vue)
+│   │   ├── graphics/       # Photo/graphics components (Vue)
+│   │   ├── layout/          # Layout components
+│   │   ├── sections/       # Page sections
+│   │   └── schedule/       # Schedule components (Vue)
+│   ├── layouts/            # Page layouts
+│   ├── pages/              # Routes (file-based routing)
+│   │   └── api/           # Astro API endpoints (serverless functions)
+│   ├── services/           # Service classes
+│   └── styles/            # Global styles
+├── public/                 # Static assets
+└── dist/                  # Build output
+```
 
-> Information on why `npm ci` is recommended over `npm install` when not adding new dependencies can be found in [NPM's docs](https://docs.npmjs.com/cli/v6/commands/npm-ci#description).
+## Development Setup
 
-## Running locally
+### Prerequisites
 
-Run `npm run dev` in the project directory, then visit http://localhost:5173/
+- Bun (latest version)
 
-If you've set a local environment variable `VITE_BASE`, visit `http://localhost:5173/<VITE_BASE>`
+### Installation
 
-To create a production build and preview it locally, run `npm run build`, then run `npm run preview` and visit http://localhost:4173/.
+```bash
+# Install dependencies
+bun install
 
-If you've set a local environment variable `VITE_BASE`, visit `http://localhost:4173/<VITE_BASE>`
+# Start development server
+bun run dev
 
-## Deploying to Forked Repository's Github Page
+# Build for production
+bun run build
 
-In some cases, such as when you'd like to make it easier for PR reviewers to preview your changes, you may want to deploy a version of the site to your own GitHub page. To do so:
+# Preview production build
+bun run preview
+```
 
-1. Follow GitHub [instructions to create a repository level environment variable](https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository). The Name will be `VITE_BASE` and the value will be `/<REPO>/`. Since this repository's name is `new-hsl`, the value would be `/new-hsl/`.
+## Environment Variables
 
-   > You can read why this is necessary [Vite's docs about deploying to a GitHub page](https://vitejs.dev/guide/static-deploy.html#github-pages).
+Create a `.env` file in the root directory:
 
-2. Navigate to the repository Settings tab, then Pages under the "Code and automation" section.
+```env
+GOOGLE_API_KEY=your_google_calendar_api_key
+CALENDAR_ID=your_google_calendar_id
+```
 
-3. In the "Build and Deployment" section, select GitHub Actions for the Source.
+## Deployment
 
-Now, when you push to the `gh-pages` branch on your forked repo, your changes should automatically deploy to `https://<USERNAME>.github.io/<REPO>/`. If this doesn't happen automatically, be sure to check https://www.githubstatus.com/ to see if GitHub actions are up and running before starting other troubleshooting.
+The site is configured for hybrid deployment:
+- Static pages are pre-rendered at build time
+- API routes (`/api/calendar` and `/api/flickr`) are deployed as serverless functions via Astro
 
-## Linting
+### Netlify
 
-Before commiting changes, it is helpful to run `npm run lint` and fix any warnings or errors to ensure your changes match expected coding styles.
+The project works with Netlify out of the box. Set environment variables in the Netlify dashboard.
 
-## Testing
+### Other Platforms
 
-There are currently no tests.
+Astro supports deployment to:
+- Vercel
+- Cloudflare Pages
+- AWS Amplify
+- GitHub Pages (static only)
 
-## Deploying
+## Features
 
-When your changes are merged into the `gh-pages` branch and pushed to Github, the changes will deploy automatically using GitHub actions. (The production branch is no longer used.)
+- **Static Generation**: Most pages are pre-rendered for fast loading
+- **Vue Islands**: Interactive components (calendar, photos) use Vue islands
+- **API Routes**: Calendar and Flickr APIs are serverless functions
+- **Markdown Ready**: Content pages can be converted to Markdown
 
-##### CSS
+## Architecture Notes
 
-Base CSS is twitter/bootstrap and bootstrap-responsive. **Don't edit those files**
+- **Static Pages**: About, Membership, Classes, Support pages are static
+- **Dynamic Components**: Calendar, Photo galleries, and schedule use Vue islands
+- **API Routes**: `/api/calendar` and `/api/flickr` are Astro API routes deployed as serverless functions
+- **Environment Variables**: Required for API routes (GOOGLE_API_KEY, CALENDAR_ID)
 
-New styles should be added to app.css or a new CSS file that you include in the relevant html file.
+## Converting to Markdown
 
-##### JS
+Content pages like About and Membership can be converted to Markdown by:
+1. Creating `.md` files in `src/content/`
+2. Using Astro's Content Collections
+3. Rendering Markdown in page templates
 
-There is a /src repo where JavaScript code lives. React component code can go here. There is also some minimalistic scripts in /src/scripts.
+See Astro documentation for content collections setup.

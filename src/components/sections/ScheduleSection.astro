@@ -1,0 +1,18 @@
+---
+import BaseContainer from '../base/BaseContainer.astro';
+import OpenHours from '../schedule/OpenHours.vue';
+---
+
+<section class="schedule-section">
+  <BaseContainer>
+    <OpenHours client:load />
+  </BaseContainer>
+</section>
+
+<style>
+  .schedule-section {
+    padding: var(--space-12) 0;
+    background: var(--paper-white);
+  }
+</style>
+

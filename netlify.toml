@@ -1,0 +1,21 @@
+[build]
+  publish = "dist"
+  command = "bun run build"
+  # Functions are now handled by Astro API routes in src/pages/api/
+  # Original Netlify functions in netlify/functions/ are kept for reference but not used
+
+[build.environment]
+  NODE_VERSION = "20.19.0"
+
+# Astro generates static HTML files for each route, so no SPA redirect needed
+# Netlify will automatically serve the correct files based on the directory structure
+
+# Astro API routes are automatically handled - no redirects needed
+# API routes are at /api/calendar and /api/flickr
+
+[dev]
+  command = "bun run dev"
+  port = 8888
+  targetPort = 4321
+  publish = "dist"
+  autoLaunch = false

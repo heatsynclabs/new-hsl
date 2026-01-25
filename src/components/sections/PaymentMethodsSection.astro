@@ -1,0 +1,489 @@
+---
+import PaymentMethodCard from '../base/PaymentMethodCard.astro';
+
+// Payment method logos (actual logo files from /public/)
+const logos = {
+  zelle: '/zelle-icon.svg',
+  zeffy: '/zeffy-icon.svg',
+  paypal: '/paypal.svg',
+  // Cash and Check use inline SVGs as fallback
+  check: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="4" fill="#4A5568"/>
+    <rect x="4" y="7" width="16" height="10" rx="1" stroke="white" stroke-width="1.5"/>
+    <line x1="4" y1="11" x2="20" y2="11" stroke="white" stroke-width="1.5"/>
+    <line x1="7" y1="14" x2="12" y2="14" stroke="white" stroke-width="1.5"/>
+  </svg>`,
+  cash: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="24" height="24" rx="4" fill="#38A169"/>
+    <text x="12" y="18" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle">$</text>
+  </svg>`
+};
+
+// Payment methods data
+const paymentMethods = [
+  {
+    name: 'Zelle',
+    icon: logos.zelle,
+    featured: true,
+    description: 'Send money directly from your bank app. Our preferred payment method for dues and donations.',
+    pros: ['No fees for you or us', 'Instant transfer', 'Secure bank-to-bank'],
+    cons: ['Requires a US bank account', 'Must use bank\'s mobile app or website', 'Some banks don\'t allow recurring payments'],
+    tips: ['Look for Zelle in your bank\'s mobile app or website'],
+    recipient: 'finances@heatsynclabs.org',
+    qrCode: '/qr-zelle.jpeg',
+    link: undefined,
+    linkText: 'Open Your Bank App'
+  },
+  {
+    name: 'Zeffy',
+    icon: logos.zeffy,
+    featured: false,
+    description: 'Online donation platform that accepts credit and debit cards. Great for one-time or recurring donations.',
+    pros: ['Credit/debit cards accepted', 'Set up recurring donations', '100% goes to HeatSync'],
+    cons: ['Zeffy asks for optional tip (goes to them, not us)'],
+    tips: ['You can set tip to $0 - we don\'t get any of the tip'],
+    link: 'https://www.zeffy.com/en-US/donation-form/donate-to-heatsync',
+    linkText: 'Donate via Zeffy'
+  },
+  {
+    name: 'PayPal',
+    icon: logos.paypal,
+    featured: false,
+    description: 'Classic online payment option. Widely accessible but comes with processing fees.',
+    pros: ['Widely accessible', 'Pay with PayPal balance', 'Buyer protection'],
+    cons: ['Fee: 1.99% + $0.49', 'Please cover the fee (checkbox option)'],
+    tips: ['If you can, choose to cover the fee — it helps us receive your full donation!'],
+    link: 'https://www.paypal.com/donate?token=CHcahRyHOUjNz5wjbXa6yNOcYC-NDAoe3B_7Kz4fv1rmataOD0O3cW9WIp2IWjlS4m1mvorMP8kqQIUm',
+    linkText: 'Pay with PayPal'
+  },
+  {
+    name: 'Cash',
+    icon: logos.cash,
+    featured: false,
+    description: 'Pay in person at the lab. Simple and immediate.',
+    pros: ['No fees at all', 'Immediate payment', 'No account needed'],
+    cons: ['Must have cash on hand'],
+    tips: ['Visit during open hours', 'There are various boxes you can deposit small amounts of cash in throughout the lab', 'There is a Bank of America ATM across the street', 'Some banks reimburse ATM fees', 'Include your email to match membership payments'],
+    link: undefined,
+    linkText: undefined
+  },
+  {
+    name: 'Check',
+    icon: logos.check,
+    featured: false,
+    description: 'Yes, people still use these and yes, we still accept them.',
+    pros: ['No processing fees', 'Paper trail for records'],
+    cons: ['You have to have a check'],
+    tips: ['Make payable to "HeatSync Labs"', 'Include your email to match membership payments'],
+    link: undefined,
+    linkText: undefined
+  }
+];
+---
+
+<section class="payment-section">
+  <div class="payment-section__container">
+    <header class="payment-section__header">
+      <h1 class="payment-section__title">Ways to Pay HeatSync Labs</h1>
+      <p class="payment-section__intro">
+        Choose the payment method that works best for you. We accept dues, donations, and purchases through any of these options.
+      </p>
+      <div class="payment-section__print-options">
+        <button class="print-btn" id="print-compact">Print (Compact)</button>
+        <button class="print-btn" id="print-full">Print (Full Page)</button>
+      </div>
+    </header>
+
+    <div class="payment-grid">
+      {paymentMethods.map((method) => (
+        <PaymentMethodCard
+          name={method.name}
+          icon={method.icon}
+          description={method.description}
+          pros={method.pros}
+          cons={method.cons}
+          tips={method.tips}
+          link={method.link}
+          linkText={method.linkText}
+          featured={method.featured}
+          recipient={method.recipient}
+          qrCode={method.qrCode}
+        />
+      ))}
+    </div>
+
+    <footer class="payment-section__footer">
+      <div class="payment-section__address">
+        <strong>Mailing Address:</strong><br/>
+        HeatSync Labs<br/>
+        140 W Main St<br/>
+        Mesa, AZ 85201
+      </div>
+      <p class="payment-section__note">
+        HeatSync Labs is a 501(c)(3) nonprofit. Donations may be tax-deductible.<br/>
+        <span class="payment-section__ein">EIN: 27-1277735</span>
+      </p>
+    </footer>
+  </div>
+</section>
+
+<style>
+  .payment-section {
+    padding: var(--space-10) var(--space-6);
+    background: var(--color-bg-primary);
+    min-height: calc(100vh - var(--header-height));
+  }
+
+  .payment-section__container {
+    max-width: var(--container-lg);
+    margin: 0 auto;
+  }
+
+  .payment-section__header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+
+  .payment-section__title {
+    font-family: var(--font-serif);
+    font-size: var(--text-5xl);
+    font-weight: var(--font-bold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-4);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .payment-section__intro {
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: var(--leading-relaxed);
+  }
+
+  .payment-section__print-options {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .print-btn {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    color: var(--color-bg-secondary);
+    background: var(--color-text-primary);
+    border: none;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-base);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .print-btn:hover {
+    background: var(--color-accent-primary);
+  }
+
+  .payment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-5);
+    margin-bottom: var(--space-8);
+  }
+
+  /* Make Zelle card span full width on larger screens to emphasize it */
+  .payment-grid > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 900px) {
+    .payment-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .payment-grid > :first-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .payment-section__footer {
+    text-align: center;
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border-light);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .payment-section__address {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    line-height: var(--leading-relaxed);
+  }
+
+  .payment-section__address strong {
+    color: var(--color-text-primary);
+  }
+
+  .payment-section__note {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    margin: 0;
+    line-height: var(--leading-relaxed);
+  }
+
+  .payment-section__ein {
+    font-weight: var(--font-medium);
+    color: var(--color-text-secondary);
+  }
+
+  /* Print styles for single-page layout */
+  @media print {
+    .payment-section {
+      padding: 0;
+      min-height: auto;
+    }
+
+    .payment-section__header {
+      margin-bottom: var(--space-2);
+    }
+
+    .payment-section__title {
+      font-size: var(--text-3xl);
+      margin-bottom: var(--space-2);
+    }
+
+    .payment-section__intro {
+      font-size: var(--text-sm);
+    }
+
+    .payment-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+
+    .payment-grid > :first-child {
+      grid-column: 1 / -1;
+    }
+
+    .payment-section__footer {
+      padding-top: var(--space-3);
+      gap: var(--space-2);
+    }
+
+    .payment-section__address,
+    .payment-section__note {
+      font-size: var(--text-xs);
+    }
+
+    /* Hide Check card and footer when printing */
+    .payment-grid > :last-child,
+    .payment-section__footer {
+      display: none !important;
+    }
+
+    /* Hide print buttons when printing */
+    .payment-section__print-options {
+      display: none !important;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Full page print mode */
+  @media print {
+    body.print-full-page,
+    body.print-full-page html {
+      height: auto !important;
+      overflow: visible !important;
+    }
+
+    body.print-full-page .payment-section {
+      padding: 0;
+    }
+
+    body.print-full-page .payment-section__header {
+      display: none !important;
+    }
+
+    body.print-full-page .payment-grid {
+      display: block !important;
+    }
+
+    body.print-full-page .payment-grid > * {
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      page-break-after: always !important;
+      break-after: page !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+      min-height: 9.5in;
+      padding: var(--space-10);
+      margin: 0;
+      box-sizing: border-box;
+      border: none;
+      box-shadow: none;
+    }
+
+    body.print-full-page .payment-grid > *::before {
+      display: none;
+    }
+
+    body.print-full-page .payment-grid > *:last-child {
+      display: flex !important;
+      page-break-after: auto !important;
+    }
+
+    body.print-full-page .payment-card__header {
+      flex-direction: column;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+
+    body.print-full-page .payment-card__icon {
+      width: 80px;
+      height: 80px;
+    }
+
+    body.print-full-page .payment-card__icon :global(svg) {
+      width: 80px;
+      height: 80px;
+    }
+
+    body.print-full-page .payment-card__icon--image {
+      max-width: 400px;
+      max-height: 120px;
+      width: auto;
+      height: auto;
+    }
+
+    body.print-full-page .payment-card__name {
+      font-size: 48px;
+      font-weight: var(--font-bold);
+    }
+
+    body.print-full-page .payment-card__badge {
+      font-size: var(--text-base);
+      padding: var(--space-2) var(--space-4);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color-adjust: exact;
+    }
+
+    body.print-full-page .payment-card__description {
+      font-size: var(--text-lg);
+      max-width: 500px;
+      margin-bottom: var(--space-3);
+    }
+
+    body.print-full-page .payment-card__recipient {
+      padding: var(--space-3) var(--space-4);
+      margin-bottom: var(--space-3);
+      justify-content: center;
+      border-width: 2px;
+    }
+
+    body.print-full-page .payment-card__recipient-label {
+      font-size: var(--text-base);
+    }
+
+    body.print-full-page .payment-card__recipient-value {
+      font-size: var(--text-xl);
+    }
+
+    body.print-full-page .payment-card__details {
+      gap: var(--space-4);
+      margin-bottom: var(--space-3);
+    }
+
+    body.print-full-page .payment-card__label {
+      font-size: var(--text-xl);
+      margin-bottom: var(--space-1);
+    }
+
+    body.print-full-page .payment-card__pros,
+    body.print-full-page .payment-card__cons {
+      text-align: left;
+    }
+
+    body.print-full-page .payment-card__pros li,
+    body.print-full-page .payment-card__cons li {
+      font-size: var(--text-lg) !important;
+      margin-bottom: var(--space-1);
+    }
+
+    body.print-full-page .payment-card__tips {
+      text-align: left;
+      margin-bottom: var(--space-3);
+    }
+
+    body.print-full-page .payment-card__tips li {
+      font-size: var(--text-base) !important;
+      margin-bottom: var(--space-1);
+    }
+
+    body.print-full-page .payment-card__qr,
+    body.print-full-page .payment-card__qr--static {
+      position: static !important;
+      margin-top: var(--space-4);
+    }
+
+    body.print-full-page .payment-card__qr img {
+      width: 180px;
+      height: 180px;
+      border-width: 2px;
+    }
+
+    body.print-full-page .payment-card__qr-label {
+      font-size: var(--text-lg);
+      margin-top: var(--space-2);
+    }
+
+    body.print-full-page .payment-card__action {
+      padding-bottom: 0;
+    }
+
+    body.print-full-page .payment-card:has(.payment-card__qr--static) {
+      padding-bottom: var(--space-10) !important;
+    }
+
+    body.print-full-page .payment-section__footer {
+      display: none !important;
+    }
+
+    /* Add HeatSync Labs branding at bottom of each page */
+    body.print-full-page .payment-card::after {
+      content: "HeatSync Labs · heatsynclabs.org";
+      display: block;
+      font-family: var(--font-mono);
+      font-size: var(--text-base);
+      color: var(--warm-gray);
+      margin-top: auto;
+      padding-top: var(--space-8);
+    }
+  }
+</style>
+
+<script>
+  document.getElementById('print-compact')?.addEventListener('click', () => {
+    document.body.classList.remove('print-full-page');
+    window.print();
+  });
+
+  document.getElementById('print-full')?.addEventListener('click', () => {
+    document.body.classList.add('print-full-page');
+    window.print();
+    // Remove class after print dialog closes
+    window.addEventListener('afterprint', () => {
+      document.body.classList.remove('print-full-page');
+    }, { once: true });
+  });
+</script>

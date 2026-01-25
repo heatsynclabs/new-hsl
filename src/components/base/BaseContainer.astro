@@ -1,0 +1,64 @@
+---
+interface Props {
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  padding?: boolean
+}
+
+const { size = 'xl', padding = true } = Astro.props;
+const containerClasses = [
+  'container',
+  size === 'sm' && 'container--sm',
+  size === 'md' && 'container--md',
+  size === 'lg' && 'container--lg',
+  size === 'xl' && 'container--xl',
+  size === 'full' && 'container--full',
+  !padding && 'container--no-padding',
+].filter(Boolean).join(' ');
+---
+
+<div class={containerClasses}>
+  <slot />
+</div>
+
+<style>
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+
+  .container--sm {
+    max-width: var(--container-sm);
+  }
+
+  .container--md {
+    max-width: var(--container-md);
+  }
+
+  .container--lg {
+    max-width: var(--container-lg);
+  }
+
+  .container--xl {
+    max-width: var(--container-xl);
+  }
+
+  .container--full {
+    max-width: none;
+  }
+
+  .container--no-padding {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding-left: var(--space-4);
+      padding-right: var(--space-4);
+    }
+  }
+</style>
+

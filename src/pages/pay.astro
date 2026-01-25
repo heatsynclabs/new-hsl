@@ -1,0 +1,76 @@
+---
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+import PaymentMethodsSection from '../components/sections/PaymentMethodsSection.astro';
+---
+
+<Layout title="Ways to Pay HeatSync Labs">
+  <PaymentMethodsSection />
+</Layout>
+
+<style is:global>
+  /* Print-specific styles to ensure single-page layout */
+  @media print {
+    /* Remove browser headers/footers by using 0 margins */
+    @page {
+      size: letter;
+      margin: 0;
+    }
+
+    /* Add padding to body instead to control content area */
+    body {
+      padding: 0.3in;
+      padding-top: 0.2in;
+      padding-bottom: 0.2in;
+    }
+
+    /* Hide header and footer for clean printout */
+    .header,
+    .footer {
+      display: none !important;
+    }
+
+    /* Remove main padding for print */
+    .main {
+      padding: 0 !important;
+    }
+
+    /* Ensure the page fits on one sheet (compact mode only) */
+    html:not(.print-full-page),
+    body:not(.print-full-page) {
+      font-size: 10.5px;
+    }
+
+    body:not(.print-full-page) {
+      height: 100%;
+      overflow: hidden;
+      max-height: 10.5in;
+    }
+
+    /* Only print first page (compact mode only) */
+    body:not(.print-full-page) html {
+      height: 10.5in;
+      overflow: hidden;
+      max-height: 10.5in;
+    }
+
+    /* Full page mode overrides */
+    body.print-full-page,
+    body.print-full-page * {
+      overflow: visible !important;
+      height: auto !important;
+    }
+
+    /* Remove background textures */
+    body::before,
+    body::after {
+      display: none !important;
+    }
+
+    /* Hide Check card and footer */
+    .payment-grid > *:last-child,
+    .payment-section__footer {
+      display: none !important;
+    }
+  }
+</style>
