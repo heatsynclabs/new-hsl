@@ -3,7 +3,7 @@ import vue from "@astrojs/vue";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://heatsynclabs.brettneese.com",
+  site: "https://www.heatsynclabs.org",
   base: "/",
   integrations: [vue()],
   output: "static",
