@@ -69,6 +69,6 @@ Come visit during open hours. Ask questions, see what's being built, and meet th
 
 Connect with us online:
 
-- [Join our Slack](http://bit.ly/hslslack)
+- [Join our Slack](https://join.slack.com/t/heatsynclabs/shared_invite/enQtMzU2OTM4ODAxMDI1LWRkYzA0MzQ2Zjk4Yzk0ZmFkYzczNTY4ZWEyMzE4NDFmZjIwNzgzNTg0M2JiYzllMjg0OWUxZWIyZTEwYzA1MWY)
 - [Follow us on Instagram](https://www.instagram.com/heatsynclabs/?hl=en)
 - [Like us on Facebook](https://www.facebook.com/HeatSyncLabs/)
