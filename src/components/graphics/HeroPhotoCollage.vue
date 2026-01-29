@@ -9,18 +9,18 @@
         { 'torn-top': tornTops.includes(index + 1) },
         { 'torn-bottom': tornBottoms.includes(index + 1) }
       ]"
-      :data-images="JSON.stringify(photo.images)"
+      @click="handlePhotoClick(index)"
     >
       <div v-if="tapes.includes(index + 1)" class="tape"></div>
       <div class="photo-stack">
+        <!-- Render ALL images upfront, use CSS to show/hide -->
         <img
-          class="photo-current"
-          :src="photo.currentImage"
+          v-for="(imgUrl, imgIndex) in photo.images"
+          :key="`photo-${index}-img-${imgIndex}`"
+          :src="imgUrl"
           :alt="`Workshop activity ${index + 1}`"
-        />
-        <img
-          class="photo-next"
-          alt=""
+          :class="['photo-img', { active: imgIndex === photo.currentIndex }]"
+          loading="lazy"
         />
       </div>
       <div v-if="scribbles[index + 1]" class="scribble">{{ scribbles[index + 1] }}</div>
@@ -34,7 +34,6 @@ import { FlickrService, type FlickrPhoto } from '../../services/flickrService'
 
 interface PhotoItem {
   images: string[]
-  currentImage: string
   currentIndex: number
 }
 
@@ -46,53 +45,128 @@ const tapes = [1, 3, 5]
 const scribbles: Record<number, string> = {}
 
 let rotationIntervals: number[] = []
+let isMobile = false
+let allFetchedPhotos: FlickrPhoto[] = []  // Store all fetched photo metadata
+let hasLoadedMorePhotos = false
+
+// Shuffle array (Fisher-Yates)
+const shuffleArray = <T>(array: T[]): T[] => {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
+// Pick N random items from an array
+const pickRandom = <T>(array: T[], count: number): T[] => {
+  const shuffled = shuffleArray(array)
+  return shuffled.slice(0, count)
+}
+
+// Check if mobile (matches CSS breakpoint)
+const checkMobile = () => {
+  if (typeof window !== 'undefined') {
+    isMobile = window.innerWidth <= 900
+  }
+}
+
+// Handle tap/click on photos (for mobile)
+const handlePhotoClick = (index: number) => {
+  if (!isMobile) return // Only handle on mobile
+  const photo = photos.value[index]
+  if (photo && photo.images.length > 1) {
+    photo.currentIndex = (photo.currentIndex + 1) % photo.images.length
+  }
+}
+
+// Build photo groups from a set of photos
+const buildPhotoGroups = (photoList: FlickrPhoto[]): PhotoItem[] => {
+  const photoGroups: PhotoItem[] = []
+  const numGroups = 5
+  const photosPerGroup = Math.ceil(photoList.length / numGroups)
+
+  for (let i = 0; i < numGroups; i++) {
+    const startIdx = i * photosPerGroup
+    const groupImages = photoList.slice(startIdx, startIdx + photosPerGroup).map(p => p.url)
+
+    if (groupImages.length > 0) {
+      photoGroups.push({
+        images: groupImages,
+        currentIndex: Math.floor(Math.random() * groupImages.length)
+      })
+    }
+  }
+
+  // Fill with placeholders if needed
+  while (photoGroups.length < 5) {
+    photoGroups.push({
+      images: ['/hsl-logo.png'],
+      currentIndex: 0
+    })
+  }
+
+  return photoGroups
+}
+
+// Add more photos to existing groups
+const addMorePhotos = (newPhotos: FlickrPhoto[]) => {
+  if (newPhotos.length === 0) return
+
+  const photosPerGroup = Math.ceil(newPhotos.length / 5)
+
+  photos.value.forEach((group, index) => {
+    const startIdx = index * photosPerGroup
+    const newImages = newPhotos.slice(startIdx, startIdx + photosPerGroup).map(p => p.url)
+    // Add new images to the group
+    group.images = [...group.images, ...newImages]
+  })
+}
 
 const initPhotos = async () => {
   try {
-    // Flickr RSS feed returns max 20 photos
-    const fetchedPhotos = await flickrService.getPhotos(20)
+    checkMobile()
 
-    // Group photos into 5 sets, distributing evenly
-    const photoGroups: PhotoItem[] = []
-    const numGroups = 5
-    const photosPerGroup = Math.ceil(fetchedPhotos.length / numGroups)
+    // Fetch photo metadata from Flickr API (we'll only render some initially)
+    allFetchedPhotos = await flickrService.getPhotos(50, '')
 
-    for (let i = 0; i < numGroups; i++) {
-      const startIdx = i * photosPerGroup
-      const groupImages = fetchedPhotos.slice(startIdx, startIdx + photosPerGroup).map(p => p.url)
-
-      if (groupImages.length > 0) {
-        photoGroups.push({
-          images: groupImages,
-          currentImage: groupImages[0],
-          currentIndex: 0
-        })
-      }
+    if (allFetchedPhotos.length === 0) {
+      throw new Error('No photos found')
     }
 
-    // Fill in with placeholder images if not enough photos
-    while (photoGroups.length < 5) {
-      photoGroups.push({
-        images: ['/hsl-logo.png'],
-        currentImage: '/hsl-logo.png',
-        currentIndex: 0
-      })
-    }
+    // Shuffle all photos
+    allFetchedPhotos = shuffleArray(allFetchedPhotos)
 
-    photos.value = photoGroups
-    startRotations()
+    // Start with first 10 random photos (2 per group)
+    const initialPhotos = allFetchedPhotos.slice(0, 10)
+    photos.value = buildPhotoGroups(initialPhotos)
+
+    // Only start rotations on desktop
+    if (!isMobile) {
+      startRotations()
+
+      // After 8 seconds, load 10 more photos (total 20, 4 per group)
+      setTimeout(() => {
+        if (!hasLoadedMorePhotos && allFetchedPhotos.length > 10) {
+          hasLoadedMorePhotos = true
+          const morePhotos = allFetchedPhotos.slice(10, 20)
+          addMorePhotos(morePhotos)
+        }
+      }, 8000)
+    }
   } catch (error) {
     console.error('Failed to load photos:', error)
     // Use placeholder images
     photos.value = Array(5).fill(null).map(() => ({
       images: ['/hsl-logo.png'],
-      currentImage: '/hsl-logo.png',
       currentIndex: 0
     }))
   }
 }
 
 const startRotations = () => {
+  // Stagger the start of each photo's rotation
   photos.value.forEach((photo, index) => {
     if (photo.images.length <= 1) return
 
@@ -100,32 +174,9 @@ const startRotations = () => {
 
     setTimeout(() => {
       const intervalId = window.setInterval(() => {
-        const container = document.querySelector(`.photo-${index + 1}`)
-        const currentImg = container?.querySelector('.photo-current') as HTMLImageElement
-        const nextImg = container?.querySelector('.photo-next') as HTMLImageElement
-
-        if (currentImg && nextImg) {
-          const nextIndex = (photo.currentIndex + 1) % photo.images.length
-          const nextSrc = photo.images[nextIndex]
-
-          // Set next image src and wait for load
-          nextImg.onload = () => {
-            // Fade in the next image on top
-            nextImg.style.visibility = 'visible'
-            nextImg.style.opacity = '1'
-
-            // After transition, update current and reset next
-            setTimeout(() => {
-              photo.currentIndex = nextIndex
-              photo.currentImage = nextSrc
-              currentImg.src = nextSrc
-              nextImg.style.opacity = '0'
-              nextImg.style.visibility = 'hidden'
-            }, 500)
-          }
-
-          nextImg.src = nextSrc
-        }
+        // Simply update the currentIndex - Vue reactivity handles the rest
+        // No src changes, no network requests!
+        photo.currentIndex = (photo.currentIndex + 1) % photo.images.length
       }, 4500 + (index * 400))
 
       rotationIntervals.push(intervalId)
@@ -177,37 +228,32 @@ onUnmounted(() => {
   height: 100%;
 }
 
-.photo img {
+.photo-img {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
   filter: saturate(0.9) contrast(1.02);
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
-.photo-current {
-  position: relative;
+.photo-img.active {
+  opacity: 1;
   z-index: 1;
 }
 
-.photo-next {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.5s ease, visibility 0.5s ease;
-}
-
-.photo.torn-top img {
+.photo.torn-top .photo-img {
   clip-path: polygon(
     0% 4%, 10% 0%, 20% 3%, 30% 1%, 40% 4%, 50% 0%, 60% 3%, 70% 1%, 80% 4%, 90% 0%, 100% 3%,
     100% 100%, 0% 100%
   );
 }
 
-.photo.torn-bottom img {
+.photo.torn-bottom .photo-img {
   clip-path: polygon(
     0% 0%, 100% 0%,
     100% 96%, 90% 100%, 80% 97%, 70% 100%, 60% 96%, 50% 100%, 40% 97%, 30% 100%, 20% 96%, 10% 100%, 0% 97%
@@ -347,7 +393,7 @@ onUnmounted(() => {
   transform: rotate(1deg);
 }
 
-/* Mobile adjustments */
+/* Tablet adjustments */
 @media (max-width: 768px) {
   .photo {
     padding: 4px;
@@ -368,9 +414,63 @@ onUnmounted(() => {
   .photo-5 { width: 44%; height: 40%; }
 }
 
-@media (max-width: 480px) {
+/* Mobile: simplified view with only 2 photos, no animation */
+@media (max-width: 900px) {
+  .photo-collage {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Only show photos 1 and 2 on mobile */
+  .photo-3,
+  .photo-4,
+  .photo-5 {
+    display: none !important;
+  }
+
   .photo {
-    padding: 3px;
+    position: relative;
+    padding: 4px;
+    animation: none !important;
+    cursor: pointer;
+    /* Subtle hint that photos are tappable */
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .photo:active {
+    transform: scale(0.97) !important;
+  }
+
+  /* Reset positioning for mobile - side by side */
+  .photo-1,
+  .photo-2 {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 45%;
+    height: 140px;
+    max-width: 200px;
+  }
+
+  .photo-1 {
+    transform: rotate(-3deg);
+  }
+
+  .photo-1:active {
+    transform: rotate(-3deg) scale(0.97) !important;
+  }
+
+  .photo-2 {
+    transform: rotate(2deg);
+  }
+
+  .photo-2:active {
+    transform: rotate(2deg) scale(0.97) !important;
   }
 
   .tape {
@@ -378,36 +478,25 @@ onUnmounted(() => {
   }
 
   .scribble {
-    font-size: 7px;
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .photo {
+    padding: 3px;
   }
 
-  .photo-1 .tape { width: 35px; }
-  .photo-3 .tape { width: 30px; }
-  .photo-5 .tape { width: 40px; }
-
-  @keyframes drift1 {
-    0%, 100% { transform: rotate(-3deg) translate(0, 0); }
-    50% { transform: rotate(-2deg) translate(2px, -3px); }
+  .photo-1,
+  .photo-2 {
+    height: 120px;
+    max-width: 160px;
   }
 
-  @keyframes drift2 {
-    0%, 100% { transform: rotate(2deg) translate(0, 0); }
-    50% { transform: rotate(3deg) translate(-2px, 2px); }
+  .tape {
+    height: 8px;
   }
 
-  @keyframes drift3 {
-    0%, 100% { transform: rotate(-1deg) translate(0, 0); }
-    50% { transform: rotate(0deg) translate(1px, -2px); }
-  }
-
-  @keyframes drift4 {
-    0%, 100% { transform: rotate(3deg) translate(0, 0); }
-    50% { transform: rotate(2deg) translate(-2px, -2px); }
-  }
-
-  @keyframes drift5 {
-    0%, 100% { transform: rotate(-2deg) translate(0, 0); }
-    50% { transform: rotate(-1deg) translate(2px, 2px); }
-  }
+  .photo-1 .tape { width: 30px; }
 }
 </style>
