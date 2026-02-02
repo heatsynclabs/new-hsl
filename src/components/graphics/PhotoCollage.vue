@@ -59,7 +59,7 @@ const currentIndex = ref(0)
 const showFeaturedImage = ref(false)
 const featuredPhoto = ref<FlickrPhoto | null>(null)
 
-let rotationInterval: number | null = null
+const timeoutIds: number[] = []
 
 const PHOTOS_TO_SHOW = 6
 const COLLAGE_DURATION = 6000 // 6 seconds
@@ -99,6 +99,11 @@ const updateVisiblePhotos = () => {
 const startRotation = () => {
   if (photos.value.length <= PHOTOS_TO_SHOW) return
 
+  const schedule = (fn: () => void, delay: number) => {
+    const id = window.setTimeout(fn, delay)
+    timeoutIds.push(id)
+  }
+
   const cycle = () => {
     if (showFeaturedImage.value) {
       // Pre-load next collage photos before switching
@@ -110,9 +115,9 @@ const startRotation = () => {
         container.style.opacity = '0'
       }
 
-      setTimeout(() => {
+      schedule(() => {
         showFeaturedImage.value = false
-        setTimeout(cycle, COLLAGE_DURATION)
+        schedule(cycle, COLLAGE_DURATION)
       }, 300) // Small delay for fade out
     } else {
       // Pre-select next featured photo
@@ -129,22 +134,20 @@ const startRotation = () => {
         container.style.opacity = '0'
       }
 
-      setTimeout(() => {
+      schedule(() => {
         showFeaturedImage.value = true
-        setTimeout(cycle, FEATURED_DURATION)
+        schedule(cycle, FEATURED_DURATION)
       }, 300) // Small delay for fade out
     }
   }
 
   // Start with collage view
-  setTimeout(cycle, COLLAGE_DURATION)
+  schedule(cycle, COLLAGE_DURATION)
 }
 
 const stopRotation = () => {
-  if (rotationInterval) {
-    clearInterval(rotationInterval)
-    rotationInterval = null
-  }
+  timeoutIds.forEach(id => window.clearTimeout(id))
+  timeoutIds.length = 0
 }
 
 const onImageLoad = (photoId: string) => {

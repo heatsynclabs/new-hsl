@@ -97,25 +97,6 @@ onMounted(() => {
   // Refresh events every 30 minutes
   eventIntervalId = window.setInterval(fetchEvents, 30 * 60 * 1000)
 
-  // Add console command for testing
-  ;(window as any).toggleDoorStatus = () => {
-    isOpen.value = !isOpen.value
-    isLoading.value = false
-    console.log(`Door status toggled to: ${isOpen.value ? 'OPEN' : 'CLOSED'}`)
-    return isOpen.value ? 'OPEN' : 'CLOSED'
-  }
-
-  // Add console command to set specific status
-  ;(window as any).setDoorStatus = (status: boolean) => {
-    isOpen.value = status
-    isLoading.value = false
-    console.log(`Door status set to: ${isOpen.value ? 'OPEN' : 'CLOSED'}`)
-    return isOpen.value ? 'OPEN' : 'CLOSED'
-  }
-
-  console.log('%c🛠️ Debug Commands Available:', 'color: #d35f35; font-weight: bold; font-size: 14px')
-  console.log('%ctoggleDoorStatus() - Toggle between open/closed', 'color: #7a8b7f')
-  console.log('%csetDoorStatus(true/false) - Set specific status', 'color: #7a8b7f')
 })
 
 onUnmounted(() => {
