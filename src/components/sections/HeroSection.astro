@@ -34,11 +34,13 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
         </h1>
 
         <p class="hero__subtitle">
-          Arizona's original hackerspace for mad scientists and curious makers.
+          Arizona's original hackerspace, built on open source principles.
+          <br><br>
+          We are a <a href="https://medlabboulder.gitlab.io/democraticmediums/mediums/do-ocracy/" target="_blank" rel="noopener" class="welcome-link"><strong style="color: var(--color-accent-primary);">do-ocracy</strong></a>. Show up, contribute, learn, and build alongside a diverse and inclusive maker community that supports each other.
         </p>
 
         <p class="hero__pitch">
-          We're a <strong>community workshop</strong>, not a business. Show up with an idea, a broken gadget, or just curiosity. We've got the tools and people who want to help. <a href="/about" class="welcome-link"><strong style="color: var(--color-accent-primary);">And everyone is welcome.</strong></a>
+          <a href="/about" class="welcome-link"><strong style="color: var(--color-accent-primary);">Everyone is welcome</strong></a> <svg class="heart-icon" viewBox="0 0 24 24" fill="var(--color-accent-primary)" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </p>
 
         <div class="hero__actions">
@@ -52,7 +54,7 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
 
         <div class="stats-row">
           <div class="stat">
-            <div class="stat-value">15+</div>
+            <div class="stat-value">16+</div>
             <div class="stat-label">Years Running</div>
           </div>
           <div class="stat">
@@ -374,6 +376,13 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
   .hero__pitch strong {
     color: var(--color-text-primary);
     font-weight: var(--font-semibold);
+  }
+
+  .heart-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    vertical-align: middle;
   }
 
   .welcome-link {

@@ -90,7 +90,7 @@ onMounted(() => {
 <style scoped>
 .calendar-section {
   padding: var(--space-6) 0 var(--space-2) 0;
-  background: var(--paper-white);
+  background: var(--color-bg-primary);
 }
 
 .calendar__title {
@@ -98,7 +98,7 @@ onMounted(() => {
   font-weight: var(--font-normal);
   margin-bottom: var(--space-4);
   text-align: center;
-  color: var(--ink-black);
+  color: var(--color-text-primary);
 }
 
 .calendar__loading,
