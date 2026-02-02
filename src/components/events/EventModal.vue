@@ -115,7 +115,7 @@ const formatEventTime = (event: CalendarEvent): string => {
 }
 
 .modal-content {
-  background: var(--paper-white);
+  background: var(--color-bg-primary);
   border-radius: var(--radius-lg);
   max-width: 600px;
   width: 100%;
@@ -134,13 +134,13 @@ const formatEventTime = (event: CalendarEvent): string => {
   width: 32px;
   height: 32px;
   cursor: pointer;
-  color: var(--warm-gray);
+  color: var(--color-text-tertiary);
   transition: color var(--transition-base);
   z-index: 1;
 }
 
 .modal-close:hover {
-  color: var(--ink-black);
+  color: var(--color-text-primary);
 }
 
 .modal-close svg {
@@ -155,7 +155,7 @@ const formatEventTime = (event: CalendarEvent): string => {
 .event-title {
   font-size: var(--text-2xl);
   font-weight: var(--font-medium);
-  color: var(--ink-black);
+  color: var(--color-text-primary);
   margin-bottom: var(--space-4);
   padding-right: var(--space-8);
   line-height: var(--leading-tight);
@@ -184,11 +184,11 @@ const formatEventTime = (event: CalendarEvent): string => {
 
 .event-registration--link:hover {
   background: rgba(104, 127, 93, 0.2);
-  color: var(--ink-black);
+  color: var(--color-text-primary);
 }
 
 .event-registration--link:hover .registration-icon {
-  color: var(--ink-black);
+  color: var(--color-text-primary);
 }
 
 .registration-icon {
@@ -213,7 +213,7 @@ const formatEventTime = (event: CalendarEvent): string => {
   align-items: center;
   gap: var(--space-3);
   font-size: var(--text-base);
-  color: var(--graphite);
+  color: var(--color-text-secondary);
   font-family: var(--font-sans);
 }
 
@@ -225,20 +225,20 @@ const formatEventTime = (event: CalendarEvent): string => {
 }
 
 .event-description {
-  border-top: 1px solid var(--warm-gray);
+  border-top: 1px solid var(--color-text-tertiary);
   padding-top: var(--space-6);
 }
 
 .event-description h3 {
   font-size: var(--text-lg);
   font-weight: var(--font-medium);
-  color: var(--ink-black);
+  color: var(--color-text-primary);
   margin-bottom: var(--space-3);
 }
 
 .event-description div {
   font-size: var(--text-base);
-  color: var(--graphite);
+  color: var(--color-text-secondary);
   line-height: var(--leading-relaxed);
 }
 

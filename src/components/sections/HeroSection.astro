@@ -15,17 +15,15 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
           <span class="hero__logo-text">HeatSync Labs</span>
         </a>
 
-        <!-- Status indicator below logo -->
-        <div class="hero__status" id="hero-status">
+        <!-- Status + location row -->
+        <div class="hero__meta" id="hero-status">
           <LabStatusIndicator client:load />
-        </div>
-
-        <span class="hero__label">
-          <a href="https://maps.app.goo.gl/Qh3wZuQuik4U7niE6" target="_blank" rel="noopener">
+          <span class="hero__divider">&middot;</span>
+          <a href="https://maps.app.goo.gl/Qh3wZuQuik4U7niE6" target="_blank" rel="noopener" class="hero__location">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-            108 W Main St, Downtown Mesa, AZ
+            Mesa, AZ
           </a>
-        </span>
+        </div>
 
         <h1 class="hero__headline">
           <strong>Make</strong> things.<br>
@@ -34,11 +32,16 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
         </h1>
 
         <p class="hero__subtitle">
-          Arizona's original hackerspace for mad scientists and curious makers.
+          Arizona's original hackerspace, built on open source principles.
         </p>
 
-        <p class="hero__pitch">
-          We're a <strong>community workshop</strong>, not a business. Show up with an idea, a broken gadget, or just curiosity. We've got the tools and people who want to help. <a href="/about" class="welcome-link"><strong style="color: var(--color-accent-primary);">And everyone is welcome.</strong></a>
+        <p class="hero__body">
+          We are a <a href="https://medlabboulder.gitlab.io/democraticmediums/mediums/do-ocracy/" target="_blank" rel="noopener" class="hero__link">do-ocracy</a>. Show up, contribute, learn, and build alongside a diverse and inclusive maker community that supports each other.
+        </p>
+
+        <p class="hero__welcome">
+          <a href="/about" class="hero__link">Everyone is welcome</a>
+          <svg class="heart-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </p>
 
         <div class="hero__actions">
@@ -52,7 +55,7 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
 
         <div class="stats-row">
           <div class="stat">
-            <div class="stat-value">15+</div>
+            <div class="stat-value">16+</div>
             <div class="stat-label">Years Running</div>
           </div>
           <div class="stat">
@@ -92,7 +95,7 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
   // Hero logo scroll animation (desktop only - mobile handled via CSS)
   (() => {
     const heroLogo = document.getElementById('hero-logo');
-    const heroStatus = document.getElementById('hero-status');
+    const heroStatus = document.getElementById('hero-status') as HTMLElement | null;
     const headerLogo = document.querySelector('.nav__logo');
 
     // Only run on pages with hero logo
@@ -115,13 +118,13 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
         if (isScrolled) {
           // Scrolled: Logo in header, hero status hidden
           heroLogo.classList.add('hero__logo--hidden');
-          if (heroStatus) heroStatus.classList.add('hero__status--hidden');
+          if (heroStatus) heroStatus.classList.add('hero__meta--hidden');
           headerLogoInner.classList.add('logo--visible');
           headerLogoInner.classList.remove('logo--hidden');
         } else {
           // At top: Logo in hero, hero status visible
           heroLogo.classList.remove('hero__logo--hidden');
-          if (heroStatus) heroStatus.classList.remove('hero__status--hidden');
+          if (heroStatus) heroStatus.classList.remove('hero__meta--hidden');
           headerLogoInner.classList.add('logo--hidden');
           headerLogoInner.classList.remove('logo--visible');
         }
@@ -156,7 +159,7 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     gap: var(--space-4);
     text-decoration: none;
     color: var(--color-text-primary);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-3);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: top left;
   }
@@ -170,15 +173,15 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
   }
 
   .hero__logo-mark {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     object-fit: contain;
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .hero__logo-text {
     font-family: var(--font-serif);
-    font-size: clamp(36px, 5vw, 44px);
+    font-size: clamp(30px, 4vw, 38px);
     font-weight: var(--font-semibold);
     letter-spacing: var(--tracking-tight);
     white-space: nowrap;
@@ -191,22 +194,56 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     pointer-events: none;
   }
 
-  /* Hero status indicator */
-  .hero__status {
-    margin-top: var(--space-4);
-    margin-bottom: var(--space-6);
+  /* Hero meta row (status + location) */
+  .hero__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .hero__status--hidden {
+  .hero__meta--hidden {
     opacity: 0;
     transform: translateY(-20px);
     pointer-events: none;
   }
 
+  .hero__divider {
+    color: var(--color-text-tertiary);
+    opacity: 0.4;
+    font-size: var(--text-lg);
+  }
+
+  .hero__location {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    font-family: var(--font-mono);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .hero__location:hover {
+    color: var(--color-accent-primary);
+  }
+
+  .hero__location svg {
+    width: 12px;
+    height: 12px;
+  }
+
   /* Mobile adjustments for hero logo */
   @media (max-width: 900px) {
     .hero__logo {
+      justify-content: center;
+    }
+
+    .hero__meta {
       justify-content: center;
     }
   }
@@ -216,8 +253,7 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
       display: none;
     }
 
-    .hero__status {
-      display: flex;
+    .hero__meta {
       justify-content: center;
     }
   }
@@ -234,7 +270,7 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
   }
 
   .hero {
-    padding: var(--space-12) 0;
+    padding: var(--space-8) 0;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -308,28 +344,11 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     z-index: var(--z-raised);
   }
 
-  .hero__label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: var(--text-xs);
-    letter-spacing: var(--tracking-wider);
-    text-transform: uppercase;
-    color: var(--color-text-tertiary);
-    margin-bottom: var(--space-4);
-    font-family: var(--font-mono);
-  }
-
-  .hero__label svg {
-    width: 14px;
-    height: 14px;
-  }
-
   .hero__headline {
-    font-size: clamp(28px, 4.5vw, 48px);
+    font-size: clamp(28px, 4vw, 44px);
     font-weight: var(--font-light);
-    line-height: 1.1;
-    margin-bottom: var(--space-1);
+    line-height: 1.05;
+    margin-bottom: var(--space-4);
     letter-spacing: var(--tracking-tight);
     font-family: var(--font-sans);
   }
@@ -356,60 +375,74 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
 
   .hero__subtitle {
     font-size: var(--text-base);
-    color: var(--color-text-tertiary);
+    color: var(--color-text-secondary);
     font-weight: var(--font-normal);
-    margin-bottom: var(--space-3);
-    line-height: 1.5;
+    margin-bottom: var(--space-2);
+    line-height: 1.4;
     font-family: var(--font-sans);
   }
 
-  .hero__pitch {
-    font-size: 15px;
-    line-height: 1.7;
+  .hero__body {
+    font-size: var(--text-sm);
+    line-height: 1.6;
     color: var(--color-text-tertiary);
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-2);
+    font-family: var(--font-sans);
+    max-width: 480px;
+  }
+
+  .hero__welcome {
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+    color: var(--color-accent-primary);
+    margin-bottom: var(--space-5);
     font-family: var(--font-sans);
   }
 
-  .hero__pitch strong {
-    color: var(--color-text-primary);
-    font-weight: var(--font-semibold);
+  .heart-icon {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 2px;
   }
 
-  .welcome-link {
+  .hero__link {
+    color: var(--color-accent-primary);
     text-decoration: none;
+    font-weight: var(--font-semibold);
     transition: opacity 0.2s ease;
   }
 
-  .welcome-link:hover {
-    opacity: 0.8;
+  .hero__link:hover {
+    opacity: 0.75;
   }
 
   .hero__actions {
     display: flex;
-    gap: var(--space-4);
+    gap: var(--space-3);
     flex-wrap: wrap;
     align-items: center;
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-4);
   }
 
   /* Stats row */
   .stats-row {
     display: flex;
-    gap: var(--space-6);
-    padding-top: var(--space-6);
+    gap: var(--space-5);
+    padding-top: var(--space-4);
     border-top: 1px solid var(--color-border-light);
   }
 
   .stat {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
   }
 
   .stat-value {
     font-family: var(--font-mono);
-    font-size: 20px;
+    font-size: 18px;
     font-weight: var(--font-semibold);
     color: var(--color-accent-primary);
     line-height: 1;
@@ -546,8 +579,8 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
       text-align: center;
     }
 
-    .hero__label {
-      justify-content: center;
+    .hero__body {
+      max-width: 100%;
     }
 
     .hero__actions {
@@ -604,15 +637,19 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     }
 
     .hero__headline {
-      font-size: 24px;
+      font-size: 28px;
     }
 
     .hero__subtitle {
+      font-size: var(--text-base);
+    }
+
+    .hero__body {
       font-size: var(--text-sm);
     }
 
-    .hero__pitch {
-      font-size: 13px;
+    .hero__welcome {
+      font-size: var(--text-base);
       margin-bottom: var(--space-6);
     }
 

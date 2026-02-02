@@ -1,7 +1,7 @@
 <template>
   <div class="full-calendar">
     <!-- Recurring Events section -->
-    <div v-if="!loading && recurringEvents.length > 0" class="events-list">
+    <div v-if="!loading && recurringEvents.length > 0" class="events-list recurring-section">
       <h3 class="events-title">Recurring Events</h3>
       <div class="recurring-events-carousel">
         <div
@@ -27,20 +27,79 @@
     </div>
 
     <div class="calendar-header">
-      <button @click="previousMonth" class="nav-button">
-        ← Previous
-      </button>
-      <h2 class="month-year">{{ formatMonthYear(currentDate) }}</h2>
-      <button @click="nextMonth" class="nav-button">
-        Next →
-      </button>
+      <div class="header-top-row">
+        <div class="view-toggle">
+          <button
+            :class="['view-toggle-btn', { active: viewMode === 'month' }]"
+            @click="viewMode = 'month'"
+          >Month</button>
+          <button
+            :class="['view-toggle-btn', { active: viewMode === 'day' }]"
+            @click="switchToDayView()"
+          >Day</button>
+        </div>
+      </div>
+      <div class="header-nav-row">
+        <button @click="viewMode === 'day' ? previousDay() : previousMonth()" class="nav-button">
+          ←
+        </button>
+        <h2 class="month-year">
+          {{ viewMode === 'day' && selectedDay ? format(selectedDay, 'EEEE, MMMM d, yyyy') : formatMonthYear(currentDate) }}
+        </h2>
+        <button @click="viewMode === 'day' ? nextDay() : nextMonth()" class="nav-button">
+          →
+        </button>
+      </div>
     </div>
 
-    <div v-if="loading" class="calendar-loading">
+    <div v-if="error" class="calendar-error">
+      <p>Unable to load calendar events. Please try again later.</p>
+      <button @click="loadEvents" class="nav-button">Retry</button>
+    </div>
+
+    <div v-else-if="loading" class="calendar-loading">
       <p>Loading calendar...</p>
     </div>
 
-    <div v-else class="calendar-grid">
+    <!-- Day View -->
+    <div v-else-if="viewMode === 'day'" class="day-view">
+      <div v-if="selectedDayEvents.length === 0" class="day-view-empty">
+        No events on this day.
+      </div>
+      <div
+        v-for="event in selectedDayEvents"
+        :key="event.id"
+        class="day-view-event"
+        @click="openEventModal(event)"
+      >
+        <div class="day-view-event-time">{{ formatEventTime(event) }}</div>
+        <div class="day-view-event-body">
+          <div class="day-view-event-title">{{ event.displayTitle }}</div>
+          <div v-if="event.requiresRegistration" class="day-view-event-registration">
+            <svg class="registration-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 21V19C16 17.9391 15.5786 16.9217 14.8284 16.1716C14.0783 15.4214 13.0609 15 12 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="8.5" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="20" y1="8" x2="20" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="23" y1="11" x2="17" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Registration required<span v-if="event.registrationCost"> · {{ event.registrationCost }}</span>
+          </div>
+          <div v-if="event.location" class="day-view-event-location">
+            <svg class="location-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            {{ event.location }}
+          </div>
+          <div v-if="event.description" class="day-view-event-desc" v-html="event.description"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Month View -->
+    <div
+      v-else
+      class="calendar-grid"
+      :style="gridStyle"
+      @mouseleave="onGridMouseLeave"
+    >
       <!-- Day headers -->
       <div
         v-for="day in dayHeaders"
@@ -52,34 +111,56 @@
 
       <!-- Calendar days -->
       <div
-        v-for="day in calendarDays"
+        v-for="(day, index) in calendarDays"
         :key="`${day.date.getTime()}`"
         :class="[
           'calendar-day',
           {
             'other-month': !day.isCurrentMonth,
             'today': day.isToday,
-            'has-events': day.events.length > 0
+            'has-events': day.events.length > 0,
+            'is-expanded': isExpanded(index),
+            'is-selected': selectedDay && isSameDay(day.date, selectedDay)
           }
         ]"
+        @mouseenter="onDayMouseEnter(index)"
+        @mouseleave="onDayMouseLeave"
+        @click="onDayClick(day)"
       >
         <div class="day-number">{{ day.date.getDate() }}</div>
         <div v-if="day.events.length > 0" class="day-events">
-          <div
-            v-for="event in day.events.slice(0, 3)"
-            :key="event.id"
-            :class="[
-              'event-dot',
-              { 'all-day': event.isAllDay }
-            ]"
-            :title="`${event.title} - ${formatEventTime(event)}`"
-            @click="openEventModal(event)"
-          >
-            <span class="event-title">{{ getTruncatedTitle(event.title) }}</span>
-          </div>
-          <div v-if="day.events.length > 3" class="more-events">
-            +{{ day.events.length - 3 }} more
-          </div>
+          <template v-if="isExpanded(index)">
+            <div
+              v-for="event in day.events"
+              :key="event.id"
+              :class="[
+                'event-dot',
+                { 'all-day': event.isAllDay }
+              ]"
+              :title="`${event.title} - ${formatEventTime(event)}`"
+              @click.stop="openEventModal(event)"
+            >
+              <span class="event-time-inline">{{ formatEventTimeShort(event) }}</span>
+              <span class="event-title">{{ event.displayTitle }}</span>
+            </div>
+          </template>
+          <template v-else>
+            <div
+              v-for="event in day.events.slice(0, 3)"
+              :key="event.id"
+              :class="[
+                'event-dot',
+                { 'all-day': event.isAllDay }
+              ]"
+              :title="`${event.title} - ${formatEventTime(event)}`"
+              @click.stop="openEventModal(event)"
+            >
+              <span class="event-title">{{ getTruncatedTitle(event.title) }}</span>
+            </div>
+            <div v-if="day.events.length > 3" class="more-events" @click.stop="onDayClick(day)">
+              +{{ day.events.length - 3 }} more
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -106,8 +187,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths, isToday, getWeek, getDay, startOfDay, endOfDay, isWithinInterval } from 'date-fns'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths, addDays, subDays, isToday, startOfDay, endOfDay } from 'date-fns'
 import EventCard from '../events/EventCard.vue'
 import EventModal from '../events/EventModal.vue'
 import { CalendarService, type CalendarEvent } from '../../services/calendarService'
@@ -115,17 +196,9 @@ import { CalendarService, type CalendarEvent } from '../../services/calendarServ
 // Start with current month, but if we're in the last week, show next month
 const getInitialDate = () => {
   const today = new Date()
-  const currentMonth = today.getMonth()
-  const currentYear = today.getFullYear()
-
-  // Get the last day of current month
-  const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0)
-
-  // If today is in the last week of the month (after the 23rd), show next month
   if (today.getDate() > 23) {
     return addMonths(today, 1)
   }
-
   return today
 }
 
@@ -133,8 +206,16 @@ const currentDate = ref(getInitialDate())
 const allEvents = ref<CalendarEvent[]>([])
 const futureEvents = ref<CalendarEvent[]>([])
 const loading = ref(true)
+const error = ref(false)
 const modalVisible = ref(false)
 const selectedEvent = ref<CalendarEvent | null>(null)
+
+// View mode and expansion state
+const viewMode = ref<'month' | 'day'>('month')
+const hoveredCol = ref<number | null>(null)
+const hoveredRow = ref<number | null>(null)
+const selectedDay = ref<Date | null>(null)
+const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth <= 768 : false)
 
 const calendarService = new CalendarService()
 
@@ -153,23 +234,154 @@ const calendarDays = computed(() => {
     isCurrentMonth: isSameMonth(day, currentDate.value),
     isToday: isToday(day),
     events: allEvents.value.filter(event => {
-      // Check if this day falls within the event's date range (for multi-day events)
       const dayStart = startOfDay(day)
-      const dayEnd = endOfDay(day)
       const eventStart = startOfDay(event.start)
       const eventEnd = startOfDay(event.end)
-
-      // Event spans this day if: eventStart <= day <= eventEnd
       return dayStart >= eventStart && dayStart <= eventEnd
     })
   }))
 })
 
+// Number of rows in current calendar grid
+const rowCount = computed(() => Math.ceil(calendarDays.value.length / 7))
+
+// Which col/row is active (selected takes priority over hover)
+const activeCol = computed(() => {
+  if (isMobile.value) return null
+  if (selectedDay.value) {
+    const idx = calendarDays.value.findIndex(d => isSameDay(d.date, selectedDay.value!))
+    if (idx >= 0) return idx % 7
+  }
+  return hoveredCol.value
+})
+
+const activeRow = computed(() => {
+  if (isMobile.value) return null
+  if (selectedDay.value) {
+    const idx = calendarDays.value.findIndex(d => isSameDay(d.date, selectedDay.value!))
+    if (idx >= 0) return Math.floor(idx / 7)
+  }
+  return hoveredRow.value
+})
+
+// Grid template styles for expansion effect
+const gridStyle = computed(() => {
+  const col = activeCol.value
+  const row = activeRow.value
+
+  if (col === null || row === null) {
+    return {}
+  }
+
+  const cols = Array(7).fill('0.83fr')
+  cols[col] = '2fr'
+
+  const rows = Array(rowCount.value).fill('0.83fr')
+  rows[row] = '2fr'
+
+  return {
+    gridTemplateColumns: cols.join(' '),
+    gridTemplateRows: `auto ${rows.join(' ')}`
+  }
+})
+
+const isExpanded = (index: number) => {
+  const col = index % 7
+  const row = Math.floor(index / 7)
+  return activeCol.value === col && activeRow.value === row
+}
+
+const dayNeedsExpansion = (day: { events: CalendarEvent[] }) => {
+  if (day.events.length > 3) return true
+  const maxLen = typeof window !== 'undefined' && window.innerWidth <= 768 ? 10 : 15
+  return day.events.some(e => e.title.length > maxLen)
+}
+
+let hoverTimer: ReturnType<typeof setTimeout> | null = null
+
+const onDayMouseEnter = (index: number) => {
+  if (isMobile.value || selectedDay.value) return
+  const day = calendarDays.value[index]
+  if (!day || !dayNeedsExpansion(day)) return
+  if (hoverTimer) clearTimeout(hoverTimer)
+  hoverTimer = setTimeout(() => {
+    hoveredCol.value = index % 7
+    hoveredRow.value = Math.floor(index / 7)
+  }, 500)
+}
+
+const onDayMouseLeave = () => {
+  if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null }
+}
+
+const onGridMouseLeave = () => {
+  if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null }
+  if (selectedDay.value) return
+  hoveredCol.value = null
+  hoveredRow.value = null
+}
+
+const onDayClick = (day: { date: Date; events: CalendarEvent[] }) => {
+  if (isMobile.value) {
+    // Mobile: tap a day -> switch to day view
+    selectedDay.value = day.date
+    viewMode.value = 'day'
+    return
+  }
+
+  // Desktop: click to pin/unpin expansion
+  if (selectedDay.value && isSameDay(selectedDay.value, day.date)) {
+    selectedDay.value = null
+  } else {
+    selectedDay.value = day.date
+  }
+}
+
+// Day view events
+const selectedDayEvents = computed(() => {
+  if (!selectedDay.value) return []
+  const dayStart = startOfDay(selectedDay.value)
+  const dayEnd = endOfDay(selectedDay.value)
+  return allEvents.value.filter(event => {
+    const eventStart = startOfDay(event.start)
+    const eventEnd = startOfDay(event.end)
+    return dayStart >= eventStart && dayStart <= eventEnd
+  }).sort((a, b) => {
+    if (a.isAllDay && !b.isAllDay) return -1
+    if (!a.isAllDay && b.isAllDay) return 1
+    return a.start.getTime() - b.start.getTime()
+  })
+})
+
+const switchToDayView = () => {
+  if (!selectedDay.value) {
+    selectedDay.value = new Date()
+  }
+  viewMode.value = 'day'
+}
+
+const previousDay = () => {
+  if (!selectedDay.value) return
+  selectedDay.value = subDays(selectedDay.value, 1)
+  // If we cross month boundary, update currentDate and reload
+  if (!isSameMonth(selectedDay.value, currentDate.value)) {
+    currentDate.value = selectedDay.value
+    loadEvents()
+  }
+}
+
+const nextDay = () => {
+  if (!selectedDay.value) return
+  selectedDay.value = addDays(selectedDay.value, 1)
+  if (!isSameMonth(selectedDay.value, currentDate.value)) {
+    currentDate.value = selectedDay.value
+    loadEvents()
+  }
+}
+
 const recurringEvents = computed(() => {
-  // Group events by title to identify recurring events
   const eventGroups = futureEvents.value.reduce((groups, event) => {
     const title = event.title.toLowerCase()
-    // Exclude Open Hours and Member Hours
     if (title.includes('open hours') || title.includes('member hours')) {
       return groups
     }
@@ -182,7 +394,6 @@ const recurringEvents = computed(() => {
     return groups
   }, {} as Record<string, CalendarEvent[]>)
 
-  // Filter for recurring events (more than one occurrence)
   const recurring = Object.entries(eventGroups)
     .filter(([_, events]) => events.length > 1)
     .map(([_, events]) => {
@@ -192,7 +403,7 @@ const recurringEvents = computed(() => {
         description: sortedEvents[0]!.description,
         nextDate: sortedEvents[0]!.start,
         totalCount: sortedEvents.length,
-        event: sortedEvents[0]! // For modal
+        event: sortedEvents[0]!
       }
     })
 
@@ -200,7 +411,6 @@ const recurringEvents = computed(() => {
 })
 
 const oneTimeEvents = computed(() => {
-  // Group events by title to identify one-time events
   const eventGroups = futureEvents.value.reduce((groups, event) => {
     const key = event.title.toLowerCase()
     if (!groups[key]) {
@@ -210,7 +420,6 @@ const oneTimeEvents = computed(() => {
     return groups
   }, {} as Record<string, CalendarEvent[]>)
 
-  // Filter for one-time events (only one occurrence)
   const oneTime = Object.entries(eventGroups)
     .filter(([_, events]) => events.length === 1)
     .map(([_, events]) => events[0]!)
@@ -228,7 +437,7 @@ const truncateTitle = (title: string, maxLength: number) => {
 }
 
 const getTruncatedTitle = (title: string) => {
-  // Responsive title truncation based on screen size
+  if (typeof window === 'undefined') return truncateTitle(title, 15)
   if (window.innerWidth <= 360) {
     return truncateTitle(title, 6)
   } else if (window.innerWidth <= 480) {
@@ -240,6 +449,11 @@ const getTruncatedTitle = (title: string) => {
   }
 }
 
+const truncateDescription = (desc: string) => {
+  if (desc.length <= 120) return desc
+  return desc.substring(0, 117).trim() + '...'
+}
+
 const formatEventTime = (event: CalendarEvent) => {
   if (event.isAllDay) {
     return 'All Day'
@@ -247,35 +461,46 @@ const formatEventTime = (event: CalendarEvent) => {
   return `${format(event.start, 'h:mm a')} - ${format(event.end, 'h:mm a')}`
 }
 
+const formatEventTimeShort = (event: CalendarEvent) => {
+  if (event.isAllDay) return 'All Day'
+  return format(event.start, 'h:mma').toLowerCase()
+}
+
 const previousMonth = () => {
   currentDate.value = subMonths(currentDate.value, 1)
+  selectedDay.value = null
   loadEvents()
 }
 
 const nextMonth = () => {
   currentDate.value = addMonths(currentDate.value, 1)
+  selectedDay.value = null
   loadEvents()
 }
 
+let requestId = 0
+
 const loadEvents = async () => {
+  const thisRequest = ++requestId
   try {
     loading.value = true
+    error.value = false
 
-    // Load both month events for the calendar grid and get recurring events specifically
     const [monthEvents, upcomingEvents] = await Promise.all([
       calendarService.getEventsForMonth(currentDate.value),
-      calendarService.getRecurringEvents(90) // Next 3 months using recurring events API
+      calendarService.getRecurringEvents(90)
     ])
+
+    if (thisRequest !== requestId) return
 
     allEvents.value = monthEvents
     futureEvents.value = upcomingEvents
-
-    console.log(`Loaded ${allEvents.value.length} events for ${format(currentDate.value, 'MMMM yyyy')}`)
-    console.log(`Loaded ${futureEvents.value.length} upcoming events (next 4 weeks)`)
-  } catch (error) {
-    console.error('Failed to load calendar events:', error)
+  } catch (err) {
+    if (thisRequest !== requestId) return
+    console.error('Failed to load calendar events:', err)
+    error.value = true
   } finally {
-    loading.value = false
+    if (thisRequest === requestId) loading.value = false
   }
 }
 
@@ -289,8 +514,17 @@ const closeEventModal = () => {
   selectedEvent.value = null
 }
 
+const onResize = () => {
+  isMobile.value = window.innerWidth <= 768
+}
+
 onMounted(() => {
   loadEvents()
+  window.addEventListener('resize', onResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', onResize)
 })
 </script>
 
@@ -302,55 +536,103 @@ onMounted(() => {
 
 .calendar-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: var(--space-8);
-  padding: var(--space-4) 0;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  padding: var(--space-6) 0 var(--space-4);
+}
+
+.header-top-row {
+  display: flex;
+  justify-content: center;
+}
+
+.header-nav-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  justify-content: center;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--color-text-tertiary);
+  border-radius: var(--radius-base);
+  overflow: hidden;
+}
+
+.view-toggle-btn {
+  padding: var(--space-1) var(--space-4);
+  background: var(--color-bg-secondary);
+  border: none;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.view-toggle-btn.active {
+  background: var(--color-accent-primary);
+  color: var(--color-bg-primary);
 }
 
 .month-year {
   font-size: var(--text-3xl);
   font-weight: var(--font-normal);
-  color: var(--ink-black);
+  color: var(--color-text-primary);
+  text-align: center;
 }
 
 .nav-button {
-  padding: var(--space-3) var(--space-6);
-  background: var(--cream);
-  border: 1px solid var(--warm-gray);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-text-tertiary);
   border-radius: var(--radius-base);
-  color: var(--graphite);
+  color: var(--color-text-secondary);
   font-family: var(--font-mono);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   cursor: pointer;
   transition: all var(--transition-base);
+  flex-shrink: 0;
 }
 
 .nav-button:hover {
-  background: var(--accent-rust);
-  color: var(--cream);
-  border-color: var(--accent-rust);
+  background: var(--color-accent-primary);
+  color: var(--color-bg-secondary);
+  border-color: var(--color-accent-primary);
 }
 
 .calendar-loading {
   text-align: center;
   padding: var(--space-16);
-  color: var(--warm-gray);
+  color: var(--color-text-tertiary);
 }
 
+.calendar-error {
+  text-align: center;
+  padding: var(--space-16);
+  color: var(--color-accent-primary);
+}
+
+/* Month view grid */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 1px;
-  background: var(--warm-gray);
+  background: var(--color-text-tertiary);
   border-radius: var(--radius-base);
   overflow: hidden;
   margin-bottom: var(--space-12);
+  transition: grid-template-columns 0.3s ease, grid-template-rows 0.3s ease;
 }
 
 .day-header {
-  background: var(--ink-black);
-  color: var(--paper-white);
+  background: var(--color-text-primary);
+  color: var(--color-bg-primary);
   padding: var(--space-3);
   text-align: center;
   font-size: var(--text-sm);
@@ -360,16 +642,19 @@ onMounted(() => {
 }
 
 .calendar-day {
-  background: var(--paper-white);
+  background: var(--color-bg-primary);
   min-height: 120px;
   padding: var(--space-2);
   display: flex;
   flex-direction: column;
   position: relative;
+  cursor: pointer;
+  transition: min-height 0.3s ease;
+  overflow: hidden;
 }
 
 .calendar-day.other-month {
-  background: var(--cream);
+  background: var(--color-bg-secondary);
   opacity: 0.5;
 }
 
@@ -377,9 +662,18 @@ onMounted(() => {
   background: rgba(168, 90, 60, 0.1);
 }
 
+.calendar-day.is-selected {
+  box-shadow: inset 0 0 0 2px var(--color-accent-primary);
+  background: rgba(168, 90, 60, 0.05);
+}
+
+.calendar-day.is-expanded {
+  overflow-y: auto;
+}
+
 .calendar-day.today .day-number {
-  background: var(--accent-rust);
-  color: var(--paper-white);
+  background: var(--color-accent-primary);
+  color: var(--color-bg-primary);
   border-radius: 50%;
   width: 24px;
   height: 24px;
@@ -391,7 +685,7 @@ onMounted(() => {
 .day-number {
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  color: var(--ink-black);
+  color: var(--color-text-primary);
   margin-bottom: var(--space-1);
 }
 
@@ -403,8 +697,8 @@ onMounted(() => {
 }
 
 .event-dot {
-  background: var(--accent-rust);
-  color: var(--paper-white);
+  background: var(--color-accent-primary);
+  color: var(--color-bg-primary);
   padding: var(--space-1);
   border-radius: var(--radius-sm);
   font-size: var(--text-xs);
@@ -429,14 +723,138 @@ onMounted(() => {
   text-overflow: ellipsis;
 }
 
-.more-events {
-  font-size: var(--text-xs);
-  color: var(--warm-gray);
-  text-align: center;
-  padding: var(--space-1);
+.is-expanded .event-title {
+  white-space: normal;
+}
+
+.event-time-inline {
+  display: block;
+  font-size: 9px;
+  opacity: 0.85;
   font-family: var(--font-mono);
 }
 
+.more-events {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  text-align: center;
+  padding: var(--space-1);
+  font-family: var(--font-mono);
+  cursor: pointer;
+}
+
+.more-events:hover {
+  color: var(--color-accent-primary);
+}
+
+/* Day View */
+.day-view {
+  margin-bottom: var(--space-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.day-view-empty {
+  text-align: center;
+  padding: var(--space-16);
+  color: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+}
+
+.day-view-event {
+  display: flex;
+  gap: var(--space-4);
+  background: var(--color-bg-secondary);
+  border-left: 3px solid var(--color-accent-primary);
+  border-radius: var(--radius-base);
+  padding: var(--space-4);
+  cursor: pointer;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.day-view-event:hover {
+  transform: translateX(2px);
+  box-shadow: 2px 2px 8px var(--shadow-light);
+}
+
+.day-view-event-time {
+  color: var(--color-accent-primary);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.day-view-event-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.day-view-event-title {
+  color: var(--color-text-primary);
+  font-size: var(--text-lg);
+  font-weight: var(--font-medium);
+  margin-bottom: var(--space-2);
+}
+
+.day-view-event-registration {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--accent-sage);
+  font-family: var(--font-sans);
+  font-weight: var(--font-medium);
+  margin-bottom: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  background: rgba(104, 127, 93, 0.1);
+  border-radius: var(--radius-sm);
+  width: fit-content;
+}
+
+.day-view-event-registration .registration-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--accent-sage);
+  flex-shrink: 0;
+}
+
+.day-view-event-location {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+  font-family: var(--font-sans);
+  margin-bottom: var(--space-2);
+}
+
+.day-view-event-location .location-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.day-view-event-desc {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  font-family: var(--font-sans);
+}
+
+.day-view-event-desc :deep(a) {
+  color: var(--color-accent-primary);
+  text-decoration: underline;
+}
+
+.day-view-event-desc :deep(br) {
+  display: block;
+  margin-top: var(--space-1);
+}
+
+/* Sections below calendar */
 .events-list {
   margin-top: var(--space-12);
 }
@@ -445,7 +863,7 @@ onMounted(() => {
   font-size: var(--text-2xl);
   font-weight: var(--font-medium);
   margin-bottom: var(--space-6);
-  color: var(--ink-black);
+  color: var(--color-text-primary);
   text-align: center;
 }
 
@@ -453,6 +871,10 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: var(--space-4);
+}
+
+.recurring-section {
+  margin-bottom: var(--space-6);
 }
 
 .recurring-events-carousel {
@@ -468,7 +890,7 @@ onMounted(() => {
 }
 
 .recurring-events-carousel::-webkit-scrollbar-track {
-  background: var(--warm-gray);
+  background: var(--color-text-tertiary);
   border-radius: var(--radius-full);
 }
 
@@ -478,11 +900,11 @@ onMounted(() => {
 }
 
 .recurring-events-carousel::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-rust);
+  background: var(--color-accent-primary);
 }
 
 .recurring-event-item {
-  background: var(--cream);
+  background: var(--color-bg-secondary);
   border-radius: var(--radius-base);
   padding: var(--space-4);
   cursor: pointer;
@@ -518,7 +940,7 @@ onMounted(() => {
 .recurring-event-title {
   font-size: var(--text-lg);
   font-weight: var(--font-medium);
-  color: var(--ink-black);
+  color: var(--color-text-primary);
   font-family: var(--font-sans);
   margin: 0;
 }
@@ -528,7 +950,7 @@ onMounted(() => {
   align-items: center;
   gap: var(--space-2);
   font-size: var(--text-sm);
-  color: var(--accent-rust);
+  color: var(--color-accent-primary);
   font-family: var(--font-mono);
   font-weight: var(--font-medium);
 }
@@ -536,7 +958,7 @@ onMounted(() => {
 .recurring-event-next .calendar-icon {
   width: 16px;
   height: 16px;
-  color: var(--accent-rust);
+  color: var(--color-accent-primary);
 }
 
 
@@ -546,17 +968,8 @@ onMounted(() => {
     padding: 0 var(--space-4);
   }
 
-  .calendar-header {
-    margin-bottom: var(--space-6);
-  }
-
   .month-year {
     font-size: var(--text-2xl);
-  }
-
-  .nav-button {
-    padding: var(--space-2) var(--space-4);
-    font-size: var(--text-xs);
   }
 
   .calendar-day {
@@ -573,22 +986,8 @@ onMounted(() => {
     padding: 0 var(--space-2);
   }
 
-  .calendar-header {
-    flex-direction: column;
-    gap: var(--space-3);
-    text-align: center;
-  }
-
   .month-year {
-    font-size: var(--text-xl);
-    order: -1;
-  }
-
-  .nav-button {
-    padding: var(--space-2) var(--space-3);
-    font-size: var(--text-xs);
-    flex: 1;
-    max-width: 120px;
+    font-size: var(--text-lg);
   }
 
   .calendar-grid {
@@ -653,6 +1052,20 @@ onMounted(() => {
     font-size: var(--text-xl);
     margin-bottom: var(--space-4);
   }
+
+  /* Day view mobile: stack time above title */
+  .day-view-event {
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .day-view-event-time {
+    min-width: unset;
+  }
+
+  .day-view-event-title {
+    font-size: var(--text-base);
+  }
 }
 
 @media (max-width: 480px) {
@@ -665,24 +1078,21 @@ onMounted(() => {
 
   .calendar-header {
     padding: 0 var(--space-2);
-    gap: var(--space-2);
-    width: 100%;
-    box-sizing: border-box;
+    gap: var(--space-1);
   }
 
   .month-year {
-    font-size: var(--text-lg);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: var(--text-base);
   }
 
   .nav-button {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .view-toggle-btn {
     padding: var(--space-1) var(--space-2);
     font-size: 10px;
-    border-radius: var(--radius-sm);
-    white-space: nowrap;
-    min-width: 60px;
   }
 
   .calendar-grid {
@@ -785,22 +1195,28 @@ onMounted(() => {
     font-size: var(--text-lg);
     margin-bottom: var(--space-3);
   }
+
+  .day-view {
+    padding: 0 var(--space-2);
+  }
+
+  .day-view-event {
+    padding: var(--space-3);
+  }
+
+  .day-view-event-title {
+    font-size: var(--text-sm);
+  }
+
+  .day-view-event-desc {
+    font-size: var(--text-xs);
+  }
 }
 
 /* Ultra small screens */
 @media (max-width: 360px) {
-  .calendar-header {
-    padding: 0 var(--space-1);
-  }
-
   .month-year {
-    font-size: var(--text-base);
-  }
-
-  .nav-button {
-    padding: var(--space-1);
-    font-size: 9px;
-    min-width: 50px;
+    font-size: var(--text-sm);
   }
 
   .calendar-day {

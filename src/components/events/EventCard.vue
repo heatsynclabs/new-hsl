@@ -70,7 +70,7 @@ const truncateDescription = (description: string): string => {
 <style scoped>
 .event-card {
   padding: var(--space-4);
-  background: var(--cream);
+  background: var(--color-bg-secondary);
   border-radius: var(--radius-base);
   box-shadow: 2px 2px 8px var(--shadow-light);
   transition: transform var(--transition-base), box-shadow var(--transition-base);
@@ -123,7 +123,7 @@ const truncateDescription = (description: string): string => {
 .event-title {
   font-size: var(--text-base);
   font-weight: var(--font-medium);
-  color: var(--ink-black);
+  color: var(--color-text-primary);
   font-family: var(--font-sans);
   line-height: var(--leading-tight);
 }
@@ -159,7 +159,7 @@ const truncateDescription = (description: string): string => {
 
 .event-description {
   font-size: var(--text-xs);
-  color: var(--graphite);
+  color: var(--color-text-secondary);
   line-height: var(--leading-relaxed);
   font-family: var(--font-sans);
   overflow: hidden;

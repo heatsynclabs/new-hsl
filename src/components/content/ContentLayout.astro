@@ -152,6 +152,31 @@ const frontmatter = contentEntry.data;
     padding: 0;
   }
 
+  .content-body :global(.donate-cta) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--color-accent-primary);
+    color: white;
+    padding: var(--space-3) var(--space-8);
+    border-radius: var(--radius-full);
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    font-family: var(--font-mono);
+    letter-spacing: var(--tracking-wide);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin: var(--space-2) 0 var(--space-4);
+  }
+
+  .content-body :global(.donate-cta:hover) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    color: white;
+    text-decoration: none;
+  }
+
   .content-body :global(blockquote) {
     border-left: 4px solid var(--color-accent-primary);
     padding-left: var(--space-4);
