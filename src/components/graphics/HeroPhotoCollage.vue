@@ -53,18 +53,28 @@ interface PhotoPosition {
   zIndex: number
 }
 
-const allImages = Array.from({ length: 21 }, (_, i) => `/pics/${i + 1}.webp`)
+const allImages = Array.from({ length: 20 }, (_, i) => `/pics/${i + 1}.webp`)
 
-const SLOT_COUNT = 6
+// Preload all images into browser cache so cycling is instant
+const preloadedImages: HTMLImageElement[] = []
+const preloadAllImages = () => {
+  allImages.forEach(src => {
+    const img = new Image()
+    img.src = src
+    preloadedImages.push(img)
+  })
+}
+
+const SLOT_COUNT = 4
 const photos = ref<PhotoSlot[]>([])
 const expandedIndex = ref<number | null>(null)
 const positions = ref<PhotoPosition[]>([])
 const nextImgRefs = ref<Record<number, HTMLImageElement>>({})
 let usedImages: string[] = [] // track what's currently shown to avoid repeats
 
-const tornTops = [1, 4]
+const tornTops = [1]
 const tornBottoms = [0, 3]
-const tapeSlots = [0, 2, 5]
+const tapeSlots = [0, 2]
 
 const visiblePhotos = computed(() => photos.value)
 
@@ -77,10 +87,9 @@ const shuffleArray = <T,>(arr: T[]): T[] => {
   return a
 }
 
-// Generate evenly scattered positions that stay within bounds
+// Generate positions in a 2x2 grid — large images with small jitter
 const generatePositions = (): PhotoPosition[] => {
-  // 3 columns x 2 rows grid with jitter for organic feel
-  const cols = 3
+  const cols = 2
   const rows = 2
   const cellW = 100 / cols
   const cellH = 100 / rows
@@ -98,25 +107,29 @@ const generatePositions = (): PhotoPosition[] => {
 
   for (let i = 0; i < SLOT_COUNT; i++) {
     const cell = shuffledCells[i]
-    const baseLeft = cell.col * cellW
-    const baseTop = cell.row * cellH
 
-    // Image width: 38-48% — large but contained
-    const width = 38 + Math.random() * 10
+    const centerX = cell.col * cellW + cellW / 2
+    const centerY = cell.row * cellH + cellH / 2
 
-    // Aspect ratio ~4:3, so height in % is roughly width * 0.75
+    const width = 48 + Math.random() * 6 // 48-54%
     const approxHeight = width * 0.75
 
-    // Jitter within cell
-    const jitterX = (Math.random() - 0.5) * cellW * 0.4
-    const jitterY = (Math.random() - 0.5) * cellH * 0.35
+    const jitterX = (Math.random() - 0.5) * 10
+    const jitterY = (Math.random() - 0.5) * 10
 
-    // Clamp so image stays within 0-100% bounds
-    const left = Math.max(0, Math.min(100 - width, baseLeft + jitterX))
-    const top = Math.max(0, Math.min(100 - approxHeight, baseTop + jitterY))
+    // Inset bounds so rotated photos don't get clipped by overflow:hidden
+    const padX = 3
+    const padTop = 3
+    const padBottom = 8
+    const left = Math.max(padX, Math.min(100 - width - padX, centerX - width / 2 + jitterX))
+    const top = Math.max(padTop, Math.min(100 - approxHeight - padBottom, centerY - approxHeight / 2 + jitterY))
 
-    const rotation = (Math.random() - 0.5) * 10 // -5 to +5 degrees
-    const zIndex = Math.floor(Math.random() * 10) + 1
+    // Ensure a visible rotation but cap it so nothing looks too wild
+    // Range: -12 to -3 or +3 to +12 degrees (never near-zero/flat)
+    // Counter the parent's rotate(2deg) skewY(-1deg) plus add random tilt
+    const sign = Math.random() < 0.5 ? -1 : 1
+    const rotation = -2 + sign * (3 + Math.random() * 9)
+    const zIndex = Math.floor(Math.random() * 4) + 1
 
     slots.push({ left, top, width, rotation, zIndex })
   }
@@ -129,14 +142,14 @@ const photoStyles = computed(() => {
     left: `${pos.left}%`,
     top: `${pos.top}%`,
     width: `${pos.width}%`,
-    transform: `rotate(${pos.rotation}deg)`,
+    transform: `skewY(1deg) rotate(${pos.rotation}deg)`,
     zIndex: pos.zIndex
   }))
 })
 
 const tapeStyle = (index: number) => {
   const rotation = (Math.random() - 0.5) * 8
-  const widths = [45, 40, 50]
+  const widths = [45, 50]
   const w = widths[tapeSlots.indexOf(index)] || 42
   return {
     width: `${w}px`,
@@ -210,6 +223,7 @@ const stopCycle = () => {
 }
 
 onMounted(() => {
+  preloadAllImages()
   initPhotos()
   startCycle()
 })
