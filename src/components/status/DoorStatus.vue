@@ -8,10 +8,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const isOpen = ref(false)
 const isLoading = ref(true)
+let intervalId: number | undefined
 
 const checkDoorStatus = async () => {
   try {
@@ -31,7 +32,11 @@ onMounted(() => {
   checkDoorStatus()
 
   // Check status every 5 minutes
-  setInterval(checkDoorStatus, 5 * 60 * 1000)
+  intervalId = window.setInterval(checkDoorStatus, 5 * 60 * 1000)
+})
+
+onUnmounted(() => {
+  if (intervalId) window.clearInterval(intervalId)
 })
 </script>
 

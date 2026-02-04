@@ -3,16 +3,17 @@ import BaseContainer from '../base/BaseContainer.astro';
 import StyledDonateButton from '../base/StyledDonateButton.vue';
 ---
 
-<section class="support-section">
+<section class="support-banner">
+  <div class="support-banner__bg"></div>
   <BaseContainer>
-    <div class="support-content">
-      <div class="support-text">
-        <h2 class="support-title">Support HeatSync Labs</h2>
-        <p class="support-description">
-          Help us keep the lights on, the tools running, and the doors open for everyone. Your donation directly supports our community workshop and makes it possible for people to learn, build, and share together.
+    <div class="support-banner__content">
+      <div class="support-banner__text">
+        <h2 class="support-banner__title">Help Us Keep the Doors Open <svg class="heart-icon" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></h2>
+        <p class="support-banner__desc">
+          HeatSync Labs is 100% volunteer-run and funded by people like you. Your donation keeps the tools running and the space accessible to everyone.
         </p>
       </div>
-      <div class="support-action">
+      <div class="support-banner__action">
         <StyledDonateButton client:load />
       </div>
     </div>
@@ -20,57 +21,86 @@ import StyledDonateButton from '../base/StyledDonateButton.vue';
 </section>
 
 <style>
-  .support-section {
-    background: var(--color-bg-secondary);
-    padding: var(--space-16) 0;
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
+  .support-banner {
+    position: relative;
+    overflow: hidden;
+    padding: var(--space-12) 0;
   }
 
-  .support-content {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: var(--space-12);
+  .support-banner__bg {
+    position: absolute;
+    inset: 0;
+    background: var(--accent-sage);
+    z-index: 0;
+  }
+
+  .support-banner__bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+  }
+
+  .support-banner__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
   }
 
-  .support-title {
+  .support-banner__text {
+    max-width: 600px;
+  }
+
+  .support-banner__title .heart-icon {
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .support-banner__title {
     font-size: var(--text-3xl);
-    font-weight: var(--font-light);
-    margin-bottom: var(--space-4);
-    color: var(--color-text-primary);
+    font-weight: var(--font-semibold);
+    color: white;
+    margin-bottom: var(--space-3);
     font-family: var(--font-sans);
+    line-height: 1.2;
   }
 
-  .support-description {
-    font-size: var(--text-lg);
+  .support-banner__desc {
+    font-size: var(--text-base);
     line-height: var(--leading-relaxed);
-    color: var(--color-text-secondary);
+    color: rgba(255, 255, 255, 0.85);
     font-family: var(--font-sans);
+    margin: 0;
   }
 
-  .support-action {
-    text-align: center;
+  .support-banner__action {
+    flex-shrink: 0;
   }
 
   @media (max-width: 768px) {
-    .support-section {
-      padding: var(--space-12) 0;
+    .support-banner {
+      padding: var(--space-10) 0;
     }
 
-    .support-content {
-      grid-template-columns: 1fr;
-      gap: var(--space-8);
+    .support-banner__content {
+      flex-direction: column;
       text-align: center;
+      gap: var(--space-6);
     }
 
-    .support-title {
+    .support-banner__title {
       font-size: var(--text-2xl);
     }
 
-    .support-description {
-      font-size: var(--text-base);
+    .support-banner__desc {
+      font-size: var(--text-sm);
     }
   }
 </style>
-

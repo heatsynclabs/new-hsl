@@ -1,30 +1,26 @@
 ---
-import BaseContainer from '../base/BaseContainer.astro';
-import { getEntry } from 'astro:content';
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+import BaseContainer from '../components/base/BaseContainer.astro';
+import { marked } from 'marked';
 
-interface Props {
-  contentEntry: Awaited<ReturnType<typeof getEntry>>;
-}
-
-const { contentEntry } = Astro.props;
-
-const { Content } = await contentEntry.render();
-const frontmatter = contentEntry.data;
+const readmeUrl = 'https://raw.githubusercontent.com/heatsynclabs/awesome-heatsync/refs/heads/main/README.md';
+const response = await fetch(readmeUrl);
+const markdown = await response.text();
+const htmlContent = await marked.parse(markdown);
 ---
 
-<BaseContainer>
-  <article class="content-page">
-    <header class="content-header">
-      <h1 class="content-title">{frontmatter.title}</h1>
-      {frontmatter.description && (
-        <p class="content-description">{frontmatter.description}</p>
-      )}
-    </header>
-    <div class="content-body">
-      <Content />
-    </div>
-  </article>
-</BaseContainer>
+<Layout title="Projects - HeatSync Labs">
+  <BaseContainer>
+    <article class="content-page">
+      <header class="content-header">
+        <h1 class="content-title">Projects</h1>
+        <p class="content-description">Awesome projects from the HeatSync Labs community</p>
+      </header>
+      <div class="content-body" set:html={htmlContent} />
+    </article>
+  </BaseContainer>
+</Layout>
 
 <style>
   .content-page {
@@ -57,6 +53,10 @@ const frontmatter = contentEntry.data;
   .content-body {
     max-width: 800px;
     margin: 0 auto;
+  }
+
+  .content-body :global(h1) {
+    display: none; /* Hide the README's h1 since we have our own title */
   }
 
   .content-body :global(h2) {
@@ -150,31 +150,6 @@ const frontmatter = contentEntry.data;
   .content-body :global(pre code) {
     background: transparent;
     padding: 0;
-  }
-
-  .content-body :global(.donate-cta) {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    background: var(--color-accent-primary);
-    color: white;
-    padding: var(--space-3) var(--space-8);
-    border-radius: var(--radius-full);
-    font-size: var(--text-lg);
-    font-weight: var(--font-semibold);
-    font-family: var(--font-mono);
-    letter-spacing: var(--tracking-wide);
-    text-decoration: none;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    margin: var(--space-2) 0 var(--space-4);
-  }
-
-  .content-body :global(.donate-cta:hover) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    color: white;
-    text-decoration: none;
   }
 
   .content-body :global(blockquote) {
