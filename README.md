@@ -102,3 +102,7 @@ Content pages like About and Membership can be converted to Markdown by:
 3. Rendering Markdown in page templates
 
 See Astro documentation for content collections setup.
+
+## Contributing
+
+Want to help improve the website? Check out **[CONTRIBUTING.md](CONTRIBUTING.md)** — it covers everything from fixing a typo to adding new pages, no coding experience required.
