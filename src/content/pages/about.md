@@ -3,7 +3,7 @@ title: "About HeatSync Labs"
 description: "Arizona's premier community-operated hackerspace, fostering innovation and collaboration since 2009"
 ---
 
-## Our Story
+## Our History
 
 HeatSync Labs began as a grassroots effort to create a collaborative workspace where makers, artists, and technologists could come together to create, learn, and share knowledge. What started as a small group of passionate individuals has grown into the region's leading community hackerspace.
 
