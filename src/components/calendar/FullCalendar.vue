@@ -1,7 +1,7 @@
 <template>
   <div class="full-calendar">
     <!-- Recurring Events section -->
-    <div v-if="!loading && recurringEvents.length > 0" class="events-list recurring-section">
+    <div v-if="!loading && recurringEvents.length > 0" class="events-list recurring-section content-constrained">
       <h3 class="events-title">Recurring Events</h3>
       <div class="recurring-events-carousel">
         <div
@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <div class="calendar-header">
+    <div class="calendar-header content-constrained">
       <div class="header-top-row">
         <div class="view-toggle">
           <button
@@ -52,17 +52,17 @@
       </div>
     </div>
 
-    <div v-if="error" class="calendar-error">
+    <div v-if="error" class="calendar-error content-constrained">
       <p>Unable to load calendar events. Please try again later.</p>
       <button @click="loadEvents" class="nav-button">Retry</button>
     </div>
 
-    <div v-else-if="loading" class="calendar-loading">
+    <div v-else-if="loading" class="calendar-loading content-constrained">
       <p>Loading calendar...</p>
     </div>
 
     <!-- Day View -->
-    <div v-else-if="viewMode === 'day'" class="day-view">
+    <div v-else-if="viewMode === 'day'" class="day-view content-constrained">
       <div v-if="selectedDayEvents.length === 0" class="day-view-empty">
         No events on this day.
       </div>
@@ -97,8 +97,6 @@
     <div
       v-else
       class="calendar-grid"
-      :style="gridStyle"
-      @mouseleave="onGridMouseLeave"
     >
       <!-- Day headers -->
       <div
@@ -118,55 +116,35 @@
           {
             'other-month': !day.isCurrentMonth,
             'today': day.isToday,
-            'has-events': day.events.length > 0,
-            'is-expanded': isExpanded(index),
-            'is-selected': selectedDay && isSameDay(day.date, selectedDay)
+            'has-events': day.events.length > 0
           }
         ]"
-        @mouseenter="onDayMouseEnter(index)"
-        @mouseleave="onDayMouseLeave"
         @click="onDayClick(day)"
       >
         <div class="day-number">{{ day.date.getDate() }}</div>
         <div v-if="day.events.length > 0" class="day-events">
-          <template v-if="isExpanded(index)">
-            <div
-              v-for="event in day.events"
-              :key="event.id"
-              :class="[
-                'event-dot',
-                { 'all-day': event.isAllDay }
-              ]"
-              :title="`${event.title} - ${formatEventTime(event)}`"
-              @click.stop="openEventModal(event)"
-            >
-              <span class="event-time-inline">{{ formatEventTimeShort(event) }}</span>
-              <span class="event-title">{{ event.displayTitle }}</span>
-            </div>
-          </template>
-          <template v-else>
-            <div
-              v-for="event in day.events.slice(0, 3)"
-              :key="event.id"
-              :class="[
-                'event-dot',
-                { 'all-day': event.isAllDay }
-              ]"
-              :title="`${event.title} - ${formatEventTime(event)}`"
-              @click.stop="openEventModal(event)"
-            >
-              <span class="event-title">{{ getTruncatedTitle(event.title) }}</span>
-            </div>
-            <div v-if="day.events.length > 3" class="more-events" @click.stop="onDayClick(day)">
-              +{{ day.events.length - 3 }} more
-            </div>
-          </template>
+          <div
+            v-for="event in day.events.slice(0, 3)"
+            :key="event.id"
+            :class="[
+              'event-dot',
+              { 'all-day': event.isAllDay }
+            ]"
+            :title="`${event.title} - ${formatEventTime(event)}`"
+            @click.stop="openEventModal(event)"
+          >
+            <span class="event-time-inline">{{ formatEventTimeShort(event) }}</span>
+            <span class="event-title">{{ event.title }}</span>
+          </div>
+          <div v-if="day.events.length > 3" class="more-events" @click.stop="onDayClick(day)">
+            +{{ day.events.length - 3 }} more
+          </div>
         </div>
       </div>
     </div>
 
     <!-- One-time Events section -->
-    <div v-if="!loading && oneTimeEvents.length > 0" class="events-list">
+    <div v-if="!loading && oneTimeEvents.length > 0" class="events-list content-constrained">
       <h3 class="events-title">Upcoming Events</h3>
       <div class="events-grid">
         <EventCard
@@ -187,7 +165,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths, addDays, subDays, isToday, startOfDay, endOfDay } from 'date-fns'
 import EventCard from '../events/EventCard.vue'
 import EventModal from '../events/EventModal.vue'
@@ -210,12 +188,9 @@ const error = ref(false)
 const modalVisible = ref(false)
 const selectedEvent = ref<CalendarEvent | null>(null)
 
-// View mode and expansion state
+// View mode
 const viewMode = ref<'month' | 'day'>('month')
-const hoveredCol = ref<number | null>(null)
-const hoveredRow = ref<number | null>(null)
 const selectedDay = ref<Date | null>(null)
-const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth <= 768 : false)
 
 const calendarService = new CalendarService()
 
@@ -242,99 +217,9 @@ const calendarDays = computed(() => {
   }))
 })
 
-// Number of rows in current calendar grid
-const rowCount = computed(() => Math.ceil(calendarDays.value.length / 7))
-
-// Which col/row is active (selected takes priority over hover)
-const activeCol = computed(() => {
-  if (isMobile.value) return null
-  if (selectedDay.value) {
-    const idx = calendarDays.value.findIndex(d => isSameDay(d.date, selectedDay.value!))
-    if (idx >= 0) return idx % 7
-  }
-  return hoveredCol.value
-})
-
-const activeRow = computed(() => {
-  if (isMobile.value) return null
-  if (selectedDay.value) {
-    const idx = calendarDays.value.findIndex(d => isSameDay(d.date, selectedDay.value!))
-    if (idx >= 0) return Math.floor(idx / 7)
-  }
-  return hoveredRow.value
-})
-
-// Grid template styles for expansion effect
-const gridStyle = computed(() => {
-  const col = activeCol.value
-  const row = activeRow.value
-
-  if (col === null || row === null) {
-    return {}
-  }
-
-  const cols = Array(7).fill('0.83fr')
-  cols[col] = '2fr'
-
-  const rows = Array(rowCount.value).fill('0.83fr')
-  rows[row] = '2fr'
-
-  return {
-    gridTemplateColumns: cols.join(' '),
-    gridTemplateRows: `auto ${rows.join(' ')}`
-  }
-})
-
-const isExpanded = (index: number) => {
-  const col = index % 7
-  const row = Math.floor(index / 7)
-  return activeCol.value === col && activeRow.value === row
-}
-
-const dayNeedsExpansion = (day: { events: CalendarEvent[] }) => {
-  if (day.events.length > 3) return true
-  const maxLen = typeof window !== 'undefined' && window.innerWidth <= 768 ? 10 : 15
-  return day.events.some(e => e.title.length > maxLen)
-}
-
-let hoverTimer: ReturnType<typeof setTimeout> | null = null
-
-const onDayMouseEnter = (index: number) => {
-  if (isMobile.value || selectedDay.value) return
-  const day = calendarDays.value[index]
-  if (!day || !dayNeedsExpansion(day)) return
-  if (hoverTimer) clearTimeout(hoverTimer)
-  hoverTimer = setTimeout(() => {
-    hoveredCol.value = index % 7
-    hoveredRow.value = Math.floor(index / 7)
-  }, 500)
-}
-
-const onDayMouseLeave = () => {
-  if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null }
-}
-
-const onGridMouseLeave = () => {
-  if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null }
-  if (selectedDay.value) return
-  hoveredCol.value = null
-  hoveredRow.value = null
-}
-
 const onDayClick = (day: { date: Date; events: CalendarEvent[] }) => {
-  if (isMobile.value) {
-    // Mobile: tap a day -> switch to day view
-    selectedDay.value = day.date
-    viewMode.value = 'day'
-    return
-  }
-
-  // Desktop: click to pin/unpin expansion
-  if (selectedDay.value && isSameDay(selectedDay.value, day.date)) {
-    selectedDay.value = null
-  } else {
-    selectedDay.value = day.date
-  }
+  selectedDay.value = day.date
+  viewMode.value = 'day'
 }
 
 // Day view events
@@ -463,7 +348,7 @@ const formatEventTime = (event: CalendarEvent) => {
 
 const formatEventTimeShort = (event: CalendarEvent) => {
   if (event.isAllDay) return 'All Day'
-  return format(event.start, 'h:mma').toLowerCase()
+  return `${format(event.start, 'h:mma').toLowerCase()}-${format(event.end, 'h:mma').toLowerCase()}`
 }
 
 const previousMonth = () => {
@@ -514,24 +399,21 @@ const closeEventModal = () => {
   selectedEvent.value = null
 }
 
-const onResize = () => {
-  isMobile.value = window.innerWidth <= 768
-}
-
 onMounted(() => {
   loadEvents()
-  window.addEventListener('resize', onResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', onResize)
 })
 </script>
 
 <style scoped>
 .full-calendar {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
+}
+
+.content-constrained {
+  max-width: var(--container-xl);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .calendar-header {
@@ -627,7 +509,6 @@ onUnmounted(() => {
   border-radius: var(--radius-base);
   overflow: hidden;
   margin-bottom: var(--space-12);
-  transition: grid-template-columns 0.3s ease, grid-template-rows 0.3s ease;
 }
 
 .day-header {
@@ -649,7 +530,6 @@ onUnmounted(() => {
   flex-direction: column;
   position: relative;
   cursor: pointer;
-  transition: min-height 0.3s ease;
   overflow: hidden;
 }
 
@@ -660,15 +540,6 @@ onUnmounted(() => {
 
 .calendar-day.today {
   background: rgba(168, 90, 60, 0.1);
-}
-
-.calendar-day.is-selected {
-  box-shadow: inset 0 0 0 2px var(--color-accent-primary);
-  background: rgba(168, 90, 60, 0.05);
-}
-
-.calendar-day.is-expanded {
-  overflow-y: auto;
 }
 
 .calendar-day.today .day-number {
@@ -721,10 +592,6 @@ onUnmounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.is-expanded .event-title {
-  white-space: normal;
 }
 
 .event-time-inline {
@@ -1013,6 +880,10 @@ onUnmounted(() => {
   .event-dot {
     padding: 1px var(--space-1);
     font-size: 10px;
+  }
+
+  .event-time-inline {
+    display: none;
   }
 
   .event-title {
