@@ -151,7 +151,7 @@
           <line x1="8" y1="2" x2="8" y2="6"></line>
           <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
-        iCal
+        Add to iCal
       </a>
       <a :href="googleCalendarUrl" target="_blank" rel="noopener noreferrer" class="subscribe-link" title="Add to Google Calendar">
         <svg class="subscribe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -161,7 +161,15 @@
           <line x1="3" y1="10" x2="21" y2="10"></line>
           <text x="12" y="18" text-anchor="middle" font-size="7" fill="currentColor" stroke="none" font-weight="bold">G</text>
         </svg>
-        Google Calendar
+        Add to Google Calendar
+      </a>
+      <a :href="googleCalendarEmbedUrl" target="_blank" rel="noopener noreferrer" class="subscribe-link" title="Open in Google Calendar">
+        <svg class="subscribe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+        Open in Google Calendar
       </a>
     </div>
 
@@ -197,6 +205,7 @@ import { config } from '../../config'
 const encodedCalendarId = encodeURIComponent(config.calendarId)
 const icalUrl = `https://calendar.google.com/calendar/ical/${encodedCalendarId}/public/basic.ics`
 const googleCalendarUrl = `https://calendar.google.com/calendar/render?cid=${encodedCalendarId}`
+const googleCalendarEmbedUrl = `https://calendar.google.com/calendar/embed?src=${encodedCalendarId}`
 
 // Start with current month, but if we're in the last week, show next month
 const getInitialDate = () => {
