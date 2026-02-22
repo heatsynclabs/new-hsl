@@ -177,13 +177,15 @@ const formatEventTime = (event: CalendarEvent): string => {
 }
 
 .event-registration--link {
+  color: var(--color-accent-primary);
+  background: rgba(168, 90, 60, 0.1);
   text-decoration: none;
   cursor: pointer;
   transition: background var(--transition-base), color var(--transition-base);
 }
 
 .event-registration--link:hover {
-  background: rgba(104, 127, 93, 0.2);
+  background: rgba(168, 90, 60, 0.2);
   color: var(--color-text-primary);
 }
 
@@ -197,6 +199,10 @@ const formatEventTime = (event: CalendarEvent): string => {
   color: var(--accent-sage);
   flex-shrink: 0;
   transition: color var(--transition-base);
+}
+
+.event-registration--link .registration-icon {
+  color: var(--color-accent-primary);
 }
 
 .event-meta {
@@ -240,6 +246,23 @@ const formatEventTime = (event: CalendarEvent): string => {
   font-size: var(--text-base);
   color: var(--color-text-secondary);
   line-height: var(--leading-relaxed);
+  font-family: var(--font-sans);
+}
+
+.event-description div :deep(br) {
+  display: block;
+  content: '';
+  margin-top: var(--space-3);
+}
+
+.event-description div :deep(a) {
+  color: var(--color-accent-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.event-description div :deep(a:hover) {
+  color: var(--color-text-primary);
 }
 
 /* Responsive */
