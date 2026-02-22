@@ -16,7 +16,7 @@
       </div>
 
       <div v-else class="calendar__events">
-        <div class="events-carousel">
+        <div class="events-grid">
           <EventCard
             v-for="event in events"
             :key="event.id"
@@ -43,26 +43,38 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import BaseContainer from '../base/BaseContainer.vue'
 import BaseButton from '../base/BaseButton.vue'
 import EventCard from '../events/EventCard.vue'
 import EventModal from '../events/EventModal.vue'
 import { CalendarService, type CalendarEvent } from '../../services/calendarService'
 
-const events = ref<CalendarEvent[]>([])
+const allEvents = ref<CalendarEvent[]>([])
 const loading = ref(true)
 const error = ref(false)
 const modalVisible = ref(false)
 const selectedEvent = ref<CalendarEvent | null>(null)
+const isMobile = ref(typeof window !== 'undefined' ? window.innerWidth <= 768 : false)
 
 const calendarService = new CalendarService()
+
+const events = computed(() => {
+  if (isMobile.value) {
+    return allEvents.value.slice(0, 3)
+  }
+  return allEvents.value
+})
+
+const onResize = () => {
+  isMobile.value = window.innerWidth <= 768
+}
 
 const loadEvents = async () => {
   try {
     loading.value = true
     error.value = false
-    events.value = await calendarService.getEvents(14) // Next 2 weeks for upcoming events
+    allEvents.value = await calendarService.getEvents(14) // Next 2 weeks for upcoming events
   } catch (err) {
     console.error('Failed to load calendar events:', err)
     error.value = true
@@ -84,6 +96,11 @@ const closeEventModal = () => {
 
 onMounted(() => {
   loadEvents()
+  window.addEventListener('resize', onResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', onResize)
 })
 </script>
 
@@ -115,7 +132,7 @@ onMounted(() => {
   margin: 0 auto;
 }
 
-.events-carousel {
+.events-grid {
   display: flex;
   gap: var(--space-4);
   overflow-x: auto;
@@ -123,26 +140,26 @@ onMounted(() => {
   scroll-behavior: smooth;
 }
 
-.events-carousel::-webkit-scrollbar {
+.events-grid :deep(.event-card) {
+  flex: 0 0 300px;
+}
+
+.events-grid::-webkit-scrollbar {
   height: 8px;
 }
 
-.events-carousel::-webkit-scrollbar-track {
+.events-grid::-webkit-scrollbar-track {
   background: var(--warm-gray);
   border-radius: var(--radius-full);
 }
 
-.events-carousel::-webkit-scrollbar-thumb {
+.events-grid::-webkit-scrollbar-thumb {
   background: var(--accent-rust);
   border-radius: var(--radius-full);
 }
 
-.events-carousel::-webkit-scrollbar-thumb:hover {
+.events-grid::-webkit-scrollbar-thumb:hover {
   background: var(--accent-sage);
-}
-
-.events-carousel .event-card {
-  flex: 0 0 280px;
 }
 
 .calendar__footer {
@@ -158,14 +175,16 @@ onMounted(() => {
     padding: var(--space-12) 0;
   }
 
-  .calendar__event {
+  .events-grid {
+    display: flex;
     flex-direction: column;
-    text-align: center;
+    overflow-x: visible;
+    padding: 0;
   }
 
-  .event__date {
-    align-self: center;
-    margin-bottom: var(--space-3);
+  .events-grid :deep(.event-card) {
+    flex: none;
+    width: 100%;
   }
 }
 </style>
