@@ -294,9 +294,8 @@ export class CalendarService {
       .replace(/\(?Registration\s*Required\)?:?\s*/gi, '')
       .replace(/https?:\/\/guestli(?:\.st|st\.co)\/[^\s<>"')]+/gi, '')
       .replace(/\(?\$\d+(?:\.\d{2})?\)?:?\s*/g, '')
-      .replace(/<br\s*\/?>/gi, ' ')
-      .replace(/\n+/g, ' ')
-      .replace(/\s+/g, ' ')
+      .replace(/\n/g, '<br>')
+      .replace(/(<br\s*\/?>)+/gi, '<br>')
       .trim()
 
     return {
