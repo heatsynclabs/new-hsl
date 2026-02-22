@@ -143,6 +143,28 @@
       </div>
     </div>
 
+    <div v-if="!loading" class="subscribe-links content-constrained">
+      <a :href="icalUrl" class="subscribe-link" title="Subscribe via iCal">
+        <svg class="subscribe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        iCal
+      </a>
+      <a :href="googleCalendarUrl" target="_blank" rel="noopener noreferrer" class="subscribe-link" title="Add to Google Calendar">
+        <svg class="subscribe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+          <text x="12" y="18" text-anchor="middle" font-size="7" fill="currentColor" stroke="none" font-weight="bold">G</text>
+        </svg>
+        Google Calendar
+      </a>
+    </div>
+
     <!-- One-time Events section -->
     <div v-if="!loading && oneTimeEvents.length > 0" class="events-list content-constrained">
       <h3 class="events-title">Upcoming Events</h3>
@@ -170,6 +192,11 @@ import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInte
 import EventCard from '../events/EventCard.vue'
 import EventModal from '../events/EventModal.vue'
 import { CalendarService, type CalendarEvent } from '../../services/calendarService'
+import { config } from '../../config'
+
+const encodedCalendarId = encodeURIComponent(config.calendarId)
+const icalUrl = `https://calendar.google.com/calendar/ical/${encodedCalendarId}/public/basic.ics`
+const googleCalendarUrl = `https://calendar.google.com/calendar/render?cid=${encodedCalendarId}`
 
 // Start with current month, but if we're in the last week, show next month
 const getInitialDate = () => {
@@ -430,6 +457,40 @@ onMounted(() => {
   justify-content: center;
 }
 
+.subscribe-links {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-1) 0;
+}
+
+.subscribe-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border: 1px solid var(--color-text-tertiary);
+  border-radius: var(--radius-base);
+  background: var(--color-bg-secondary);
+  transition: all var(--transition-base);
+}
+
+.subscribe-link:hover {
+  background: var(--color-accent-primary);
+  color: var(--color-bg-primary);
+  border-color: var(--color-accent-primary);
+}
+
+.subscribe-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 .header-nav-row {
   display: flex;
   align-items: center;
@@ -508,7 +569,7 @@ onMounted(() => {
   background: var(--color-text-tertiary);
   border-radius: var(--radius-base);
   overflow: hidden;
-  margin-bottom: var(--space-12);
+  margin-bottom: var(--space-2);
 }
 
 .day-header {
@@ -616,7 +677,7 @@ onMounted(() => {
 
 /* Day View */
 .day-view {
-  margin-bottom: var(--space-12);
+  margin-bottom: var(--space-2);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -964,6 +1025,11 @@ onMounted(() => {
   .view-toggle-btn {
     padding: var(--space-1) var(--space-2);
     font-size: 10px;
+  }
+
+  .subscribe-link {
+    font-size: 10px;
+    padding: var(--space-1) var(--space-2);
   }
 
   .calendar-grid {
