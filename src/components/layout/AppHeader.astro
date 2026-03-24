@@ -16,11 +16,31 @@ import ThemeToggle from './ThemeToggle.vue';
       <ul class="nav__links">
         <li><a href="/about" class="nav__link">About</a></li>
         <li><a href="/membership" class="nav__link">Membership</a></li>
-        <li><a href="/calendar" class="nav__link">Events</a></li>
-        <li><a href="/projects" class="nav__link">Projects</a></li>
-        <li><a href="https://wiki.heatsynclabs.org" class="nav__link" target="_blank" rel="noopener">Wiki</a></li>
-        <li><a href="/classes" class="nav__link">Classes</a></li>
-        <li><a href="/community" class="nav__link">Community</a></li>
+        <li class="nav__dropdown">
+          <a href="/calendar" class="nav__link">
+            Events
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor" class="nav__dropdown-icon">
+              <path d="M5 6L0 0h10L5 6z"/>
+            </svg>
+          </a>
+          <ul class="nav__dropdown-menu">
+            <li><a href="/calendar" class="nav__dropdown-link">Calendar</a></li>
+            <li><a href="/classes" class="nav__dropdown-link">Classes</a></li>
+          </ul>
+        </li>
+        <li class="nav__dropdown">
+          <a href="/community" class="nav__link">
+            Community
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor" class="nav__dropdown-icon">
+              <path d="M5 6L0 0h10L5 6z"/>
+            </svg>
+          </a>
+          <ul class="nav__dropdown-menu">
+            <li><a href="/community" class="nav__dropdown-link">Join the Community</a></li>
+            <li><a href="/projects" class="nav__dropdown-link">Projects</a></li>
+            <li><a href="https://wiki.heatsynclabs.org" class="nav__dropdown-link" target="_blank" rel="noopener">Wiki</a></li>
+          </ul>
+        </li>
         <li class="nav__dropdown">
           <a href="/support" class="nav__link">
             Support Us
@@ -72,10 +92,10 @@ import ThemeToggle from './ThemeToggle.vue';
         <li><a href="/about" class="nav__mobile-link">About</a></li>
         <li><a href="/membership" class="nav__mobile-link">Membership</a></li>
         <li><a href="/calendar" class="nav__mobile-link">Events</a></li>
-        <li><a href="/projects" class="nav__mobile-link">Projects</a></li>
-        <li><a href="https://wiki.heatsynclabs.org" class="nav__mobile-link" target="_blank" rel="noopener">Wiki</a></li>
-        <li><a href="/classes" class="nav__mobile-link">Classes</a></li>
+        <li><a href="/classes" class="nav__mobile-link nav__mobile-link--sub">Classes</a></li>
         <li><a href="/community" class="nav__mobile-link">Community</a></li>
+        <li><a href="/projects" class="nav__mobile-link nav__mobile-link--sub">Projects</a></li>
+        <li><a href="https://wiki.heatsynclabs.org" class="nav__mobile-link nav__mobile-link--sub" target="_blank" rel="noopener">Wiki</a></li>
         <li><a href="/support" class="nav__mobile-link">Support Us</a></li>
         <li><a href="/support" class="nav__mobile-link nav__mobile-link--sub">Support Our Mission</a></li>
         <li><a href="/pay" class="nav__mobile-link nav__mobile-link--sub">Payment Methods</a></li>
@@ -156,7 +176,7 @@ import ThemeToggle from './ThemeToggle.vue';
     list-style: none;
     margin: 0;
     padding: 0;
-    justify-self: end;
+    margin-left: auto;
     align-items: center;
     flex-wrap: nowrap;
   }
