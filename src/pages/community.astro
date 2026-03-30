@@ -1,0 +1,575 @@
+---
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+import BaseContainer from '../components/base/BaseContainer.astro';
+---
+
+<Layout title="Community - HeatSync Labs">
+  <section class="community-hero">
+    <BaseContainer>
+      <div class="community-hero__content">
+        <h1 class="community-hero__title">Join the Community</h1>
+        <p class="community-hero__subtitle">
+          HeatSync Labs is more than a space &mdash; it's a network of makers, hackers, and creators.
+          Here's how to connect with us online and in person.
+        </p>
+      </div>
+    </BaseContainer>
+  </section>
+
+  <section class="community-channels">
+    <BaseContainer>
+      <!-- Primary channels -->
+      <div class="channel-grid">
+
+        <a href="https://join.slack.com/t/heatsynclabs/shared_invite/enQtMzU2OTM4ODAxMDI1LWRkYzA0MzQ2Zjk4Yzk0ZmFkYzczNTY4ZWEyMzE4NDFmZjIwNzgzNTg0M2JiYzllMjg0OWUxZWIyZTEwYzA1MWY" target="_blank" rel="noopener" class="channel-card channel-card--featured">
+          <div class="channel-card__icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
+          </div>
+          <div class="channel-card__body">
+            <h2 class="channel-card__title">Slack</h2>
+            <p class="channel-card__description">
+              Ask questions, share projects, coordinate meetups, and connect with members.
+            </p>
+            <span class="channel-card__cta">Join Slack &rarr;</span>
+          </div>
+        </a>
+
+        <a href="https://discord.gg/2aWPgkeS6Q" target="_blank" rel="noopener" class="channel-card channel-card--featured">
+          <div class="channel-card__icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+          </div>
+          <div class="channel-card__body">
+            <h2 class="channel-card__title">Discord</h2>
+            <p class="channel-card__description">
+              Voice chat, screen sharing, and community channels. Great for real-time collaboration,
+              project discussions, and hanging out with fellow makers.
+            </p>
+            <span class="channel-card__cta">Join Discord &rarr;</span>
+          </div>
+        </a>
+
+        <a href="https://groups.google.com/forum/?fromgroups#!forum/heatsynclabs" target="_blank" rel="noopener" class="channel-card">
+          <div class="channel-card__icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </div>
+          <div class="channel-card__body">
+            <h2 class="channel-card__title">Mailing List</h2>
+            <p class="channel-card__description">
+              Our Google Groups mailing list for announcements, longer discussions, and community updates.
+              A great way to stay in the loop without checking in daily.
+            </p>
+            <span class="channel-card__cta">Subscribe &rarr;</span>
+          </div>
+        </a>
+
+        <a href="https://www.instagram.com/heatsynclabs/" target="_blank" rel="noopener" class="channel-card">
+          <div class="channel-card__icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1 1 12.324 0 6.162 6.162 0 0 1-12.324 0zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm4.965-10.405a1.44 1.44 0 1 1 2.881.001 1.44 1.44 0 0 1-2.881-.001z"/></svg>
+          </div>
+          <div class="channel-card__body">
+            <h2 class="channel-card__title">Instagram</h2>
+            <p class="channel-card__description">
+              Photos and stories from the lab &mdash; builds in progress, events, and the creative chaos of our makerspace.
+            </p>
+            <span class="channel-card__cta">Follow Us &rarr;</span>
+          </div>
+        </a>
+
+        <a href="https://www.facebook.com/HeatSyncLabs/" target="_blank" rel="noopener" class="channel-card">
+          <div class="channel-card__icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </div>
+          <div class="channel-card__body">
+            <h2 class="channel-card__title">Facebook</h2>
+            <p class="channel-card__description">
+              Event announcements, community photos, and updates. Follow our page to stay connected
+              and share our events with your network.
+            </p>
+            <span class="channel-card__cta">Like Our Page &rarr;</span>
+          </div>
+        </a>
+
+        <a href="https://github.com/heatsynclabs" target="_blank" rel="noopener" class="channel-card">
+          <div class="channel-card__icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          </div>
+          <div class="channel-card__body">
+            <h2 class="channel-card__title">GitHub</h2>
+            <p class="channel-card__description">
+              Open source projects, this website's source code, and collaborative repos.
+              Contribute code, report issues, or explore what we're building.
+            </p>
+            <span class="channel-card__cta">View Repos &rarr;</span>
+          </div>
+        </a>
+
+        <a href="https://www.flickr.com/people/hslphotosync/" target="_blank" rel="noopener" class="channel-card">
+          <div class="channel-card__icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="7" cy="12" r="5.5"/><circle cx="17" cy="12" r="5.5" fill-opacity="0.6"/></svg>
+          </div>
+          <div class="channel-card__body">
+            <h2 class="channel-card__title">Flickr</h2>
+            <p class="channel-card__description">
+              Our project photo gallery. Browse through years of builds, events, workshops, and maker creations
+              from the lab.
+            </p>
+            <span class="channel-card__cta">View Gallery &rarr;</span>
+          </div>
+        </a>
+
+        <a href="https://www.ebay.com/usr/heatsynclabs" target="_blank" rel="noopener" class="channel-card">
+          <div class="channel-card__icon">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5.71 8.44c-.72 0-1.47.16-1.47 1.18h2.89c-.04-.88-.62-1.18-1.42-1.18zM2 10.82c0 1.82 1.02 2.74 3.09 2.74.81 0 1.5-.1 2.09-.33l-.01-1.11c-.49.22-1.05.35-1.72.35-.93 0-1.53-.3-1.59-1.11h3.65v-.5c0-1.76-.81-2.79-2.43-2.79C3.22 8.07 2 9.09 2 10.82zM9.21 6h-1.6v7.38h1.6V6zm4.62 5.87c-.24.14-.6.21-.97.21-.59 0-.85-.3-.85-.97V6H10.4v5.48c0 1.42.66 2.08 2 2.08.6 0 1.12-.14 1.43-.27V6h-1.6v5.87h1.6zm5.02.35c.72 0 1.19-.41 1.19-1.08 0-.67-.47-1.05-1.19-1.05-.72 0-1.19.38-1.19 1.05 0 .67.47 1.08 1.19 1.08zm-2.76-1.09c0-1.62 1.03-2.06 2.76-2.06 1.72 0 2.76.44 2.76 2.06 0 1.63-1.04 2.43-2.76 2.43-1.73 0-2.76-.8-2.76-2.43z"/></svg>
+          </div>
+          <div class="channel-card__body">
+            <h2 class="channel-card__title">eBay Store</h2>
+            <p class="channel-card__description">
+              Browse surplus equipment, member projects, and interesting finds. Every purchase directly
+              supports the lab.
+            </p>
+            <span class="channel-card__cta">Shop Now &rarr;</span>
+          </div>
+        </a>
+
+      </div>
+    </BaseContainer>
+  </section>
+
+  <section class="community-resources">
+    <BaseContainer>
+      <h2 class="section-title">Resources</h2>
+      <div class="resource-grid">
+        <a href="https://wiki.heatsynclabs.org" target="_blank" rel="noopener" class="resource-card">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="resource-card__icon"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          <div>
+            <h3 class="resource-card__title">Wiki</h3>
+            <p class="resource-card__description">Equipment guides, policies, and community knowledge base</p>
+          </div>
+        </a>
+        <a href="https://members.heatsynclabs.org" target="_blank" rel="noopener" class="resource-card">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="resource-card__icon"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          <div>
+            <h3 class="resource-card__title">Member Portal</h3>
+            <p class="resource-card__description">Manage your membership, book resources, and more</p>
+          </div>
+        </a>
+        <a href="https://members.heatsynclabs.org/resources" target="_blank" rel="noopener" class="resource-card">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="resource-card__icon"><path d="M22 9V7h-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2h2v-2h-2v-2h2v-2h-2V9h2zm-4 10H4V5h14v14zM6 13h5v4H6v-4zm6-6h4v3h-4V7zM6 7h5v5H6V7zm6 4h4v6h-4v-6z"/></svg>
+          <div>
+            <h3 class="resource-card__title">Equipment List</h3>
+            <p class="resource-card__description">See what tools and machines are available at the lab</p>
+          </div>
+        </a>
+        <a href="/calendar" class="resource-card">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="resource-card__icon"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+          <div>
+            <h3 class="resource-card__title">Events Calendar</h3>
+            <p class="resource-card__description">Workshops, open hack nights, classes, and community events</p>
+          </div>
+        </a>
+      </div>
+    </BaseContainer>
+  </section>
+
+  <section class="community-visit">
+    <BaseContainer>
+      <div class="visit-card">
+        <div class="visit-card__content">
+          <h2 class="visit-card__title">Visit Us In Person</h2>
+          <p class="visit-card__text">
+            The best way to experience HeatSync Labs is to walk through the door.
+            We're open to the public &mdash; no membership required to visit.
+          </p>
+          <address class="visit-card__address">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            108 W Main St, Mesa, AZ 85201
+          </address>
+          <div class="visit-card__actions">
+            <a href="https://maps.app.goo.gl/Qh3wZuQuik4U7niE6" target="_blank" rel="noopener" class="visit-card__btn visit-card__btn--primary">Get Directions</a>
+            <a href="/about#visit-us" class="visit-card__btn visit-card__btn--secondary">Hours & Details</a>
+          </div>
+        </div>
+      </div>
+    </BaseContainer>
+  </section>
+</Layout>
+
+<style>
+  /* Hero */
+  .community-hero {
+    padding: var(--space-16) 0 var(--space-12);
+    background: var(--color-bg-primary);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .community-hero__content {
+    max-width: 640px;
+  }
+
+  .community-hero__title {
+    font-family: var(--font-sans);
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: var(--font-semibold);
+    letter-spacing: var(--tracking-tight);
+    margin-bottom: var(--space-4);
+    color: var(--color-text-primary);
+  }
+
+  .community-hero__subtitle {
+    font-family: var(--font-sans);
+    font-size: var(--text-lg);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  /* Channel Grid */
+  .community-channels {
+    padding: var(--space-12) 0;
+  }
+
+  .channel-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5);
+  }
+
+  /* Channel Card */
+  .channel-card {
+    display: flex;
+    gap: var(--space-5);
+    padding: var(--space-6);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .channel-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--color-accent-primary);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform var(--transition-base);
+  }
+
+  .channel-card:hover {
+    border-color: var(--color-accent-primary);
+    box-shadow: 0 4px 16px var(--color-shadow-medium);
+    transform: translateY(-2px);
+  }
+
+  .channel-card:hover::before {
+    transform: scaleY(1);
+  }
+
+  .channel-card--featured {
+    grid-column: span 1;
+  }
+
+  .channel-card__icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-accent-primary);
+    background: var(--color-bg-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-2);
+    transition: all var(--transition-base);
+  }
+
+  .channel-card:hover .channel-card__icon {
+    background: var(--color-accent-primary);
+    color: var(--paper-white);
+  }
+
+  .channel-card__icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .channel-card__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .channel-card__title {
+    font-family: var(--font-sans);
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    margin: 0 0 var(--space-1);
+    color: var(--color-text-primary);
+    display: inline;
+  }
+
+  .channel-card__badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: var(--font-semibold);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--color-accent-primary);
+    background: rgba(211, 95, 53, 0.1);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    margin-left: var(--space-2);
+    vertical-align: middle;
+  }
+
+  :global([data-theme="dark"]) .channel-card__badge {
+    background: rgba(230, 122, 83, 0.15);
+  }
+
+  .channel-card__description {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-tertiary);
+    margin: var(--space-2) 0 var(--space-3);
+  }
+
+  .channel-card__cta {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    color: var(--color-accent-primary);
+    letter-spacing: var(--tracking-wide);
+    transition: letter-spacing var(--transition-base);
+  }
+
+  .channel-card:hover .channel-card__cta {
+    letter-spacing: var(--tracking-wider);
+  }
+
+  /* Resources Section */
+  .community-resources {
+    padding: var(--space-12) 0;
+    background: var(--color-bg-secondary);
+    border-top: 1px solid var(--color-border-light);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .section-title {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
+    color: var(--color-accent-secondary);
+    margin-bottom: var(--space-6);
+  }
+
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+  }
+
+  .resource-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: inherit;
+    transition: all var(--transition-base);
+  }
+
+  .resource-card:hover {
+    border-color: var(--color-accent-secondary);
+    box-shadow: 0 2px 8px var(--color-shadow);
+  }
+
+  .resource-card__icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: var(--color-accent-secondary);
+    margin-top: 2px;
+  }
+
+  .resource-card__title {
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    margin: 0 0 var(--space-1);
+    color: var(--color-text-primary);
+  }
+
+  .resource-card__description {
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-tertiary);
+    margin: 0;
+  }
+
+  /* Visit Section */
+  .community-visit {
+    padding: var(--space-12) 0;
+  }
+
+  .visit-card {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-10);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .visit-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-accent-primary), var(--color-accent-secondary));
+  }
+
+  .visit-card__content {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .visit-card__title {
+    font-family: var(--font-sans);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+    letter-spacing: var(--tracking-tight);
+    margin: 0 0 var(--space-3);
+    color: var(--color-text-primary);
+  }
+
+  .visit-card__text {
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-5);
+  }
+
+  .visit-card__address {
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--color-text-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+  }
+
+  .visit-card__address svg {
+    width: 16px;
+    height: 16px;
+    color: var(--color-accent-primary);
+  }
+
+  .visit-card__actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+  }
+
+  .visit-card__btn {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    letter-spacing: var(--tracking-wide);
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: all var(--transition-base);
+  }
+
+  .visit-card__btn--primary {
+    background: var(--color-accent-primary);
+    color: var(--paper-white);
+  }
+
+  .visit-card__btn--primary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .visit-card__btn--secondary {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border-light);
+  }
+
+  .visit-card__btn--secondary:hover {
+    border-color: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .resource-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .community-hero {
+      padding: var(--space-12) 0 var(--space-8);
+    }
+
+    .channel-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .channel-card--featured {
+      grid-column: span 1;
+    }
+
+    .resource-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .visit-card {
+      padding: var(--space-8);
+    }
+
+    .visit-card__actions {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .community-hero__subtitle {
+      font-size: var(--text-base);
+    }
+
+    .channel-card {
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .visit-card {
+      padding: var(--space-6);
+    }
+  }
+</style>
