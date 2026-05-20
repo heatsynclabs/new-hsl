@@ -1,86 +1,167 @@
-/* Design Tokens - HeatSync Labs Design System */
+/* ============================================================
+   HEATSYNC LABS DESIGN SYSTEM - Design Tokens
+   Paper. Ink. Orange. Block shadows. Real fonts. No slop.
+   Tokens map the canonical design system onto the semantic
+   variables the whole site already consumes, so the system
+   cascades everywhere.
+   ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Charis+SIL:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+/* Design system fonts. Charis SIL stays as the LOGO BRAND FONT only. */
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Special+Elite&family=VT323&family=Courier+Prime:wght@400;700&family=Charis+SIL:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 :root {
-  /* Color Palette - Muted, sophisticated palette inspired by paper and ink */
-  --ink-black: #1a1918;
-  --graphite: #3e3d3c;
-  --warm-gray: #6b6866;
-  --paper-white: #f9f7f5;
-  --cream: #fefcfa;
-  --accent-rust: #d35f35;
-  --accent-sage: #7a8b7f;
-  --highlight: #e8c47a;
-  --off-white: #fcfcfc;
-  --success-green: #10b981;
-  --error-red: #ef4444;
+  /* ---- Raw palette (design system canon) ---- */
 
-  /* Shadows for material depth */
-  --shadow-light: rgba(26, 25, 24, 0.08);
-  --shadow-medium: rgba(26, 25, 24, 0.12);
-  --shadow-heavy: rgba(26, 25, 24, 0.16);
+  /* PAPER family - warm cream backgrounds */
+  --paper:        #f5f0e6;
+  --paper-c:      #faf8f2;
+  --paper-d:      #e8e0d0;
 
-  /* Dark palette colors */
-  --charcoal-deep: #1e1d1c;
-  --charcoal-light: #2a2928;
-  --charcoal-lighter: #353433;
-  --warm-cream: #e8e6e3;
-  --muted-cream: #c9c7c4;
-  --warm-gray-dark: #9e9c99;
-  --border-dark: #4a4745;
+  /* INK family - near-black for type, borders, panels */
+  --ink:          #1a1a1a;
+  --ink-panel:    #111111;
+  --ink-soft:     #2c2c29;
 
-  /* Semantic color tokens (light theme defaults) */
-  --color-bg-primary: var(--paper-white);
-  --color-bg-secondary: var(--cream);
-  --color-bg-tertiary: var(--paper-white);
-  --color-text-primary: var(--ink-black);
-  --color-text-secondary: var(--graphite);
-  --color-text-tertiary: var(--warm-gray);
-  --color-border: var(--warm-gray);
-  --color-border-light: rgba(107, 104, 102, 0.3);
-  --color-shadow: var(--shadow-light);
-  --color-shadow-medium: var(--shadow-medium);
-  --color-accent-primary: var(--accent-rust);
-  --color-accent-secondary: var(--accent-sage);
-  --color-highlight: var(--highlight);
+  /* HSL ORANGE - the one signature accent */
+  --orange:       #e07820;
+  --orange-d:     #b85e12;
+  --orange-dim:   rgba(224, 120, 32, 0.15);
+  --orange-dim2:  rgba(224, 120, 32, 0.08);
 
-  /* Typography Scale */
-  --font-mono: 'IBM Plex Mono', 'SF Mono', 'Consolas', monospace;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-serif: 'Charis SIL', Georgia, serif;
+  /* Cool / secondary accents - used sparingly for callouts only */
+  --teal:         #0e7490;
+  --blue:         #1d6fa8;
+  --red:          #c0392b;
+  --newbie-green: #15573e;
+
+  /* Archetype palette (handbook interior) */
+  --builder:      #a85208;
+  --talker:       #6d28d9;
+  --lurker:       #1e3a5f;
+  --founder:      #92400e;
+  --newbie:       #15573e;
+  --drama:        #9d174d;
+
+  /* Open-hours day rainbow - the handbook archetype palette (all WCAG-AA on paper).
+     Six archetypes spread across the week + HSL orange for the seventh day. */
+  --day-sun: #a85208; /* builder */
+  --day-mon: #6d28d9; /* talker  */
+  --day-tue: #15573e; /* newbie  */
+  --day-wed: #1e3a5f; /* lurker  */
+  --day-thu: #9d174d; /* drama   */
+  --day-fri: #92400e; /* founder */
+  --day-sat: #b85e12; /* orange  */
+
+  /* Calendar event chips - kept in the original pre-redesign palette by request */
+  --event-timed:  #d35f35; /* legacy rust */
+  --event-allday: #7a8b7f; /* legacy sage */
+
+  /* Legacy aliases kept so older references still resolve */
+  --ink-black:    var(--ink);
+  --graphite:     var(--ink-soft);
+  --warm-gray:    #6b6256;
+  --paper-white:  var(--paper);
+  --cream:        var(--paper-c);
+  --accent-rust:  var(--orange);
+  --accent-sage:  var(--orange-d);
+  --highlight:    var(--orange);
+  --off-white:    var(--paper-c);
+  --success-green: var(--newbie-green);
+  --error-red:    var(--red);
+
+  /* ---- Material depth: HARD offset block shadows (no blur) ---- */
+  --shadow-block:        5px 5px 0 var(--ink);
+  --shadow-block-sm:     3px 3px 0 var(--ink);
+  --shadow-block-lg:     8px 8px 0 var(--ink);
+  --shadow-block-orange: 5px 5px 0 var(--orange);
+  --shadow-block-orange-sm: 3px 3px 0 var(--orange);
+  --shadow-block-orange-lg: 8px 8px 0 var(--orange);
+
+  /* Thick borders */
+  --border-thick:  3px solid var(--ink);
+  --border-orange: 3px solid var(--orange);
+
+  /* Legacy soft-shadow rgba (still referenced in a few spots; kept low) */
+  --shadow-light:  rgba(26, 25, 24, 0.10);
+  --shadow-medium: rgba(26, 25, 24, 0.16);
+  --shadow-heavy:  rgba(26, 25, 24, 0.22);
+
+  /* Dark-palette raw values */
+  --charcoal-deep:    var(--ink-panel);
+  --charcoal-light:   var(--ink);
+  --charcoal-lighter: var(--ink-soft);
+  --warm-cream:       var(--paper);
+  --muted-cream:      var(--paper-d);
+  --warm-gray-dark:   #b0a890;
+  --border-dark:      #4a4745;
+
+  /* ============================================================
+     SEMANTIC TOKENS - light (paper) theme defaults
+     ============================================================ */
+  --color-bg-primary:    var(--paper);
+  --color-bg-secondary:  var(--paper-c);
+  --color-bg-tertiary:   var(--paper-d);
+  --color-bg-panel:      var(--ink-panel);  /* ink panels: hero, footer, posters */
+  --color-text-primary:   var(--ink);
+  --color-text-secondary: var(--ink-soft);
+  --color-text-tertiary:  var(--warm-gray);
+  --color-text-on-panel:  var(--paper);
+  --color-border:         var(--ink);
+  --color-border-light:   rgba(26, 26, 26, 0.25);
+  --color-shadow:         rgba(26, 25, 24, 0.10);
+  --color-shadow-medium:  rgba(26, 25, 24, 0.16);
+  --color-accent-primary:   var(--orange);
+  --color-accent-secondary: var(--orange-d);
+  --color-highlight:        var(--orange-dim);
+
+  /* Block-shadow semantic helpers (auto-flip in dark) */
+  --color-shadow-block:        var(--shadow-block);
+  --color-shadow-block-orange: var(--shadow-block-orange);
+  --color-border-thick:        var(--border-thick);
+
+  /* ---- Typography ---- */
+  --font-display: 'Permanent Marker', cursive;   /* big headlines only */
+  --font-body:    'Special Elite', Georgia, serif; /* body copy */
+  --font-ui:      'VT323', monospace;             /* eyebrows, labels, nav, stats */
+  --font-mono:    'Courier Prime', 'SF Mono', monospace; /* fine print, code */
+  --font-logo:    'Charis SIL', Georgia, serif;   /* LOGO WORDMARK ONLY - brand font */
+
+  /* Back-compat aliases: body text -> Special Elite, serif -> logo brand font */
+  --font-sans:    var(--font-body);
+  --font-serif:   var(--font-logo);
 
   /* Font Sizes */
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-base: 16px;
-  --text-lg: 18px;
-  --text-xl: 20px;
-  --text-2xl: 24px;
-  --text-3xl: 28px;
-  --text-4xl: 32px;
-  --text-5xl: 40px;
-  --text-6xl: 48px;
-  --text-7xl: 56px;
+  --text-xs: 13px;
+  --text-sm: 15px;
+  --text-base: 17px;
+  --text-lg: 19px;
+  --text-xl: 22px;
+  --text-2xl: 26px;
+  --text-3xl: 32px;
+  --text-4xl: 40px;
+  --text-5xl: 48px;
+  --text-6xl: 60px;
+  --text-7xl: 72px;
 
   /* Font Weights */
-  --font-light: 300;
+  --font-light: 400;
   --font-normal: 400;
-  --font-medium: 500;
-  --font-semibold: 600;
+  --font-medium: 400;
+  --font-semibold: 700;
   --font-bold: 700;
 
   /* Letter Spacing */
-  --tracking-tight: -1px;
+  --tracking-tight: 0;
   --tracking-normal: 0;
-  --tracking-wide: 0.5px;
-  --tracking-wider: 1px;
+  --tracking-wide: 1px;
+  --tracking-wider: 2px;
+  --tracking-ui: 3px;
 
   /* Line Heights */
-  --leading-tight: 1.2;
+  --leading-tight: 1.05;
   --leading-normal: 1.5;
-  --leading-relaxed: 1.6;
-  --leading-loose: 1.8;
+  --leading-relaxed: 1.55;
+  --leading-loose: 1.7;
 
   /* Spacing Scale */
   --space-1: 4px;
@@ -97,14 +178,14 @@
   --space-24: 96px;
   --space-32: 128px;
 
-  /* Border Radius */
+  /* Border Radius - design system is SHARP. Keep everything square. */
   --radius-none: 0;
-  --radius-sm: 2px;
-  --radius-base: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-full: 9999px;
+  --radius-sm: 0;
+  --radius-base: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-full: 9999px; /* reserved for genuinely circular UI only */
 
   /* Container Sizes */
   --container-sm: 640px;
@@ -122,28 +203,64 @@
 
   /* Transitions */
   --transition-fast: 0.15s ease;
-  --transition-base: 0.3s ease;
-  --transition-slow: 0.5s ease;
+  --transition-base: 0.25s ease;
+  --transition-slow: 0.4s ease;
 
   /* Component Specific */
-  --header-height: 72px;
+  --header-height: 76px;
   --card-padding: var(--space-8);
   --button-height: 48px;
 }
 
-/* Dark mode overrides */
+/* ============================================================
+   DARK (ink panel) THEME
+   Background flips to ink, text to paper, orange stays orange,
+   and block shadows flip to orange so they stay visible.
+   ============================================================ */
 [data-theme="dark"] {
-  --color-bg-primary: var(--charcoal-deep);
-  --color-bg-secondary: var(--charcoal-light);
-  --color-bg-tertiary: var(--charcoal-lighter);
-  --color-text-primary: var(--warm-cream);
-  --color-text-secondary: var(--muted-cream);
-  --color-text-tertiary: var(--warm-gray-dark);
-  --color-border: var(--border-dark);
-  --color-border-light: rgba(74, 71, 69, 0.5);
-  --color-shadow: rgba(0, 0, 0, 0.3);
-  --color-shadow-medium: rgba(0, 0, 0, 0.4);
-  --color-accent-primary: #e67a53;
-  --color-accent-secondary: #8fa695;
-  --color-highlight: #c9a75f;
+  --color-bg-primary:    var(--ink-panel);
+  --color-bg-secondary:  var(--ink);
+  --color-bg-tertiary:   var(--ink-soft);
+  --color-bg-panel:      #000000;
+  --color-text-primary:   var(--paper);
+  --color-text-secondary: var(--paper-d);
+  --color-text-tertiary:  var(--warm-gray-dark);
+  --color-text-on-panel:  var(--paper);
+  --color-border:         var(--paper-d);
+  --color-border-light:   rgba(232, 224, 208, 0.18);
+  --color-shadow:         rgba(0, 0, 0, 0.5);
+  --color-shadow-medium:  rgba(0, 0, 0, 0.6);
+  --color-accent-primary:   var(--orange);
+  --color-accent-secondary: #f0913c;
+  --color-highlight:        var(--orange-dim);
+
+  /* In dark, default block shadow goes orange so it reads on ink */
+  --color-shadow-block:        5px 5px 0 var(--orange);
+  --color-shadow-block-orange: 5px 5px 0 var(--orange);
+  --color-border-thick:        3px solid var(--paper-d);
+
+  /* Day rainbow - brightened archetypes so each reads against ink (color-blind safe: always paired with the day name) */
+  --day-sun: #d98b3a; /* builder */
+  --day-mon: #a78bfa; /* talker  */
+  --day-tue: #3fa37e; /* newbie  */
+  --day-wed: #6aa9e0; /* lurker  */
+  --day-thu: #e8769f; /* drama   */
+  --day-fri: #cf8a4a; /* founder */
+  --day-sat: #f0913c; /* orange  */
+  --event-timed:  #d35f35;
+  --event-allday: #7a8b7f;
+}
+
+/* Rainbow heart cycle - shared keyframes (used by the "Everyone is welcome" heart) */
+@keyframes hsl-rainbow-heart {
+  0%   { color: #c0392b; }
+  16%  { color: #b85e12; }
+  33%  { color: #15573e; }
+  50%  { color: #0e7490; }
+  66%  { color: #1d6fa8; }
+  83%  { color: #6d28d9; }
+  100% { color: #9d174d; }
+}
+@media (prefers-reduced-motion: reduce) {
+  @keyframes hsl-rainbow-heart { 0%, 100% { color: var(--orange-d); } }
 }

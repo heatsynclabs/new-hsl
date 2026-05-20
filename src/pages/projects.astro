@@ -32,18 +32,20 @@ const htmlContent = await marked.parse(markdown);
   }
 
   .content-title {
-    font-size: var(--text-4xl);
-    font-weight: var(--font-light);
+    font-size: clamp(34px, 6vw, 56px);
+    font-weight: 400;
     margin-bottom: var(--space-4);
     color: var(--color-text-primary);
-    font-family: var(--font-sans);
+    font-family: var(--font-display);
     text-align: center;
+    line-height: 1;
+    text-shadow: none;
   }
 
   .content-description {
     font-size: var(--text-lg);
     color: var(--color-text-tertiary);
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     text-align: center;
     max-width: 600px;
     margin: 0 auto;
@@ -60,32 +62,37 @@ const htmlContent = await marked.parse(markdown);
   }
 
   .content-body :global(h2) {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-medium);
-    margin-top: var(--space-8);
+    font-size: var(--text-3xl);
+    font-weight: 400;
+    margin-top: var(--space-10);
     margin-bottom: var(--space-4);
     color: var(--color-text-primary);
-    font-family: var(--font-sans);
-    border-bottom: 2px solid var(--color-accent-primary);
+    font-family: var(--font-display);
+    border-bottom: 3px solid var(--color-accent-primary);
     padding-bottom: var(--space-2);
+    line-height: 1;
   }
 
   .content-body :global(h3) {
     font-size: var(--text-xl);
-    font-weight: var(--font-medium);
+    font-weight: 400;
     margin-top: var(--space-6);
     margin-bottom: var(--space-3);
-    color: var(--color-accent-primary);
-    font-family: var(--font-mono);
+    color: var(--color-accent-secondary);
+    font-family: var(--font-ui);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
   }
 
   .content-body :global(h4) {
     font-size: var(--text-lg);
-    font-weight: var(--font-medium);
+    font-weight: 400;
     margin-top: var(--space-4);
     margin-bottom: var(--space-2);
-    color: var(--color-accent-primary);
-    font-family: var(--font-mono);
+    color: var(--color-accent-secondary);
+    font-family: var(--font-ui);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
   }
 
   .content-body :global(p) {
@@ -93,7 +100,7 @@ const htmlContent = await marked.parse(markdown);
     line-height: var(--leading-relaxed);
     margin-bottom: var(--space-4);
     color: var(--color-text-secondary);
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
   }
 
   .content-body :global(ul),
@@ -111,15 +118,16 @@ const htmlContent = await marked.parse(markdown);
   }
 
   .content-body :global(a) {
-    color: var(--color-accent-primary);
-    text-decoration: none;
-    font-weight: var(--font-medium);
-    transition: color var(--transition-base);
-  }
-
-  .content-body :global(a:hover) {
     color: var(--color-accent-secondary);
     text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: var(--font-bold);
+    transition: color var(--transition-base);
+  }
+  :global([data-theme="dark"]) .content-body :global(a) { color: var(--orange); }
+
+  .content-body :global(a:hover) {
+    color: var(--color-text-primary);
   }
 
   .content-body :global(strong) {

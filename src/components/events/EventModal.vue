@@ -115,14 +115,13 @@ const formatEventTime = (event: CalendarEvent): string => {
 }
 
 .modal-content {
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-lg);
+  background: var(--color-bg-secondary);
+  border: var(--color-border-thick);
   max-width: 600px;
   width: 100%;
   max-height: 80vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .modal-close {
@@ -154,11 +153,13 @@ const formatEventTime = (event: CalendarEvent): string => {
 
 .event-title {
   font-size: var(--text-2xl);
-  font-weight: var(--font-medium);
+  font-weight: 400;
+  font-family: var(--font-ui);
+  letter-spacing: 0.5px;
   color: var(--color-text-primary);
   margin-bottom: var(--space-4);
   padding-right: var(--space-8);
-  line-height: var(--leading-tight);
+  line-height: 1.1;
 }
 
 .event-registration {
@@ -166,43 +167,40 @@ const formatEventTime = (event: CalendarEvent): string => {
   align-items: center;
   gap: var(--space-2);
   font-size: var(--text-sm);
-  color: var(--accent-sage);
-  font-family: var(--font-sans);
-  font-weight: var(--font-medium);
+  color: var(--color-accent-secondary);
+  font-family: var(--font-ui);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 400;
   margin-bottom: var(--space-4);
   padding: var(--space-2) var(--space-3);
-  background: rgba(104, 127, 93, 0.1);
-  border-radius: var(--radius-sm);
+  background: var(--orange-dim);
+  border: 2px solid var(--color-accent-primary);
   width: fit-content;
 }
 
 .event-registration--link {
-  color: var(--color-accent-primary);
-  background: rgba(168, 90, 60, 0.1);
+  color: var(--color-accent-secondary);
   text-decoration: none;
   cursor: pointer;
   transition: background var(--transition-base), color var(--transition-base);
 }
 
 .event-registration--link:hover {
-  background: rgba(168, 90, 60, 0.2);
-  color: var(--color-text-primary);
+  background: var(--color-accent-primary);
+  color: var(--ink);
 }
 
 .event-registration--link:hover .registration-icon {
-  color: var(--color-text-primary);
+  color: var(--ink);
 }
 
 .registration-icon {
   width: 18px;
   height: 18px;
-  color: var(--accent-sage);
+  color: var(--color-accent-secondary);
   flex-shrink: 0;
   transition: color var(--transition-base);
-}
-
-.event-registration--link .registration-icon {
-  color: var(--color-accent-primary);
 }
 
 .event-meta {
@@ -231,14 +229,17 @@ const formatEventTime = (event: CalendarEvent): string => {
 }
 
 .event-description {
-  border-top: 1px solid var(--color-text-tertiary);
+  border-top: 2px solid var(--color-border-light);
   padding-top: var(--space-6);
 }
 
 .event-description h3 {
   font-size: var(--text-lg);
-  font-weight: var(--font-medium);
-  color: var(--color-text-primary);
+  font-weight: 400;
+  font-family: var(--font-ui);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-accent-secondary);
   margin-bottom: var(--space-3);
 }
 

@@ -52,7 +52,7 @@ const paymentMethods = [
     description: 'Classic online payment option. Widely accessible but comes with processing fees.',
     pros: ['Widely accessible', 'Pay with PayPal balance', 'Buyer protection'],
     cons: ['Fee: 1.99% + $0.49', 'Please cover the fee (checkbox option)'],
-    tips: ['If you can, choose to cover the fee — it helps us receive your full donation!'],
+    tips: ['If you can, choose to cover the fee. It helps us receive your full donation!'],
     link: 'https://www.paypal.com/donate/?cmd=_donations&business=finances@heatsynclabs.org&lc=US&item_name=Thank+you+for+supporting+Heatsync+Labs&no_note=0&cn=&curency_code=USD&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted',
     linkText: 'Pay with PayPal'
   },
@@ -145,16 +145,18 @@ const paymentMethods = [
   }
 
   .payment-section__title {
-    font-family: var(--font-serif);
-    font-size: var(--text-5xl);
-    font-weight: var(--font-bold);
+    font-family: var(--font-display);
+    font-size: clamp(34px, 6vw, 56px);
+    font-weight: 400;
     color: var(--color-text-primary);
     margin: 0 0 var(--space-4);
-    letter-spacing: var(--tracking-tight);
+    letter-spacing: 0;
+    line-height: 1;
+    text-shadow: none;
   }
 
   .payment-section__intro {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: var(--text-base);
     color: var(--color-text-secondary);
     max-width: 600px;
@@ -170,20 +172,22 @@ const paymentMethods = [
   }
 
   .print-btn {
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
-    color: var(--color-bg-secondary);
-    background: var(--color-text-primary);
-    border: none;
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    font-weight: 400;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--ink);
+    border: 2px solid var(--ink);
     padding: var(--space-2) var(--space-4);
-    border-radius: var(--radius-base);
     cursor: pointer;
     transition: all var(--transition-fast);
   }
 
   .print-btn:hover {
     background: var(--color-accent-primary);
+    color: var(--ink);
   }
 
   .payment-grid {

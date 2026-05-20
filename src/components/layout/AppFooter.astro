@@ -58,10 +58,11 @@ const currentYear = new Date().getFullYear();
 
 <style>
   .footer {
-    background: var(--ink-black);
-    color: var(--paper-white);
+    background: var(--ink-panel);
+    color: var(--paper);
     padding: var(--space-12) 0 var(--space-6);
     margin-top: auto;
+    border-top: 6px solid var(--orange);
   }
 
   .footer__content {
@@ -78,19 +79,19 @@ const currentYear = new Date().getFullYear();
   }
 
   .footer__title {
-    font-size: var(--text-sm);
-    font-weight: var(--font-semibold);
-    letter-spacing: var(--tracking-wider);
+    font-size: var(--text-xl);
+    font-weight: 400;
+    letter-spacing: var(--tracking-ui);
     text-transform: uppercase;
-    color: var(--accent-sage);
-    font-family: var(--font-mono);
+    color: var(--orange);
+    font-family: var(--font-ui);
   }
 
   .footer__text {
     font-size: var(--text-sm);
     font-family: var(--font-mono);
     line-height: var(--leading-relaxed);
-    color: var(--paper-white);
+    color: var(--paper);
     opacity: 0.9;
   }
 
@@ -101,20 +102,21 @@ const currentYear = new Date().getFullYear();
   }
 
   .footer__link {
-    color: var(--paper-white);
+    color: var(--paper);
     text-decoration: none;
     font-size: var(--text-sm);
     font-family: var(--font-mono);
     opacity: 0.8;
-    transition: opacity var(--transition-base);
+    transition: opacity var(--transition-base), color var(--transition-base);
   }
 
   .footer__link:hover {
     opacity: 1;
+    color: var(--orange);
   }
 
   .footer__bottom {
-    border-top: 1px solid var(--graphite);
+    border-top: 1px solid rgba(245, 240, 230, 0.2);
     padding-top: var(--space-6);
     text-align: center;
   }

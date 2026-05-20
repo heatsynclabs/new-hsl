@@ -50,33 +50,33 @@ import BaseButton from '../components/base/BaseButton.astro';
   }
 
   .register-title {
-    font-size: var(--text-4xl);
-    font-weight: var(--font-light);
+    font-size: clamp(34px, 6vw, 56px);
+    font-weight: 400;
     margin-bottom: var(--space-4);
-    color: var(--ink-black);
-    font-family: var(--font-sans);
+    color: var(--color-text-primary);
+    font-family: var(--font-display);
+    line-height: 1;
+    text-shadow: none;
   }
 
   .register-subtitle {
     font-size: var(--text-lg);
-    color: var(--warm-gray);
-    font-family: var(--font-sans);
+    color: var(--color-text-tertiary);
+    font-family: var(--font-body);
     max-width: 600px;
     margin: 0 auto;
     line-height: var(--leading-relaxed);
   }
 
   .airtable-embed {
-    background: var(--paper-white);
-    border-radius: var(--radius-base);
+    background: var(--color-bg-secondary);
+    border: var(--color-border-thick);
     overflow: hidden;
-    box-shadow: 0 4px 6px var(--shadow-light);
     margin-bottom: var(--space-8);
   }
 
   .airtable-embed__iframe {
     display: block;
-    border-radius: var(--radius-base);
     min-height: 700px;
   }
 
@@ -90,7 +90,7 @@ import BaseButton from '../components/base/BaseButton.astro';
     }
 
     .register-title {
-      font-size: var(--text-3xl);
+      font-size: var(--text-5xl);
     }
 
     .register-subtitle {

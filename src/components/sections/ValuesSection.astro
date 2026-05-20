@@ -1,0 +1,128 @@
+---
+import BaseContainer from '../base/BaseContainer.astro';
+
+const values = [
+  {
+    title: 'Be excellent to each other.',
+    body: "That's it. That's the whole thing. Everything else follows from here.",
+  },
+  {
+    title: 'Do-ocracy.',
+    body: 'If you want something done, do it. Do not wait for permission or committees. When you are unsure or something is irreversible, seek consensus first.',
+  },
+  {
+    title: 'Leave it better.',
+    body: 'The space. The tools. The community. Better than you found it, every time.',
+  },
+  {
+    title: 'Teach and learn.',
+    body: 'Teach what you know. Ask about what you do not.',
+  },
+  {
+    title: "We're a Community, Not a Service",
+    body: 'Membership is a donation to a community, not a subscription to a service.',
+  },
+];
+---
+
+<section class="values">
+  <BaseContainer>
+    <h2 class="values__title display-title">Our Values</h2>
+    <div class="values__rule"></div>
+
+    <ul class="values__list">
+      {values.map((v) => (
+        <li class="value-row">
+          <h3 class="value-row__title">{v.title}</h3>
+          <p class="value-row__body">{v.body}</p>
+        </li>
+      ))}
+    </ul>
+  </BaseContainer>
+</section>
+
+<style>
+  .values {
+    padding: var(--space-12) 0;
+  }
+
+  .section-eyebrow {
+    font-family: var(--font-ui);
+    color: var(--color-accent-secondary);
+    font-size: var(--text-xl);
+    letter-spacing: var(--tracking-ui);
+    margin-bottom: var(--space-1);
+  }
+
+  .values__title {
+    font-size: var(--text-5xl);
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-4);
+  }
+
+  .values__rule {
+    height: 4px;
+    background: var(--orange);
+    margin-bottom: var(--space-8);
+  }
+
+  .values__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  /* Each value is a colored band - flat, left-border accent + faint tint.
+     Color is decorative; the title text carries the meaning (color-blind safe). */
+  .value-row {
+    --vc: var(--orange-d);
+    border-left: 6px solid var(--vc);
+    background: color-mix(in srgb, var(--vc) 9%, var(--color-bg-primary));
+    padding: var(--space-4) var(--space-6);
+    transition: transform var(--transition-base);
+  }
+  .value-row:hover { transform: translateX(4px); }
+
+  .value-row:nth-child(1) { --vc: var(--builder); }
+  .value-row:nth-child(2) { --vc: var(--talker); }
+  .value-row:nth-child(3) { --vc: var(--newbie); }
+  .value-row:nth-child(4) { --vc: var(--red); }
+  .value-row:nth-child(5) { --vc: var(--blue); }
+
+  /* Dark mode: brighten each value's own accent so it reads on ink */
+  :global([data-theme="dark"]) .value-row:nth-child(1) { --vc: #d98b3a; } /* builder */
+  :global([data-theme="dark"]) .value-row:nth-child(2) { --vc: #a78bfa; } /* talker */
+  :global([data-theme="dark"]) .value-row:nth-child(3) { --vc: #3fa37e; } /* newbie */
+  :global([data-theme="dark"]) .value-row:nth-child(4) { --vc: #f0736a; } /* red */
+  :global([data-theme="dark"]) .value-row:nth-child(5) { --vc: #6aa9e0; } /* blue */
+  :global([data-theme="dark"]) .value-row {
+    background: color-mix(in srgb, var(--vc) 14%, var(--color-bg-primary));
+  }
+
+  .value-row__title {
+    font-family: var(--font-mono);
+    font-weight: var(--font-bold);
+    font-size: var(--text-lg);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--vc);
+    margin: 0 0 var(--space-1);
+  }
+
+  .value-row__body {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .values { padding: var(--space-10) 0; }
+    .values__title { font-size: var(--text-4xl); }
+    .value-row { padding: var(--space-3) var(--space-4); }
+  }
+</style>

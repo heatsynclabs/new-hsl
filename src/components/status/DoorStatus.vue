@@ -46,33 +46,32 @@ onUnmounted(() => {
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
-  font-family: var(--font-mono);
-  font-weight: var(--font-medium);
+  border: 2px solid var(--ink);
+  font-size: var(--text-lg);
+  font-family: var(--font-ui);
+  font-weight: 400;
   letter-spacing: var(--tracking-wide);
   transition: all var(--transition-base);
 }
 
 .door-status--loading {
-  background: var(--warm-gray);
-  color: var(--graphite);
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
 }
 
 .door-status--open {
-  background: var(--accent-sage);
-  color: var(--paper-white);
+  background: var(--newbie-green);
+  color: var(--paper);
 }
 
 .door-status--closed {
-  background: var(--graphite);
-  color: var(--paper-white);
+  background: var(--ink);
+  color: var(--paper);
 }
 
 .door-status__indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  width: 9px;
+  height: 9px;
   background: currentColor;
 }
 

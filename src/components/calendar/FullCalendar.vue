@@ -511,8 +511,7 @@ onMounted(() => {
 .view-toggle {
   display: flex;
   gap: 0;
-  border: 1px solid var(--color-text-tertiary);
-  border-radius: var(--radius-base);
+  border: 2px solid var(--color-text-primary);
   overflow: hidden;
 }
 
@@ -521,8 +520,10 @@ onMounted(() => {
   background: var(--color-bg-secondary);
   border: none;
   color: var(--color-text-secondary);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
   cursor: pointer;
   transition: all var(--transition-base);
 }
@@ -533,20 +534,22 @@ onMounted(() => {
 }
 
 .month-year {
-  font-size: var(--text-3xl);
-  font-weight: var(--font-normal);
+  font-size: var(--text-4xl);
+  font-weight: 400;
+  font-family: var(--font-display);
   color: var(--color-text-primary);
   text-align: center;
+  line-height: 0.95;
+  text-shadow: none;
 }
 
 .nav-button {
   padding: var(--space-2) var(--space-4);
   background: var(--color-bg-secondary);
-  border: 1px solid var(--color-text-tertiary);
-  border-radius: var(--radius-base);
+  border: 2px solid var(--color-text-primary);
   color: var(--color-text-secondary);
-  font-family: var(--font-mono);
-  font-size: var(--text-base);
+  font-family: var(--font-ui);
+  font-size: var(--text-lg);
   cursor: pointer;
   transition: all var(--transition-base);
   flex-shrink: 0;
@@ -586,10 +589,11 @@ onMounted(() => {
   color: var(--color-bg-primary);
   padding: var(--space-3);
   text-align: center;
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: 400;
+  font-family: var(--font-ui);
   letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
 }
 
 .calendar-day {
@@ -603,19 +607,40 @@ onMounted(() => {
   overflow: hidden;
 }
 
+/* Days from the prev/next month: not greyed out. Instead a single magenta
+   outline wraps each contiguous run (the leading strip and the trailing strip),
+   with no lines between adjacent out-of-month days. */
 .calendar-day.other-month {
-  background: var(--color-bg-secondary);
-  opacity: 0.5;
+  background: var(--color-bg-primary);
+  opacity: 1;
+  border-top: 2px solid #9d174d;
+  border-bottom: 2px solid #9d174d;
+}
+/* left cap of the leading run (first day cell, right after the weekday headers) */
+.day-header + .calendar-day.other-month {
+  border-left: 2px solid #9d174d;
+}
+/* left cap of the trailing run (first out-of-month day after an in-month day) */
+.calendar-day:not(.other-month) + .calendar-day.other-month {
+  border-left: 2px solid #9d174d;
+}
+/* right cap of the leading run (drawn on the first in-month day after the run) */
+.calendar-day.other-month + .calendar-day:not(.other-month) {
+  border-left: 2px solid #9d174d;
+}
+/* right cap of the trailing run (last cell in the grid) */
+.calendar-day.other-month:last-child {
+  border-right: 2px solid #9d174d;
 }
 
 .calendar-day.today {
-  background: rgba(168, 90, 60, 0.1);
+  background: var(--orange-dim);
 }
 
 .calendar-day.today .day-number {
-  background: var(--color-accent-primary);
-  color: var(--color-bg-primary);
-  border-radius: 50%;
+  background: var(--orange);
+  color: var(--ink);
+  border-radius: 0;
   width: 24px;
   height: 24px;
   display: flex;
@@ -638,23 +663,24 @@ onMounted(() => {
 }
 
 .event-dot {
-  background: var(--color-accent-primary);
-  color: var(--color-bg-primary);
-  padding: var(--space-1);
-  border-radius: var(--radius-sm);
+  background: var(--event-timed);
+  color: #fff;
+  padding: 2px var(--space-1);
+  border-radius: 0;
   font-size: var(--text-xs);
   line-height: 1.2;
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: transform var(--transition-fast);
 }
 
 .event-dot:hover {
-  background: var(--accent-sage);
-  transform: scale(1.02);
+  transform: translateX(2px);
 }
 
+/* all-day events read in a distinct hue (color-blind safe: time text differs too) */
 .event-dot.all-day {
-  background: var(--accent-sage);
+  background: var(--event-allday);
+  color: #fff;
 }
 
 .event-title {
@@ -662,12 +688,15 @@ onMounted(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* readable sans for the tiny month-grid chips (VT323 is too small here on mobile) */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 400;
 }
 
 .event-time-inline {
   display: block;
-  font-size: 9px;
-  opacity: 0.85;
+  font-size: 11px;
+  opacity: 0.9;
   font-family: var(--font-mono);
 }
 
@@ -703,16 +732,16 @@ onMounted(() => {
   display: flex;
   gap: var(--space-4);
   background: var(--color-bg-secondary);
-  border-left: 3px solid var(--color-accent-primary);
-  border-radius: var(--radius-base);
+  border: var(--color-border-thick);
+  border-left: 6px solid var(--color-accent-primary);
   padding: var(--space-4);
   cursor: pointer;
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  transition: transform var(--transition-base), border-color var(--transition-base);
 }
 
 .day-view-event:hover {
-  transform: translateX(2px);
-  box-shadow: 2px 2px 8px var(--shadow-light);
+  transform: translateX(3px);
+  border-color: var(--color-accent-primary);
 }
 
 .day-view-event-time {
@@ -731,8 +760,11 @@ onMounted(() => {
 
 .day-view-event-title {
   color: var(--color-text-primary);
-  font-size: var(--text-lg);
-  font-weight: var(--font-medium);
+  font-size: var(--text-xl);
+  font-weight: 400;
+  font-family: var(--font-ui);
+  letter-spacing: 0.5px;
+  line-height: 1.05;
   margin-bottom: var(--space-2);
 }
 
@@ -740,14 +772,16 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  font-size: var(--text-xs);
-  color: var(--accent-sage);
-  font-family: var(--font-sans);
-  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  color: var(--color-accent-secondary);
+  font-family: var(--font-ui);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 400;
   margin-bottom: var(--space-2);
   padding: var(--space-1) var(--space-2);
-  background: rgba(104, 127, 93, 0.1);
-  border-radius: var(--radius-sm);
+  background: var(--orange-dim);
+  border: 1px solid var(--color-accent-primary);
   width: fit-content;
 }
 
@@ -797,11 +831,14 @@ onMounted(() => {
 }
 
 .events-title {
-  font-size: var(--text-2xl);
-  font-weight: var(--font-medium);
+  font-size: var(--text-4xl);
+  font-weight: 400;
+  font-family: var(--font-display);
   margin-bottom: var(--space-6);
   color: var(--color-text-primary);
   text-align: center;
+  line-height: 0.95;
+  text-shadow: none;
 }
 
 .events-grid {
@@ -827,45 +864,34 @@ onMounted(() => {
 }
 
 .recurring-events-carousel::-webkit-scrollbar-track {
-  background: var(--color-text-tertiary);
-  border-radius: var(--radius-full);
+  background: var(--color-bg-tertiary);
+  border-radius: 0;
 }
 
 .recurring-events-carousel::-webkit-scrollbar-thumb {
-  background: var(--accent-sage);
-  border-radius: var(--radius-full);
+  background: var(--orange);
+  border-radius: 0;
+  border: 2px solid var(--color-bg-primary);
 }
 
 .recurring-events-carousel::-webkit-scrollbar-thumb:hover {
-  background: var(--color-accent-primary);
+  background: var(--orange-d);
 }
 
 .recurring-event-item {
   background: var(--color-bg-secondary);
-  border-radius: var(--radius-base);
+  border: var(--color-border-thick);
   padding: var(--space-4);
   cursor: pointer;
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
-  box-shadow: 2px 2px 8px var(--shadow-light);
+  transition: transform var(--transition-base), border-color var(--transition-base);
   position: relative;
   flex: 0 0 320px;
   min-height: 120px;
 }
 
-.recurring-event-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: var(--accent-sage);
-  border-radius: var(--radius-base) var(--radius-base) 0 0;
-}
-
 .recurring-event-item:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 10px var(--shadow-medium);
+  transform: translateY(-2px);
+  border-color: var(--color-accent-primary);
 }
 
 .recurring-event-content {
@@ -875,10 +901,12 @@ onMounted(() => {
 }
 
 .recurring-event-title {
-  font-size: var(--text-lg);
-  font-weight: var(--font-medium);
+  font-size: var(--text-xl);
+  font-weight: 400;
   color: var(--color-text-primary);
-  font-family: var(--font-sans);
+  font-family: var(--font-ui);
+  letter-spacing: 0.5px;
+  line-height: 1.05;
   margin: 0;
 }
 

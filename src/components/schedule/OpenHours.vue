@@ -80,14 +80,29 @@ const weeklySchedule = computed(() => {
     })
 
     if (dayEvents.length > 0) {
-      // Use the first event found for this day
-      const event = dayEvents[0]!
-      const startTime = format(event.start, 'h:mm a')
-      const endTime = format(event.end, 'h:mm a')
+      // Show ALL open-hours windows for this day (e.g. a morning and an evening block)
+      const ranges = [...dayEvents]
+        .sort((a, b) => a.start.getTime() - b.start.getTime())
+        .map(ev => ev.isAllDay
+          ? 'All Day'
+          : `${format(ev.start, 'h:mm a')} - ${format(ev.end, 'h:mm a')}`)
+
+      // Wednesday always advertises the public 10am–3pm open block as well
+      if (dayOfWeek === 3 && !ranges.some(r => r.startsWith('10:00 AM'))) {
+        ranges.unshift('10:00 AM - 3:00 PM')
+      }
 
       schedule.push({
         name: dayName!,
-        hours: event.isAllDay ? 'All Day' : `${startTime} - ${endTime}`,
+        hours: [...new Set(ranges)].join('\n'),
+        isOpen: true,
+        dayOfWeek: dayOfWeek
+      })
+    } else if (dayOfWeek === 3) {
+      // No calendar events yet, but Wednesday still has the standing 10am–3pm block
+      schedule.push({
+        name: dayName!,
+        hours: '10:00 AM - 3:00 PM',
         isOpen: true,
         dayOfWeek: dayOfWeek
       })
@@ -147,17 +162,19 @@ onMounted(() => {
 }
 
 .schedule__title {
-  font-size: var(--text-3xl);
-  font-weight: var(--font-normal);
-  font-family: var(--font-mono);
-  color: var(--ink-black);
+  font-size: var(--text-4xl);
+  font-weight: 400;
+  font-family: var(--font-display);
+  color: var(--color-text-primary);
   margin: 0;
+  line-height: 0.95;
+  text-shadow: none;
 }
 
 .schedule__description {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   font-size: var(--text-base);
-  color: var(--graphite);
+  color: var(--color-text-secondary);
   line-height: var(--leading-relaxed);
   margin: var(--space-4) 0 0 0;
   text-align: left;
@@ -166,54 +183,68 @@ onMounted(() => {
 .schedule__loading {
   text-align: center;
   padding: var(--space-8);
-  color: var(--warm-gray);
-  font-family: var(--font-sans);
+  color: var(--color-text-tertiary);
+  font-family: var(--font-body);
+}
+
+/* The Open Hours card itself has no outer "white rectangle" border or shadow;
+   its padding stays, and the 7-day grid border is the single container. */
+:global(.card.schedule) {
+  border: none;
+  box-shadow: none;
 }
 
 .schedule__grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
-  background: var(--warm-gray);
-  padding: 1px;
-  border-radius: var(--radius-base);
+  gap: 2px;
+  background: var(--color-text-primary);
+  padding: 2px;
+  border: var(--color-border-thick);
   overflow: hidden;
 }
 
 .schedule__day {
-  background: var(--paper-white);
-  padding: var(--space-4);
+  background: var(--color-bg-secondary);
+  padding: var(--space-4) var(--space-3);
   text-align: center;
-  min-height: 100px;
+  min-height: 110px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: var(--space-2);
+  border-top: 5px solid var(--day-color, var(--orange));
 }
 
-.schedule__day--open {
-  background: rgba(122, 139, 127, 0.1);
-}
+/* Day-of-week rainbow - color is decorative; the day name + hours carry the meaning */
+.schedule__day:nth-child(1) { --day-color: var(--day-sun); }
+.schedule__day:nth-child(2) { --day-color: var(--day-mon); }
+.schedule__day:nth-child(3) { --day-color: var(--day-tue); }
+.schedule__day:nth-child(4) { --day-color: var(--day-wed); }
+.schedule__day:nth-child(5) { --day-color: var(--day-thu); }
+.schedule__day:nth-child(6) { --day-color: var(--day-fri); }
+.schedule__day:nth-child(7) { --day-color: var(--day-sat); }
 
 .schedule__day-name {
-  font-weight: var(--font-semibold);
-  font-size: var(--text-xs);
-  letter-spacing: var(--tracking-wider);
+  font-weight: 400;
+  font-size: var(--text-lg);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
-  color: var(--graphite);
-  font-family: var(--font-mono);
+  color: var(--day-color, var(--color-text-secondary));
+  font-family: var(--font-ui);
 }
 
 .schedule__day-hours {
   font-size: var(--text-sm);
-  color: var(--ink-black);
-  font-family: var(--font-sans);
-  font-weight: var(--font-medium);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-weight: var(--font-normal);
+  white-space: pre-line;
 }
 
 .schedule__day--open .schedule__day-hours {
-  color: var(--paper-white);
-  font-weight: var(--font-semibold);
+  color: var(--color-text-primary);
+  font-weight: var(--font-bold);
 }
 
 /* Responsive */
@@ -236,8 +267,14 @@ onMounted(() => {
     text-align: center;
   }
 
+  /* Mobile: render the days as a clean padded list (card padding stays;
+     just the grid box/gaps go), with the colored day bars as separators. */
   .schedule__grid {
     grid-template-columns: 1fr;
+    border: none;
+    background: transparent;
+    gap: 0;
+    padding: 0;
   }
 
   .schedule__day {
@@ -246,10 +283,15 @@ onMounted(() => {
     justify-content: space-between;
     align-items: center;
     text-align: left;
+    border-top: 4px solid var(--day-color, var(--orange));
+  }
+
+  .schedule__day:last-child {
+    border-bottom: 4px solid var(--day-color, var(--orange));
   }
 
   .schedule__day-name {
-    font-size: var(--text-sm);
+    font-size: var(--text-base);
   }
 }
 </style>

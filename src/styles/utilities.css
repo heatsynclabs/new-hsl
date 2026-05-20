@@ -33,6 +33,10 @@
 
 .font-mono { font-family: var(--font-mono); }
 .font-sans { font-family: var(--font-sans); }
+.font-body { font-family: var(--font-body); }
+.font-ui { font-family: var(--font-ui); }
+.font-display { font-family: var(--font-display); }
+.font-logo { font-family: var(--font-logo); }
 
 .text-xs { font-size: var(--text-xs); }
 .text-sm { font-size: var(--text-sm); }
@@ -147,19 +151,25 @@
 .transition-fast { transition: all var(--transition-fast); }
 .transition-slow { transition: all var(--transition-slow); }
 
-/* Shadow utilities */
-.shadow-light { box-shadow: 4px 4px 16px var(--color-shadow); }
-.shadow-medium { box-shadow: 4px 4px 16px var(--color-shadow-medium); }
-.shadow-heavy { box-shadow: 6px 6px 20px var(--color-shadow-medium); }
+/* Shadow utilities - hard offset block shadows (design system) */
+.shadow-light { box-shadow: var(--shadow-block-sm); }
+.shadow-medium { box-shadow: var(--color-shadow-block); }
+.shadow-heavy { box-shadow: var(--shadow-block-lg); }
+.shadow-block { box-shadow: var(--color-shadow-block); }
+.shadow-block-orange { box-shadow: var(--color-shadow-block-orange); }
 
-/* Hover utilities */
+/* Border utilities */
+.border-thick { border: var(--color-border-thick); }
+.border-orange { border: var(--border-orange); }
+
+/* Hover utilities - press toward the block shadow */
 .hover-lift {
   transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
 .hover-lift:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 20px var(--color-shadow-medium);
+  box-shadow: var(--shadow-block-lg);
 }
 
 /* Screen reader only */

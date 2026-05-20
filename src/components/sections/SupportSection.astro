@@ -8,7 +8,8 @@ import StyledDonateButton from '../base/StyledDonateButton.vue';
   <BaseContainer>
     <div class="support-banner__content">
       <div class="support-banner__text">
-        <h2 class="support-banner__title">Help Us Keep the Doors Open <svg class="heart-icon" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></h2>
+        <div class="support-banner__eyebrow">// 501(C)(3) NONPROFIT // EST. 2009</div>
+        <h2 class="support-banner__title">Help Us Keep the Doors Open <svg class="heart-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></h2>
         <p class="support-banner__desc">
           HeatSync Labs is 100% volunteer-run and funded by people like you. Your donation keeps the tools running and the space accessible to everyone.
         </p>
@@ -24,22 +25,25 @@ import StyledDonateButton from '../base/StyledDonateButton.vue';
   .support-banner {
     position: relative;
     overflow: hidden;
-    padding: var(--space-12) 0;
+    padding: var(--space-16) 0;
+    border-top: 6px solid var(--orange);
+    border-bottom: 6px solid var(--orange);
   }
 
   .support-banner__bg {
     position: absolute;
     inset: 0;
-    background: var(--accent-sage);
+    background: var(--ink-panel);
     z-index: 0;
   }
 
+  /* diagonal hatch, design-system cover treatment */
   .support-banner__bg::before {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    opacity: 0.04;
+    background-image:
+      repeating-linear-gradient(45deg, transparent 0 18px, rgba(224,120,32,0.05) 18px 19px);
     pointer-events: none;
   }
 
@@ -49,34 +53,44 @@ import StyledDonateButton from '../base/StyledDonateButton.vue';
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-8);
+    gap: var(--space-10);
   }
 
   .support-banner__text {
-    max-width: 600px;
+    max-width: 620px;
+  }
+
+  .support-banner__eyebrow {
+    font-family: var(--font-ui);
+    font-size: var(--text-xl);
+    letter-spacing: var(--tracking-ui);
+    color: var(--orange);
+    margin-bottom: var(--space-3);
   }
 
   .support-banner__title .heart-icon {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     display: inline-block;
     vertical-align: middle;
+    color: var(--orange);
   }
 
   .support-banner__title {
-    font-size: var(--text-3xl);
-    font-weight: var(--font-semibold);
-    color: white;
-    margin-bottom: var(--space-3);
-    font-family: var(--font-sans);
-    line-height: 1.2;
+    font-size: var(--text-5xl);
+    font-weight: 400;
+    color: var(--paper);
+    margin-bottom: var(--space-4);
+    font-family: var(--font-display);
+    line-height: 1;
+    text-shadow: none;
   }
 
   .support-banner__desc {
-    font-size: var(--text-base);
+    font-size: var(--text-lg);
     line-height: var(--leading-relaxed);
-    color: rgba(255, 255, 255, 0.85);
-    font-family: var(--font-sans);
+    color: var(--paper-d);
+    font-family: var(--font-body);
     margin: 0;
   }
 
@@ -86,21 +100,21 @@ import StyledDonateButton from '../base/StyledDonateButton.vue';
 
   @media (max-width: 768px) {
     .support-banner {
-      padding: var(--space-10) 0;
+      padding: var(--space-12) 0;
     }
 
     .support-banner__content {
       flex-direction: column;
       text-align: center;
-      gap: var(--space-6);
+      gap: var(--space-8);
     }
 
     .support-banner__title {
-      font-size: var(--text-2xl);
+      font-size: var(--text-4xl);
     }
 
     .support-banner__desc {
-      font-size: var(--text-sm);
+      font-size: var(--text-base);
     }
   }
 </style>
