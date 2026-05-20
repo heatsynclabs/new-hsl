@@ -55,6 +55,33 @@ const htmlContent = await marked.parse(markdown);
   .content-body {
     max-width: 800px;
     margin: 0 auto;
+    overflow-wrap: break-word;
+  }
+
+  /* README tables can be wider than a phone; let them scroll inside their own
+     box instead of overflowing the page (which throws off the sticky header). */
+  .content-body :global(table) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin: var(--space-4) 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .content-body :global(th),
+  .content-body :global(td) {
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-border);
+  }
+
+  .content-body :global(th) {
+    background: var(--color-bg-secondary);
+    font-family: var(--font-ui);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-weight: 400;
   }
 
   .content-body :global(h1) {
