@@ -1,6 +1,5 @@
 ---
 import BaseContainer from '../base/BaseContainer.astro';
-import BaseCard from '../base/BaseCard.astro';
 
 const infoItems = [
   {
@@ -20,13 +19,14 @@ const infoItems = [
 
 <section class="info-section">
   <BaseContainer>
-    <h2 class="section-header">About Us</h2>
-    <div class="info-grid">
-      {infoItems.map((item) => (
-        <BaseCard hoverable class="info-card">
-          <h3 class="info-card__title">{item.title}</h3>
-          <p class="info-card__description">{item.description}</p>
-        </BaseCard>
+    <h2 class="section-header display-title">About Us</h2>
+    <div class="rules-row">
+      {infoItems.map((item, i) => (
+        <div class:list={['rule-card', { 'rule-card--dark': i === 1 }]}>
+          <span class="rule-card__num">{String(i + 1).padStart(2, '0')}</span>
+          <h3 class="rule-card__title">{item.title}</h3>
+          <p class="rule-card__desc">{item.description}</p>
+        </div>
       ))}
     </div>
   </BaseContainer>
@@ -34,47 +34,97 @@ const infoItems = [
 
 <style>
   .info-section {
-    padding: var(--space-2) 0 var(--space-12) 0;
+    padding: var(--space-12) 0;
+  }
+
+  .section-eyebrow {
+    font-family: var(--font-ui);
+    color: var(--color-accent-secondary);
+    font-size: var(--text-xl);
+    letter-spacing: var(--tracking-ui);
+    text-align: center;
+    margin-bottom: var(--space-1);
   }
 
   .section-header {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-normal);
-    margin-bottom: var(--space-4);
+    font-size: var(--text-5xl);
+    margin-bottom: var(--space-12);
     text-align: center;
-    color: var(--ink-black);
-  }
-
-  .info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: var(--space-8);
-  }
-
-  .info-card__title {
-    font-size: var(--text-xl);
-    font-weight: var(--font-medium);
-    margin-bottom: var(--space-3);
-    font-family: var(--font-mono);
     color: var(--color-text-primary);
   }
 
-  .info-card__description {
-    color: var(--color-text-tertiary);
-    font-family: var(--font-sans);
-    font-size: var(--text-sm);
-    line-height: var(--leading-loose);
+  /* Design-system rule cards (3-up). Flat & bordered; the numbered tag and the
+     odd-one-out dark card carry the identity - no resting shadow. */
+  .rules-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+    margin-top: var(--space-5);
   }
 
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .info-section {
-      padding: var(--space-12) 0;
-    }
+  .rule-card {
+    position: relative;
+    border: var(--color-border-thick);
+    background: var(--color-bg-secondary);
+    padding: var(--space-8) var(--space-6) var(--space-6);
+    transition: transform var(--transition-base), border-color var(--transition-base);
+  }
 
-    .info-grid {
-      gap: var(--space-6);
-    }
+  .rule-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-accent-primary);
+  }
+
+  /* the middle card flips tone - ink on paper (and paper on ink in dark mode) */
+  .rule-card--dark {
+    background: var(--ink-panel);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  :global([data-theme="dark"]) .rule-card--dark {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--paper);
+  }
+
+  .rule-card__num {
+    position: absolute;
+    top: -17px;
+    left: 16px;
+    background: var(--orange);
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    padding: 2px 10px;
+    font-family: var(--font-ui);
+    font-size: var(--text-lg);
+    letter-spacing: 1px;
+    line-height: 1.2;
+  }
+
+  .rule-card__title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: 400;
+    color: var(--color-accent-secondary);
+    margin: var(--space-3) 0 var(--space-2);
+    line-height: 1;
+    text-shadow: none;
+  }
+  .rule-card--dark .rule-card__title { color: var(--orange); }
+  :global([data-theme="dark"]) .rule-card--dark .rule-card__title { color: var(--orange-d); }
+
+  .rule-card__desc {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+    color: var(--color-text-secondary);
+  }
+  .rule-card--dark .rule-card__desc { color: var(--paper-d); }
+  :global([data-theme="dark"]) .rule-card--dark .rule-card__desc { color: var(--ink-soft); }
+
+  @media (max-width: 768px) {
+    .info-section { padding: var(--space-10) 0; }
+    .section-header { font-size: var(--text-4xl); }
+    .rules-row { grid-template-columns: 1fr; gap: var(--space-10); }
   }
 </style>
-

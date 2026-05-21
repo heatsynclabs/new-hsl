@@ -77,11 +77,13 @@ import BaseContainer from '../base/BaseContainer.astro';
   }
 
   .welcome-title {
-    font-size: var(--text-3xl);
-    font-weight: var(--font-light);
+    font-size: var(--text-5xl);
+    font-weight: 400;
     color: var(--color-text-primary);
     margin-bottom: var(--space-4);
-    font-family: var(--font-sans);
+    font-family: var(--font-display);
+    line-height: 0.95;
+    text-shadow: none;
   }
 
   .welcome-intro {
@@ -133,12 +135,13 @@ import BaseContainer from '../base/BaseContainer.astro';
     display: inline-block;
     color: var(--color-accent-primary);
     text-decoration: none;
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    font-weight: var(--font-medium);
-    letter-spacing: var(--tracking-wide);
+    font-family: var(--font-ui);
+    font-size: var(--text-lg);
+    font-weight: 400;
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
     transition: color var(--transition-base);
-    border-bottom: 1px solid transparent;
+    border-bottom: 2px solid transparent;
     padding-bottom: 2px;
   }
 

@@ -1,7 +1,7 @@
 ---
 import BaseContainer from '../base/BaseContainer.astro';
 import BaseButton from '../base/BaseButton.astro';
-import PhotoCollage from '../graphics/HeroPhotoCollage.vue';
+import PhotoCarousel from '../graphics/PhotoCarousel.vue';
 import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
 ---
 
@@ -11,7 +11,8 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
       <div class="hero__content">
         <!-- Prominent Hero Logo -->
         <a href="/" class="hero__logo" id="hero-logo">
-          <img src="/hsl-logo.png" alt="HeatSync Labs" class="hero__logo-mark" />
+          <img src="/hsl-logo.png" alt="HeatSync Labs" class="hero__logo-mark hero__logo-mark--light" />
+          <img src="/hsl-logo-dark.png" alt="" aria-hidden="true" class="hero__logo-mark hero__logo-mark--dark" />
           <span class="hero__logo-text">HeatSync Labs</span>
         </a>
 
@@ -24,12 +25,6 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
             Mesa, AZ
           </a>
         </div>
-
-        <h1 class="hero__headline">
-          <strong>Make</strong> things.<br>
-          Break things.<br>
-          Learn things.
-        </h1>
 
         <p class="hero__subtitle">
           Arizona's original hackerspace, built on open source principles.
@@ -45,10 +40,10 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
         </p>
 
         <div class="hero__actions">
-          <BaseButton variant="primary" size="lg" href="/community">
+          <BaseButton variant="primary" size="md" href="/community">
             Join the Community
           </BaseButton>
-          <BaseButton variant="secondary" size="lg" href="/about#visit-us">
+          <BaseButton variant="secondary" size="md" href="/about#visit-us">
             Visit Us
           </BaseButton>
         </div>
@@ -73,18 +68,9 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
         </div>
       </div>
 
-      <!-- Collage wrapper for desktop -->
-      <div class="collage-wrapper">
-        <div class="collage-backdrop">
-          <div class="corner tl"></div>
-          <div class="corner br"></div>
-        </div>
-
-        <div class="year-badge">Est. 2009</div>
-
-        <div class="photo-collage-container">
-          <PhotoCollage client:load />
-        </div>
+      <!-- Photo carousel (design-system framed) -->
+      <div class="carousel-wrapper">
+        <PhotoCarousel client:load />
       </div>
     </div>
   </BaseContainer>
@@ -164,24 +150,25 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     transform-origin: top left;
   }
 
-  .hero__logo:hover {
-    color: var(--color-accent-primary);
-  }
-
-  .hero__logo:hover .hero__logo-mark {
-    transform: rotate(72deg);
+  .hero__logo:hover .hero__logo-text {
+    color: var(--color-accent-secondary);
   }
 
   .hero__logo-mark {
     width: 60px;
     height: 60px;
     object-fit: contain;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* Dark-mode logo variant */
+  .hero__logo-mark--dark { display: none; }
+  :global([data-theme="dark"]) .hero__logo-mark--light { display: none; }
+  :global([data-theme="dark"]) .hero__logo-mark--dark { display: block; }
+
   .hero__logo-text {
-    font-family: var(--font-serif);
-    font-size: clamp(30px, 4vw, 38px);
+    /* Brand wordmark keeps the existing logo font - NOT a design-system font */
+    font-family: var(--font-logo);
+    font-size: clamp(24px, 3.2vw, 30px);
     font-weight: var(--font-semibold);
     letter-spacing: var(--tracking-tight);
     white-space: nowrap;
@@ -219,11 +206,11 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: var(--text-xs);
+    font-size: var(--text-sm);
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
     color: var(--color-text-tertiary);
-    font-family: var(--font-mono);
+    font-family: var(--font-ui);
     text-decoration: none;
     transition: color 0.2s ease;
   }
@@ -270,60 +257,27 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
   }
 
   .hero {
-    padding: var(--space-8) 0;
+    padding: var(--space-12) 0 var(--space-16);
     position: relative;
     overflow: hidden;
     display: flex;
     align-items: center;
     background: var(--color-bg-primary);
+    border-bottom: 6px solid var(--orange);
     transition: background-color var(--transition-base);
   }
 
-  .hero::before {
+  /* Diagonal hatch across the whole hero — dark mode only, matching the bottom
+     (support) section. It sits behind everything; the opaque carousel frame
+     covers it within the carousel's bounds. */
+  :global([data-theme="dark"]) .hero::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.4;
+    inset: 0;
     z-index: 0;
-    background-image:
-      repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 35px,
-        rgba(255,255,255,.1) 35px,
-        rgba(255,255,255,.1) 70px
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 35px,
-        rgba(0,0,0,.02) 35px,
-        rgba(0,0,0,.02) 70px
-      );
-    background-size: 100px 100px;
     pointer-events: none;
-  }
-
-  :global([data-theme="dark"]) .hero::before {
     background-image:
-      repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 35px,
-        rgba(255,255,255,.02) 35px,
-        rgba(255,255,255,.02) 70px
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 35px,
-        rgba(255,255,255,.03) 35px,
-        rgba(255,255,255,.03) 70px
-      );
-    opacity: 0.3;
+      repeating-linear-gradient(45deg, transparent 0 18px, rgba(224, 120, 32, 0.05) 18px 19px);
   }
 
   .hero .container {
@@ -345,74 +299,71 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
   }
 
   .hero__headline {
-    font-size: clamp(28px, 4vw, 44px);
-    font-weight: var(--font-light);
-    line-height: 1.05;
-    margin-bottom: var(--space-4);
-    letter-spacing: var(--tracking-tight);
-    font-family: var(--font-sans);
+    font-size: clamp(26px, 3.6vw, 42px);
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: var(--space-5);
+    letter-spacing: 0;
+    /* Permanent Marker display title - NO orange dropshadow */
+    font-family: var(--font-display);
+    text-shadow: none;
   }
 
   .hero__headline strong {
-    font-weight: var(--font-semibold);
-    color: var(--color-accent-primary);
+    font-weight: 400;
+    color: var(--color-accent-secondary);
     position: relative;
     display: inline-block;
   }
-
-  .hero__headline strong::after {
-    content: '';
-    position: absolute;
-    bottom: 4px;
-    left: -4px;
-    right: -4px;
-    height: 12px;
-    background: var(--color-highlight);
-    opacity: 0.5;
-    z-index: -1;
-    transform: rotate(-1deg);
+  :global([data-theme="dark"]) .hero__headline strong {
+    color: var(--orange);
   }
 
   .hero__subtitle {
     font-size: var(--text-base);
     color: var(--color-text-secondary);
     font-weight: var(--font-normal);
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-3);
     line-height: 1.4;
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
   }
 
   .hero__body {
     font-size: var(--text-sm);
-    line-height: 1.6;
+    line-height: var(--leading-relaxed);
     color: var(--color-text-tertiary);
-    margin-bottom: var(--space-2);
-    font-family: var(--font-sans);
-    max-width: 480px;
+    margin-bottom: var(--space-3);
+    font-family: var(--font-body);
+    max-width: 460px;
   }
 
   .hero__welcome {
     font-size: var(--text-base);
-    font-weight: var(--font-medium);
-    color: var(--color-accent-primary);
-    margin-bottom: var(--space-5);
-    font-family: var(--font-sans);
+    font-weight: var(--font-normal);
+    color: var(--color-accent-secondary);
+    margin-bottom: var(--space-6);
+    font-family: var(--font-body);
   }
+  :global([data-theme="dark"]) .hero__welcome { color: var(--orange); }
 
   .heart-icon {
     width: 18px;
     height: 18px;
     display: inline-block;
     vertical-align: middle;
-    margin-left: 2px;
+    margin-left: 4px;
+    /* cycles through the day rainbow */
+    animation: hsl-rainbow-heart 4.2s linear infinite;
   }
 
   .hero__link {
-    color: var(--color-accent-primary);
-    text-decoration: none;
-    font-weight: var(--font-semibold);
+    color: var(--color-accent-secondary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: var(--font-bold);
     transition: opacity 0.2s ease;
   }
+  :global([data-theme="dark"]) .hero__link { color: var(--orange); }
 
   .hero__link:hover {
     opacity: 0.75;
@@ -441,10 +392,10 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
   }
 
   .stat-value {
-    font-family: var(--font-mono);
-    font-size: 18px;
-    font-weight: var(--font-semibold);
-    color: var(--color-accent-primary);
+    font-family: var(--font-ui);
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--color-accent-secondary);
     line-height: 1;
   }
 
@@ -452,101 +403,17 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     font-size: 10px;
     color: var(--color-text-tertiary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-family: var(--font-sans);
+    letter-spacing: 1px;
+    font-family: var(--font-body);
   }
 
-  /* Collage Wrapper */
-  .collage-wrapper {
+  /* Carousel wrapper */
+  .carousel-wrapper {
     position: relative;
-    height: 100%;
-    min-height: 550px;
-  }
-
-  .collage-backdrop {
-    position: absolute;
-    top: 0;
-    right: -60px;
-    bottom: 0;
-    left: -20px;
-    background: var(--accent-rust);
-    transform: rotate(2deg) skewY(-1deg);
-    border-radius: 2px 0 0 2px;
-    overflow: hidden;
-  }
-
-  .collage-backdrop::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    opacity: 0.05;
-    pointer-events: none;
-  }
-
-  .collage-backdrop::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -5px;
-    bottom: 0;
-    width: 20px;
-    background: var(--accent-rust);
-    clip-path: polygon(
-      100% 0%, 100% 100%,
-      60% 98%, 80% 95%, 50% 92%, 70% 88%, 40% 85%, 65% 82%, 55% 78%, 75% 74%, 45% 70%,
-      70% 66%, 50% 62%, 80% 58%, 40% 54%, 60% 50%, 45% 46%, 75% 42%, 55% 38%, 70% 34%,
-      40% 30%, 65% 26%, 50% 22%, 80% 18%, 45% 14%, 70% 10%, 55% 6%, 60% 2%, 50% 0%
-    );
-  }
-
-  .corner {
-    position: absolute;
-    width: 28px;
-    height: 28px;
-    border: 1px solid rgba(255,255,255,0.25);
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .corner.tl {
-    top: 20px;
-    left: 30px;
-    border-right: none;
-    border-bottom: none;
-  }
-
-  .corner.br {
-    bottom: 20px;
-    right: 20px;
-    border-left: none;
-    border-top: none;
-  }
-
-  .photo-collage-container {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    bottom: 30px;
-    left: 50px;
-    z-index: 3;
-  }
-
-  .year-badge {
-    position: absolute;
-    top: 25px;
-    right: 40px;
-    background: var(--color-bg-secondary);
-    color: var(--color-text-primary);
-    padding: 6px 12px;
-    font-size: 11px;
-    font-weight: var(--font-semibold);
-    letter-spacing: 0.5px;
-    transform: rotate(3deg);
-    z-index: 20;
-    box-shadow: 2px 2px 8px var(--color-shadow);
-    font-family: var(--font-mono);
-    transition: background-color var(--transition-base), color var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3) var(--space-6) var(--space-8) var(--space-3);
   }
 
   /* Responsive */
@@ -554,22 +421,18 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     .hero__wrapper {
       grid-template-columns: 1fr 1fr;
     }
-
-    .collage-backdrop {
-      left: -10px;
-    }
   }
 
   @media (max-width: 900px) {
     .hero {
-      padding: var(--space-6) 0 var(--space-4);
+      padding: var(--space-8) 0 var(--space-12);
       min-height: auto;
     }
 
     .hero__wrapper {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto;
-      gap: var(--space-6);
+      gap: var(--space-10);
     }
 
     .hero__content {
@@ -580,6 +443,8 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
 
     .hero__body {
       max-width: 100%;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .hero__actions {
@@ -590,52 +455,19 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
       justify-content: center;
     }
 
-    .collage-wrapper {
+    .carousel-wrapper {
       order: 1;
-      width: calc(100% + 3rem);
-      margin-left: -1.5rem;
-      margin-right: -1.5rem;
-      height: 380px;
-      min-height: 380px;
+      padding: var(--space-4) var(--space-5) var(--space-10);
     }
-
-    .collage-backdrop {
-      top: -20px;
-      right: -30px;
-      bottom: -20px;
-      left: -30px;
-      transform: rotate(1deg) skewY(-0.5deg);
-      border-radius: 0;
-    }
-
-    .photo-collage-container {
-      top: 20px;
-      right: 20px;
-      bottom: 0;
-      left: 20px;
-    }
-
-    .year-badge {
-      top: 15px;
-      right: 25px;
-      padding: 4px 8px;
-      font-size: 10px;
-    }
-
-    .corner { display: none; }
   }
 
   @media (max-width: 600px) {
     .hero {
-      padding: var(--space-4) 0;
+      padding: var(--space-6) 0 var(--space-10);
     }
 
     .hero__wrapper {
-      gap: var(--space-5);
-    }
-
-    .hero__headline {
-      font-size: 28px;
+      gap: var(--space-8);
     }
 
     .hero__subtitle {
@@ -643,7 +475,7 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     }
 
     .hero__body {
-      font-size: var(--text-sm);
+      font-size: var(--text-base);
     }
 
     .hero__welcome {
@@ -652,46 +484,22 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     }
 
     .hero__actions {
-      margin-bottom: var(--space-8);
-    }
-
-    .collage-wrapper {
-      width: calc(100% + 2rem);
-      margin-left: -1rem;
-      margin-right: -1rem;
-      height: 320px;
-      min-height: 320px;
-    }
-
-    .collage-backdrop {
-      transform: rotate(0.5deg);
-    }
-
-    .photo-collage-container {
-      top: 15px;
-      right: 15px;
-      bottom: 0;
-      left: 15px;
+      margin-bottom: var(--space-6);
     }
 
     .stats-row {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: var(--space-4);
-      row-gap: var(--space-5);
+      row-gap: var(--space-6);
     }
 
     .stat-value {
-      font-size: 16px;
+      font-size: 28px;
     }
 
     .stat-label {
-      font-size: 9px;
-    }
-
-    .year-badge {
-      top: 10px;
-      right: 15px;
+      font-size: 10px;
     }
   }
 </style>

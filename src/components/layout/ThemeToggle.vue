@@ -50,7 +50,6 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 const currentTheme = ref<'light' | 'dark'>('light')
-let mediaQuery: MediaQueryList | null = null
 
 const ariaLabel = computed(() => {
   return currentTheme.value === 'dark'
@@ -69,30 +68,17 @@ const toggleTheme = () => {
   localStorage.setItem('theme-preference', newTheme)
 }
 
-const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-  // Only apply system preference if user hasn't set a preference
-  if (!localStorage.getItem('theme-preference')) {
-    applyTheme(e.matches ? 'dark' : 'light')
-  }
-}
-
 onMounted(() => {
-  // Initialize theme from current document state (set by inline script)
+  // Initialize theme from current document state (set by the inline script).
+  // We intentionally do NOT follow the OS preference: default is light, and
+  // only the user's explicit toggle changes the theme.
   const currentDocTheme = document.documentElement.getAttribute('data-theme')
   if (currentDocTheme === 'dark' || currentDocTheme === 'light') {
     currentTheme.value = currentDocTheme
   }
-
-  // Listen for system preference changes
-  mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-  mediaQuery.addEventListener('change', handleSystemThemeChange)
 })
 
-onUnmounted(() => {
-  if (mediaQuery) {
-    mediaQuery.removeEventListener('change', handleSystemThemeChange)
-  }
-})
+onUnmounted(() => {})
 </script>
 
 <style scoped>

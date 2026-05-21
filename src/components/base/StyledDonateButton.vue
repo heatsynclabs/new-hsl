@@ -20,29 +20,28 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  background: var(--color-bg-primary);
-  color: var(--color-accent-primary);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  padding: var(--space-3) var(--space-8);
-  border-radius: var(--radius-full);
-  font-size: var(--text-lg);
-  font-weight: var(--font-semibold);
-  font-family: var(--font-mono);
-  letter-spacing: var(--tracking-wide);
+  background: var(--orange);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  padding: var(--space-4) var(--space-10);
+  font-size: var(--text-2xl);
+  font-weight: 400;
+  font-family: var(--font-ui);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .donate-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-  background: var(--color-bg-secondary);
+  transform: translate(-3px, -3px);
+  box-shadow: 8px 8px 0 var(--paper);
 }
 
 .donate-btn:active {
-  transform: translateY(0);
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--paper);
 }
 
 .donate-btn__icon {

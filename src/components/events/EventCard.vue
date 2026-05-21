@@ -71,9 +71,8 @@ const truncateDescription = (description: string): string => {
 .event-card {
   padding: var(--space-4);
   background: var(--color-bg-secondary);
-  border-radius: var(--radius-base);
-  box-shadow: 2px 2px 8px var(--shadow-light);
-  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  border: var(--color-border-thick);
+  transition: transform var(--transition-base), border-color var(--transition-base);
   position: relative;
   cursor: pointer;
   display: flex;
@@ -81,20 +80,10 @@ const truncateDescription = (description: string): string => {
   min-height: 140px;
 }
 
-.event-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent-rust), var(--accent-sage));
-  border-radius: var(--radius-base) var(--radius-base) 0 0;
-}
-
+/* repeated UI - quiet hover, no shadow bloom */
 .event-card:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 10px var(--shadow-medium);
+  transform: translateY(-2px);
+  border-color: var(--color-accent-primary);
 }
 
 .event-content {
@@ -104,11 +93,13 @@ const truncateDescription = (description: string): string => {
 }
 
 .event-date-line {
-  font-size: var(--text-sm);
-  color: var(--accent-rust);
+  font-size: var(--text-base);
+  color: var(--color-accent-secondary);
   margin-bottom: var(--space-2);
-  font-family: var(--font-mono);
-  font-weight: var(--font-medium);
+  font-family: var(--font-ui);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  font-weight: 400;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -117,43 +108,46 @@ const truncateDescription = (description: string): string => {
 .calendar-icon {
   width: 16px;
   height: 16px;
-  color: var(--accent-rust);
+  color: var(--color-accent-primary);
 }
 
 .event-title {
-  font-size: var(--text-base);
-  font-weight: var(--font-medium);
+  font-size: var(--text-xl);
+  font-weight: 400;
   color: var(--color-text-primary);
-  font-family: var(--font-sans);
-  line-height: var(--leading-tight);
+  font-family: var(--font-ui);
+  letter-spacing: 0.5px;
+  line-height: 1.05;
 }
 
 .event-time {
-  font-size: var(--text-xs);
-  color: var(--accent-rust);
+  font-size: var(--text-sm);
+  color: var(--color-accent-secondary);
   font-family: var(--font-mono);
-  font-weight: var(--font-medium);
+  font-weight: var(--font-bold);
 }
 
 .event-registration {
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  font-size: var(--text-xs);
-  color: var(--accent-sage);
-  font-family: var(--font-sans);
-  font-weight: var(--font-medium);
+  font-size: var(--text-sm);
+  color: var(--color-accent-secondary);
+  font-family: var(--font-ui);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 400;
   margin-top: var(--space-1);
   padding: var(--space-1) var(--space-2);
-  background: rgba(104, 127, 93, 0.1);
-  border-radius: var(--radius-sm);
+  background: var(--orange-dim);
+  border: 1px solid var(--color-accent-primary);
   width: fit-content;
 }
 
 .registration-icon {
   width: 14px;
   height: 14px;
-  color: var(--accent-sage);
+  color: var(--color-accent-secondary);
   flex-shrink: 0;
 }
 

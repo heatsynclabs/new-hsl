@@ -17,9 +17,9 @@ The most impactful way to support HeatSync Labs is to [become a member](/members
 
 ### Donate Online
 
-- **[Zeffy](https://www.zeffy.com/en-US/donation-form/donate-to-heatsync)** — Credit/debit cards, one-time or recurring. 100% goes to HeatSync.
-- **[PayPal](https://www.paypal.com/donate?token=CHcahRyHOUjNz5wjbXa6yNOcYC-NDAoe3B_7Kz4fv1rmataOD0O3cW9WIp2IWjlS4m1mvorMP8kqQIUm)** — Pay with your PayPal balance or card. Small processing fee applies.
-- **[Zelle](https://zellepay.com/)** — Send directly from your bank app to **finances@heatsynclabs.org**. No fees.
+- **[Zeffy](https://www.zeffy.com/en-US/donation-form/donate-to-heatsync)**: Credit/debit cards, one-time or recurring. 100% goes to HeatSync.
+- **[PayPal](https://www.paypal.com/donate?token=CHcahRyHOUjNz5wjbXa6yNOcYC-NDAoe3B_7Kz4fv1rmataOD0O3cW9WIp2IWjlS4m1mvorMP8kqQIUm)**: Pay with your PayPal balance or card. Small processing fee applies.
+- **[Zelle](https://zellepay.com/)**: Send directly from your bank app to **finances@heatsynclabs.org**. No fees.
 
 For a full breakdown of payment methods, see our [Ways to Pay](/pay) page.
 
@@ -44,10 +44,10 @@ Interested in corporate sponsorship? We offer various sponsorship levels for bus
 
 ## Where Your Money Goes
 
-- **Equipment** — Keeping our 3D printers, laser cutters, and workshop tools in working condition.
-- **Facility** — Rent, utilities, and insurance for our 3,200 sq ft space.
-- **Community Access** — Keeping the space open and accessible during public hours.
-- **Education** — Classes, workshops, and educational programs for all skill levels.
+- **Equipment**: Keeping our 3D printers, laser cutters, and workshop tools in working condition.
+- **Facility**: Rent, utilities, and insurance for our 3,200 sq ft space.
+- **Community Access**: Keeping the space open and accessible during public hours.
+- **Education**: Classes, workshops, and educational programs for all skill levels.
 
 ## Thank You
 

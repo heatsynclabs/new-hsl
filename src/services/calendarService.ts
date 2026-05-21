@@ -266,7 +266,7 @@ export class CalendarService {
     const description = item.description || ''
 
     // Detect registration requirements
-    const registrationRegex = /[\s\-–—·•|,]*\(?registration required\)?[\s\-–—·•|,]*/gi
+    const registrationRegex = /[\s·•|,–-]*\(?registration required\)?[\s·•|,–-]*/gi
     const guestlistRegex = /https?:\/\/guestli(?:\.st|st\.co)\/[^\s<>"')]+/i
     const hasRegistrationInTitle = registrationRegex.test(title)
     const guestlistMatch = description.match(guestlistRegex)

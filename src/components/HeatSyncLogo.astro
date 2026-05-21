@@ -15,7 +15,8 @@ const logoClasses = [
 ---
 
 <div class={logoClasses}>
-  <img src="/hsl-logo.png" alt="HeatSync Labs" class="logo__mark" />
+  <img src="/hsl-logo.png" alt="HeatSync Labs" class="logo__mark logo__mark--light" />
+  <img src="/hsl-logo-dark.png" alt="" aria-hidden="true" class="logo__mark logo__mark--dark" />
   {showText && <span class="logo__text">HeatSync Labs</span>}
 </div>
 
@@ -34,15 +35,21 @@ const logoClasses = [
   }
 
   .logo__mark {
-    transition: transform var(--transition-base);
     flex-shrink: 0;
     object-fit: contain;
   }
 
+  /* Dark-mode logo variant: black flame/arrow recolored to paper, orange kept */
+  .logo__mark--dark { display: none; }
+  :global([data-theme="dark"]) .logo__mark--light { display: none; }
+  :global([data-theme="dark"]) .logo__mark--dark { display: block; }
+
   .logo__text {
     white-space: nowrap;
-    font-family: var(--font-serif);
+    /* Brand wordmark keeps the existing logo font - NOT a design-system font */
+    font-family: var(--font-logo);
     font-weight: var(--font-semibold);
+    letter-spacing: var(--tracking-tight);
   }
 
   /* Sizes */
@@ -79,13 +86,9 @@ const logoClasses = [
     font-size: var(--text-2xl);
   }
 
-  /* Interactive state */
-  .logo--interactive:hover .logo__mark {
-    transform: rotate(72deg);
-  }
-
-  .logo--interactive:hover {
-    color: var(--color-accent-primary);
+  /* Interactive state - no spin; quiet wordmark tint only */
+  .logo--interactive:hover .logo__text {
+    color: var(--color-accent-secondary);
   }
 
   /* Text-only variant */

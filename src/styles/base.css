@@ -1,4 +1,4 @@
-/* Base Styles - Global resets and foundations */
+/* Base Styles - HeatSync Labs design system foundations */
 
 /* Reset and normalize */
 *,
@@ -10,15 +10,17 @@
 }
 
 html {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
 }
 
 body {
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
+  font-family: var(--font-body);
   font-size: var(--text-base);
   line-height: var(--leading-relaxed);
   min-height: 100vh;
@@ -26,18 +28,38 @@ body {
   transition: background-color var(--transition-base), color var(--transition-base);
 }
 
-/* Remove paper texture - keep it clean like mockup */
-
-/* Typography improvements */
+/* Headings: Special Elite by default. Permanent Marker is applied
+   only to big display titles via .display-title / per-component. */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-sans);
-  font-weight: var(--font-normal);
+  font-family: var(--font-body);
+  font-weight: var(--font-bold);
   line-height: var(--leading-tight);
   color: var(--color-text-primary);
 }
 
-p, li, span {
-  font-family: var(--font-sans);
+/* Big display headlines - Permanent Marker, NO orange dropshadow. */
+.display-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.95;
+  text-shadow: none;
+}
+
+/* UI / label voice - VT323 */
+.ui-text,
+.eyebrow {
+  font-family: var(--font-ui);
+  letter-spacing: var(--tracking-ui);
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  color: var(--color-accent-secondary);
+  font-size: var(--text-xl);
+}
+
+p, li {
+  font-family: var(--font-body);
 }
 
 /* Link defaults */
@@ -70,19 +92,19 @@ img {
 
 /* Focus styles */
 *:focus-visible {
-  outline: 2px solid var(--color-accent-primary);
+  outline: 3px solid var(--color-accent-primary);
   outline-offset: 2px;
 }
 
 /* Selection styles */
 ::selection {
   background-color: var(--color-accent-primary);
-  color: var(--color-bg-secondary);
+  color: var(--paper-c);
 }
 
 /* Scrollbar styles */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -90,10 +112,30 @@ img {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: var(--radius-lg);
+  background: var(--color-accent-primary);
+  border: 2px solid var(--color-bg-primary);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-secondary);
+  background: var(--color-accent-secondary);
 }
+
+/* Horizontal rule with the design system's notched orange end-caps */
+hr {
+  border: 0;
+  border-top: 3px solid var(--color-text-primary);
+  position: relative;
+  margin: var(--space-12) 0;
+}
+hr::before,
+hr::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  width: 13px;
+  height: 13px;
+  background: var(--color-accent-primary);
+  border: 3px solid var(--color-text-primary);
+}
+hr::before { left: 0; }
+hr::after { right: 0; }

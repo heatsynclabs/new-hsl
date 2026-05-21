@@ -41,35 +41,24 @@ const cardClasses = computed(() => [
 
 <style scoped>
 .card {
-  background: var(--cream);
+  background: var(--color-bg-secondary);
   position: relative;
+  border: var(--color-border-thick);
   transition: transform var(--transition-base), box-shadow var(--transition-base);
-  border-radius: var(--radius-base);
+  border-radius: 0;
 }
 
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent-rust), var(--accent-sage));
-  border-radius: var(--radius-base) var(--radius-base) 0 0;
-}
-
-/* Variants */
+/* Variants - flat & bordered by default; block shadow only when elevated */
 .card--default {
-  box-shadow: 4px 4px 16px var(--shadow-light);
+  box-shadow: none;
 }
 
 .card--elevated {
-  box-shadow: 6px 6px 20px var(--shadow-medium);
+  box-shadow: var(--color-shadow-block-orange);
 }
 
 .card--bordered {
-  border: 1px solid var(--warm-gray);
-  box-shadow: 2px 2px 8px var(--shadow-light);
+  border: var(--color-border-thick);
 }
 
 /* Padding variants */
@@ -109,21 +98,24 @@ const cardClasses = computed(() => [
   padding-bottom: var(--space-4) !important;
 }
 
-/* Hoverable effect */
+/* Hoverable effect - quiet: orange edge, slight lift. No shadow bloom. */
+.card--hoverable {
+  transition: transform var(--transition-base), border-color var(--transition-base);
+}
 .card--hoverable:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 20px var(--shadow-heavy);
+  transform: translateY(-2px);
+  border-color: var(--color-accent-primary);
 }
 
 /* Header and footer styling */
 .card__header {
-  border-bottom: 1px solid rgba(107, 104, 102, 0.2);
+  border-bottom: 2px solid var(--color-border-light);
   margin-bottom: var(--space-4);
   padding-bottom: var(--space-4);
 }
 
 .card__footer {
-  border-top: 1px solid rgba(107, 104, 102, 0.2);
+  border-top: 2px solid var(--color-border-light);
   margin-top: var(--space-4);
   padding-top: var(--space-4);
 }

@@ -36,20 +36,22 @@ const frontmatter = contentEntry.data;
   }
 
   .content-title {
-    font-size: var(--text-4xl);
-    font-weight: var(--font-light);
+    font-size: clamp(34px, 6vw, 56px);
+    font-weight: 400;
     margin-bottom: var(--space-4);
     color: var(--color-text-primary);
-    font-family: var(--font-sans);
+    font-family: var(--font-display);
     text-align: center;
+    line-height: 1;
+    text-shadow: none;
   }
 
   .content-description {
     font-size: var(--text-lg);
     color: var(--color-text-tertiary);
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     text-align: center;
-    max-width: 600px;
+    max-width: 640px;
     margin: 0 auto;
     line-height: var(--leading-relaxed);
   }
@@ -60,32 +62,37 @@ const frontmatter = contentEntry.data;
   }
 
   .content-body :global(h2) {
-    font-size: var(--text-2xl);
-    font-weight: var(--font-medium);
-    margin-top: var(--space-8);
+    font-size: var(--text-3xl);
+    font-weight: 400;
+    margin-top: var(--space-10);
     margin-bottom: var(--space-4);
     color: var(--color-text-primary);
-    font-family: var(--font-sans);
-    border-bottom: 2px solid var(--color-accent-primary);
+    font-family: var(--font-display);
+    border-bottom: 3px solid var(--color-accent-primary);
     padding-bottom: var(--space-2);
+    line-height: 1;
   }
 
   .content-body :global(h3) {
     font-size: var(--text-xl);
-    font-weight: var(--font-medium);
+    font-weight: 400;
     margin-top: var(--space-6);
     margin-bottom: var(--space-3);
-    color: var(--color-accent-primary);
-    font-family: var(--font-mono);
+    color: var(--color-accent-secondary);
+    font-family: var(--font-ui);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
   }
 
   .content-body :global(h4) {
     font-size: var(--text-lg);
-    font-weight: var(--font-medium);
+    font-weight: 400;
     margin-top: var(--space-4);
     margin-bottom: var(--space-2);
-    color: var(--color-accent-primary);
-    font-family: var(--font-mono);
+    color: var(--color-accent-secondary);
+    font-family: var(--font-ui);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
   }
 
   .content-body :global(p) {
@@ -93,7 +100,7 @@ const frontmatter = contentEntry.data;
     line-height: var(--leading-relaxed);
     margin-bottom: var(--space-4);
     color: var(--color-text-secondary);
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
   }
 
   .content-body :global(ul),
@@ -107,19 +114,37 @@ const frontmatter = contentEntry.data;
     line-height: var(--leading-relaxed);
     margin-bottom: var(--space-2);
     color: var(--color-text-secondary);
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
+  }
+
+  .content-body :global(ul li) {
+    position: relative;
+    padding-left: var(--space-5);
+  }
+
+  .content-body :global(ul li)::before {
+    content: '+';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent-primary);
+    font-family: var(--font-ui);
+    font-size: var(--text-xl);
+    line-height: 1;
   }
 
   .content-body :global(a) {
-    color: var(--color-accent-primary);
-    text-decoration: none;
-    font-weight: var(--font-medium);
+    color: var(--color-accent-secondary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: var(--font-bold);
     transition: color var(--transition-base);
+  }
+  :global([data-theme="dark"]) .content-body :global(a) {
+    color: var(--orange);
   }
 
   .content-body :global(a:hover) {
-    color: var(--color-accent-secondary);
-    text-decoration: underline;
+    color: var(--color-text-primary);
   }
 
   .content-body :global(strong) {
@@ -156,24 +181,24 @@ const frontmatter = contentEntry.data;
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    background: var(--color-accent-primary);
-    color: white;
+    background: var(--ink);
+    color: var(--paper);
     padding: var(--space-3) var(--space-8);
-    border-radius: var(--radius-full);
-    font-size: var(--text-lg);
-    font-weight: var(--font-semibold);
-    font-family: var(--font-mono);
-    letter-spacing: var(--tracking-wide);
+    border: var(--border-thick);
+    font-size: var(--text-xl);
+    font-weight: 400;
+    font-family: var(--font-ui);
+    letter-spacing: var(--tracking-wider);
+    text-transform: uppercase;
     text-decoration: none;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     margin: var(--space-2) 0 var(--space-4);
   }
 
   .content-body :global(.donate-cta:hover) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    color: white;
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0 var(--orange);
+    color: var(--paper);
     text-decoration: none;
   }
 

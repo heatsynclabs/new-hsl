@@ -24,15 +24,15 @@ But mostly, you get to be part of a community that makes things happen. We don't
 
 ## Membership Levels
 
-### Associate — $25/month
+### Associate: $25/month
 
 Helps sustain the lab and includes a vote at Hack Your Hackerspace meetings. Great if you want to support the space and stay connected.
 
-### Basic — $50/month
+### Basic: $50/month
 
 Includes a storage box, a vote at Hack Your Hackerspace meetings, and eligibility for card access after six months. This is the most common tier for active members.
 
-### Plus — $100/month
+### Plus: $100/month
 
 Includes a locker and extra thanks for helping keep the lab thriving. Your support goes directly toward maintaining and improving the space.
 

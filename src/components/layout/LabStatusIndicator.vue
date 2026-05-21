@@ -109,41 +109,44 @@ onUnmounted(() => {
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  font-family: var(--font-mono);
+  gap: 8px;
+  padding: 3px 12px;
+  font-size: var(--text-lg);
+  font-weight: 400;
+  letter-spacing: var(--tracking-wide);
+  font-family: var(--font-ui);
   transition: all var(--transition-fast);
   text-transform: uppercase;
 }
 
 .status-badge.status-badge--loading {
-  border: 1px solid var(--color-text-tertiary);
+  border: 2px solid var(--color-text-tertiary);
   color: var(--color-text-tertiary);
   background: transparent;
 }
 
 .status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--color-text-primary);
   transition: background-color var(--transition-base);
 }
 
 .status-dot--loading {
   background: var(--color-text-tertiary);
+  border-color: var(--color-text-tertiary);
   animation: pulse 2s ease-in-out infinite;
 }
 
 .status-dot--open {
-  background: #86efac;
+  background: var(--newbie-green);
+  border-color: var(--newbie-green);
   animation: pulse 2s ease-in-out infinite;
 }
 
 .status-dot--closed {
-  background: #ef4444;
+  background: var(--red);
+  border-color: var(--red);
 }
 
 @keyframes pulse {
@@ -151,42 +154,40 @@ onUnmounted(() => {
   50% { opacity: 0.4; }
 }
 
-@keyframes glow {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(134, 239, 172, 0.5), 0 0 16px rgba(134, 239, 172, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 14px rgba(134, 239, 172, 0.7), 0 0 28px rgba(134, 239, 172, 0.5);
-  }
-}
-
 .status-text {
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-family: var(--font-ui);
+  font-size: var(--text-lg);
 }
 
-/* Open state - text with green outline and glow */
+/* Open state - square badge, green outline */
 .status-badge.status-badge--open {
   background-color: transparent;
-  color: var(--color-text-primary);
-  border: 1.5px solid #86efac;
-  animation: glow 2s ease-in-out infinite;
+  color: var(--newbie-green);
+  border: 2px solid var(--newbie-green);
+}
+:global([data-theme="dark"]) .status-badge.status-badge--open {
+  color: #3fa37e;
+  border-color: #3fa37e;
 }
 
 .status-badge.status-badge--open .status-dot {
-  background: #86efac;
+  background: var(--newbie-green);
 }
 
-/* Closed state - text with red outline */
+/* Closed state - square badge, red outline */
 .status-badge.status-badge--closed {
   background-color: transparent;
-  color: var(--color-text-primary);
-  border: 1.5px solid #ef4444;
-  box-shadow: 0 1px 3px var(--color-shadow);
+  color: var(--red);
+  border: 2px solid var(--red);
 }
+:global([data-theme="dark"]) .status-badge.status-badge--closed {
+  color: #f0736a;
+  border-color: #f0736a;
+}
+:global([data-theme="dark"]) .status-dot--closed { background: #f0736a; border-color: #f0736a; }
 
 .status-badge.status-badge--closed .status-dot {
-  background: #ef4444;
+  background: var(--red);
 }
 
 /* Hover effect */
@@ -198,17 +199,17 @@ onUnmounted(() => {
 /* Mobile adjustments */
 @media (max-width: 768px) {
   .status-badge {
-    font-size: 10px;
-    padding: 3px 8px;
+    font-size: var(--text-base);
+    padding: 2px 10px;
   }
 
   .status-dot {
-    width: 5px;
-    height: 5px;
+    width: 8px;
+    height: 8px;
   }
 
   .status-text {
-    font-size: 10px;
+    font-size: var(--text-base);
   }
 }
 </style>
