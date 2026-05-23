@@ -13,10 +13,10 @@
     <div class="carousel__frame">
       <div class="carousel__stage">
         <img
-          v-for="(src, i) in images"
-          :key="src"
-          :src="src"
-          :alt="`HeatSync Labs, field photo ${i + 1}`"
+          v-for="(photo, i) in images"
+          :key="photo.src"
+          :src="photo.src"
+          :alt="`HeatSync Labs — ${photo.name}`"
           class="carousel__img"
           :class="{ 'is-active': i === index }"
           loading="lazy"
@@ -31,7 +31,7 @@
 
       <!-- Caption bar -->
       <div class="carousel__bar">
-        <span class="carousel__eyebrow">EST. 2009</span>
+        <span class="carousel__eyebrow">{{ images[index]?.name }}</span>
         <span class="carousel__count">{{ pad(index + 1) }} / {{ pad(images.length) }}</span>
       </div>
     </div>
@@ -49,8 +49,43 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 
-const baseImages = Array.from({ length: 20 }, (_, i) => `/pics/${i + 1}.webp`)
-const images = ref<string[]>(baseImages)
+type Photo = { src: string; name: string }
+
+// Filenames live in /public/space-pics/. Keep the source list in plain
+// human-readable form; we URL-encode for the <img src> and strip the extension
+// for the caption.
+const SPACE_PIC_FILES = [
+  '3D Printing Station.webp',
+  'All are welcome.webp',
+  'Biohacking Lab.webp',
+  'CRT Wall.webp',
+  'Coffee and Books.webp',
+  'Coworking.webp',
+  'Dark Room Photography.webp',
+  'Drill Press.webp',
+  'Electronics.webp',
+  'Entrance.webp',
+  'Front Window.webp',
+  'Front window 2.webp',
+  'Jewlery Station.webp',
+  'Laser Cutters.webp',
+  'Machine Shop.webp',
+  'Main Hall.webp',
+  'Microcontrollers.webp',
+  'Music Station.webp',
+  'Sewing Station.webp',
+  'Vinyl and Sublimation Station.webp',
+  'Welding.webp',
+  'Window Decor.webp',
+  'Woodshop.webp',
+]
+
+const basePhotos: Photo[] = SPACE_PIC_FILES.map(f => ({
+  src: `/space-pics/${encodeURIComponent(f)}`,
+  name: f.replace(/\.[^.]+$/, ''),
+}))
+
+const images = ref<Photo[]>(basePhotos)
 const index = ref(0)
 const paused = ref(false)
 
@@ -88,10 +123,10 @@ const onTouchEnd = (e: TouchEvent) => {
   if (Math.abs(dx) > 40) (dx < 0 ? next : prev)()
 }
 
-const preload = () => images.value.forEach(src => { const img = new Image(); img.src = src })
+const preload = () => images.value.forEach(p => { const img = new Image(); img.src = p.src })
 
 onMounted(() => {
-  images.value = shuffle(baseImages)
+  images.value = shuffle(basePhotos)
   preload()
   // Respect reduced-motion: don't auto-advance (users still have prev/next)
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -177,13 +212,19 @@ onUnmounted(stop)
 
 .carousel__eyebrow {
   font-size: var(--text-base);
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   color: var(--orange-d);
   text-transform: uppercase;
+  min-width: 0;
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 :global([data-theme="dark"]) .carousel__eyebrow { color: var(--orange); }
 
 .carousel__count {
+  flex: 0 0 auto;
   font-size: var(--text-lg);
   letter-spacing: 2px;
   color: var(--ink);
