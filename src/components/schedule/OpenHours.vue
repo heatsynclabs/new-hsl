@@ -1,13 +1,13 @@
 <template>
-  <BaseCard padding="lg" class="schedule">
+  <BaseCard padding="lg" :class="['schedule', { 'schedule--compact': props.forceCompact }]">
     <div class="schedule__header">
       <div class="schedule__header-content">
         <h2 class="schedule__title">Open Hours</h2>
-        <p class="schedule__description">
+        <p v-if="!props.hideDescription" class="schedule__description">
           Open hours are times when the lab is open to the public. Stop in, get a tour, meet us, and even work on your projects! Card members get 24/7 access to the space.
         </p>
       </div>
-      <DoorStatus />
+      <DoorStatus v-if="!props.forceCompact" />
     </div>
 
     <div v-if="loading" class="schedule__loading">
@@ -33,6 +33,11 @@ import { format, startOfWeek, addDays, isSameDay } from 'date-fns'
 import BaseCard from '../base/BaseCard.vue'
 import DoorStatus from '../status/DoorStatus.vue'
 import { CalendarService, type CalendarEvent } from '../../services/calendarService'
+
+const props = defineProps<{
+  forceCompact?: boolean
+  hideDescription?: boolean
+}>()
 
 interface ScheduleDay {
   name: string
@@ -245,6 +250,44 @@ onMounted(() => {
 .schedule__day--open .schedule__day-hours {
   color: var(--color-text-primary);
   font-weight: var(--font-bold);
+}
+
+/* Compact (forced vertical list) — used when this card sits inside a narrow column */
+.schedule--compact .schedule__header {
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+.schedule--compact .schedule__header-content { max-width: 100%; }
+.schedule--compact .schedule__title { font-size: var(--text-3xl); }
+.schedule--compact .schedule__grid {
+  grid-template-columns: 1fr;
+  border: none;
+  background: transparent;
+  gap: 0;
+  padding: 0;
+}
+.schedule--compact .schedule__day {
+  min-height: 52px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  border-top: 4px solid var(--day-color, var(--orange));
+  padding: var(--space-3) var(--space-4);
+}
+.schedule--compact .schedule__day:last-child {
+  border-bottom: 4px solid var(--day-color, var(--orange));
+}
+.schedule--compact .schedule__day-name {
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+}
+.schedule--compact .schedule__day-hours {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
 /* Responsive */
