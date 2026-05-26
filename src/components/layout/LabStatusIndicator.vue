@@ -26,18 +26,14 @@ const displayText = computed(() => {
   if (isLoading.value) return 'Checking...'
   if (isOpen.value) return 'OPEN'
 
-  // When closed, show next opening time if available
+  // When closed, show the next thing on the calendar (any timed event, not just Open Hours)
   const now = new Date()
-  const upcomingOpenHours = events.value
-    .filter(event => {
-      const eventStart = new Date(event.start)
-      const eventTitle = event.title.toLowerCase()
-      return eventStart > now && eventTitle.includes('open hours')
-    })
-    .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+  const nextEvent = events.value.find(event =>
+    !event.isAllDay && new Date(event.start) > now
+  )
 
-  if (upcomingOpenHours.length > 0) {
-    const nextOpen = new Date(upcomingOpenHours[0].start)
+  if (nextEvent) {
+    const nextOpen = new Date(nextEvent.start)
     const day = format(nextOpen, 'EEE')
     const time = format(nextOpen, 'ha').toLowerCase()
     return `Closed • Opens ${day} ${time}`
