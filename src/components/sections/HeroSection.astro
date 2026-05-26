@@ -206,8 +206,9 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    font-size: var(--text-sm);
-    letter-spacing: var(--tracking-wider);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-text-tertiary);
     font-family: var(--font-ui);
@@ -393,18 +394,19 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
 
   .stat-value {
     font-family: var(--font-ui);
-    font-size: 26px;
-    font-weight: 400;
-    color: var(--color-accent-secondary);
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--color-text-primary);
     line-height: 1;
   }
 
   .stat-label {
-    font-size: 10px;
-    color: var(--color-text-tertiary);
+    font-size: 11px;
+    color: var(--color-accent-secondary);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-family: var(--font-body);
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    font-family: var(--font-ui);
   }
 
   /* Carousel wrapper */
@@ -495,7 +497,7 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     }
 
     .stat-value {
-      font-size: 28px;
+      font-size: 26px;
     }
 
     .stat-label {

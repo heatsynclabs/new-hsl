@@ -155,7 +155,7 @@
   --tracking-normal: 0;
   --tracking-wide: 1px;
   --tracking-wider: 2px;
-  --tracking-ui: 3px;
+  --tracking-ui: 0.1em;
 
   /* Line Heights */
   --leading-tight: 1.05;

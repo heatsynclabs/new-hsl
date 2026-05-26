@@ -93,13 +93,13 @@ const truncateDescription = (description: string): string => {
 }
 
 .event-date-line {
-  font-size: var(--text-base);
+  font-size: var(--text-xs);
   color: var(--color-accent-secondary);
   margin-bottom: var(--space-2);
   font-family: var(--font-ui);
-  letter-spacing: var(--tracking-wide);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-weight: 400;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -112,31 +112,32 @@ const truncateDescription = (description: string): string => {
 }
 
 .event-title {
-  font-size: var(--text-xl);
-  font-weight: 400;
+  font-size: var(--text-lg);
+  font-weight: 600;
   color: var(--color-text-primary);
-  font-family: var(--font-ui);
-  letter-spacing: 0.5px;
-  line-height: 1.05;
+  font-family: var(--font-body);
+  letter-spacing: 0;
+  line-height: 1.25;
 }
 
 .event-time {
-  font-size: var(--text-sm);
-  color: var(--color-accent-secondary);
-  font-family: var(--font-mono);
-  font-weight: var(--font-bold);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 
 .event-registration {
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   color: var(--color-accent-secondary);
   font-family: var(--font-ui);
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-weight: 400;
+  font-weight: 700;
   margin-top: var(--space-1);
   padding: var(--space-1) var(--space-2);
   background: var(--orange-dim);

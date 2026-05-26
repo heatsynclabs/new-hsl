@@ -49,13 +49,15 @@ h1, h2, h3, h4, h5, h6 {
 .ui-text,
 .eyebrow {
   font-family: var(--font-ui);
-  letter-spacing: var(--tracking-ui);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .eyebrow {
   color: var(--color-accent-secondary);
-  font-size: var(--text-xl);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.18em;
 }
 
 p, li {

@@ -106,19 +106,19 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 3px 12px;
-  font-size: var(--text-lg);
-  font-weight: 400;
-  letter-spacing: var(--tracking-wide);
+  padding: 0;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
   font-family: var(--font-ui);
-  transition: all var(--transition-fast);
+  transition: color var(--transition-fast);
   text-transform: uppercase;
+  border: 0;
+  background: transparent;
 }
 
 .status-badge.status-badge--loading {
-  border: 2px solid var(--color-text-tertiary);
   color: var(--color-text-tertiary);
-  background: transparent;
 }
 
 .status-dot {
@@ -152,33 +152,27 @@ onUnmounted(() => {
 
 .status-text {
   font-family: var(--font-ui);
-  font-size: var(--text-lg);
+  font-size: var(--text-xs);
 }
 
-/* Open state - square badge, green outline */
+/* Open state - text colored, no box */
 .status-badge.status-badge--open {
-  background-color: transparent;
   color: var(--newbie-green);
-  border: 2px solid var(--newbie-green);
 }
 :global([data-theme="dark"]) .status-badge.status-badge--open {
   color: #3fa37e;
-  border-color: #3fa37e;
 }
 
 .status-badge.status-badge--open .status-dot {
   background: var(--newbie-green);
 }
 
-/* Closed state - square badge, red outline */
+/* Closed state - text colored, no box */
 .status-badge.status-badge--closed {
-  background-color: transparent;
   color: var(--red);
-  border: 2px solid var(--red);
 }
 :global([data-theme="dark"]) .status-badge.status-badge--closed {
   color: #f0736a;
-  border-color: #f0736a;
 }
 :global([data-theme="dark"]) .status-dot--closed { background: #f0736a; border-color: #f0736a; }
 
@@ -195,8 +189,7 @@ onUnmounted(() => {
 /* Mobile adjustments */
 @media (max-width: 768px) {
   .status-badge {
-    font-size: var(--text-base);
-    padding: 2px 10px;
+    font-size: var(--text-xs);
   }
 
   .status-dot {
@@ -205,7 +198,7 @@ onUnmounted(() => {
   }
 
   .status-text {
-    font-size: var(--text-base);
+    font-size: var(--text-xs);
   }
 }
 </style>
