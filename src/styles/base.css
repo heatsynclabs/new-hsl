@@ -28,7 +28,7 @@ body {
   transition: background-color var(--transition-base), color var(--transition-base);
 }
 
-/* Headings: Special Elite by default. Permanent Marker is applied
+/* Headings: Instrument Sans by default. Permanent Marker is applied
    only to big display titles via .display-title / per-component. */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-body);
@@ -45,7 +45,7 @@ h1, h2, h3, h4, h5, h6 {
   text-shadow: none;
 }
 
-/* UI / label voice - VT323 */
+/* UI / label voice - Space Mono */
 .ui-text,
 .eyebrow {
   font-family: var(--font-ui);

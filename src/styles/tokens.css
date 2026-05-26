@@ -7,7 +7,7 @@
    ============================================================ */
 
 /* Design system fonts. Charis SIL stays as the LOGO BRAND FONT only. */
-@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Special+Elite&family=VT323&family=Courier+Prime:wght@400;700&family=Charis+SIL:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Instrument+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Courier+Prime:wght@400;700&family=Charis+SIL:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 :root {
   /* ---- Raw palette (design system canon) ---- */
@@ -121,12 +121,12 @@
 
   /* ---- Typography ---- */
   --font-display: 'Permanent Marker', cursive;   /* big headlines only */
-  --font-body:    'Special Elite', Georgia, serif; /* body copy */
-  --font-ui:      'VT323', monospace;             /* eyebrows, labels, nav, stats */
+  --font-body:    'Instrument Sans', sans-serif; /* body copy */
+  --font-ui:      'Space Mono', monospace;       /* eyebrows, labels, nav, stats */
   --font-mono:    'Courier Prime', 'SF Mono', monospace; /* fine print, code */
   --font-logo:    'Charis SIL', Georgia, serif;   /* LOGO WORDMARK ONLY - brand font */
 
-  /* Back-compat aliases: body text -> Special Elite, serif -> logo brand font */
+  /* Back-compat aliases: body text -> Instrument Sans, serif -> logo brand font */
   --font-sans:    var(--font-body);
   --font-serif:   var(--font-logo);
 
@@ -160,7 +160,7 @@
   /* Line Heights */
   --leading-tight: 1.05;
   --leading-normal: 1.5;
-  --leading-relaxed: 1.55;
+  --leading-relaxed: 1.62;
   --leading-loose: 1.7;
 
   /* Spacing Scale */
