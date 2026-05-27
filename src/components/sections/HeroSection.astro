@@ -2,42 +2,32 @@
 import BaseContainer from '../base/BaseContainer.astro';
 import BaseButton from '../base/BaseButton.astro';
 import PhotoCarousel from '../graphics/PhotoCarousel.vue';
-import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
 ---
 
 <section class="hero">
   <BaseContainer>
     <div class="hero__wrapper">
       <div class="hero__content">
-        <!-- Prominent Hero Logo -->
-        <a href="/" class="hero__logo" id="hero-logo">
-          <img src="/hsl-logo.png" alt="HeatSync Labs" class="hero__logo-mark hero__logo-mark--light" />
-          <img src="/hsl-logo-dark.png" alt="" aria-hidden="true" class="hero__logo-mark hero__logo-mark--dark" />
-          <span class="hero__logo-text">HeatSync Labs</span>
-        </a>
-
-        <!-- Status + location row -->
-        <div class="hero__meta" id="hero-status">
-          <LabStatusIndicator client:load />
-          <span class="hero__divider">&middot;</span>
+        <!-- Location row (status indicator lives in the caution ribbon above) -->
+        <div class="hero__meta">
           <a href="https://maps.app.goo.gl/Qh3wZuQuik4U7niE6" target="_blank" rel="noopener" class="hero__location">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
             Mesa, AZ
           </a>
         </div>
 
-        <p class="hero__subtitle">
-          Arizona's original hackerspace, built on open source principles.
-        </p>
+        <h1 class="hero__headline">
+          Arizona's <span class="hero__accent">original</span> hackerspace, built on open source principles.
+        </h1>
 
         <p class="hero__body">
-          We are a <a href="https://medlabboulder.gitlab.io/democraticmediums/mediums/do-ocracy/" target="_blank" rel="noopener" class="hero__link">do-ocracy</a>. Show up, contribute, learn, and build alongside a diverse and inclusive maker community that supports each other.
+          We are a <a href="https://medlabboulder.gitlab.io/democraticmediums/mediums/do-ocracy/" target="_blank" rel="noopener" class="hero__doo">do-ocracy</a>. Show up, contribute, learn, and build alongside a diverse and inclusive maker community that supports each other.
         </p>
 
-        <p class="hero__welcome">
-          <a href="/about" class="hero__link">Everyone is welcome</a>
+        <a href="/about" class="hero__welcome">
+          Everyone is welcome
           <svg class="heart-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </p>
+        </a>
 
         <div class="hero__actions">
           <BaseButton variant="primary" size="md" href="/community">
@@ -77,147 +67,51 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
 </section>
 
 
-<script>
-  // Hero logo scroll animation (desktop only - mobile handled via CSS)
-  (() => {
-    const heroLogo = document.getElementById('hero-logo');
-    const heroStatus = document.getElementById('hero-status') as HTMLElement | null;
-    const headerLogo = document.querySelector('.nav__logo');
-
-    // Only run on pages with hero logo
-    if (!heroLogo || !headerLogo) return;
-
-    // Get the header logo element inside the anchor
-    const headerLogoInner = headerLogo.querySelector('.logo');
-    if (!headerLogoInner) return;
-
-    let isScrolled = false;
-    const scrollThreshold = 150; // pixels to scroll before logo transitions
-
-    const updateLogoState = () => {
-      const scrollY = window.scrollY;
-      const shouldBeScrolled = scrollY > scrollThreshold;
-
-      if (shouldBeScrolled !== isScrolled) {
-        isScrolled = shouldBeScrolled;
-
-        if (isScrolled) {
-          // Scrolled: Logo in header, hero status hidden
-          heroLogo.classList.add('hero__logo--hidden');
-          if (heroStatus) heroStatus.classList.add('hero__meta--hidden');
-          headerLogoInner.classList.add('logo--visible');
-          headerLogoInner.classList.remove('logo--hidden');
-        } else {
-          // At top: Logo in hero, hero status visible
-          heroLogo.classList.remove('hero__logo--hidden');
-          if (heroStatus) heroStatus.classList.remove('hero__meta--hidden');
-          headerLogoInner.classList.add('logo--hidden');
-          headerLogoInner.classList.remove('logo--visible');
-        }
-      }
-    };
-
-    // Initial state - hide header logo
-    headerLogoInner.classList.add('logo--hidden');
-
-    // Listen for scroll with throttling
-    let ticking = false;
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          updateLogoState();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    }, { passive: true });
-
-    // Initial check in case page loaded already scrolled
-    updateLogoState();
-  })();
-</script>
-
 <style>
-  /* Hero Logo Styles */
-  .hero__logo {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
-    text-decoration: none;
-    color: var(--color-text-primary);
-    margin-bottom: var(--space-3);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-origin: top left;
+  .hero {
+    padding: 64px 0 52px;
+    position: relative;
+    background: var(--color-bg-primary);
+    transition: background-color var(--transition-base);
   }
 
-  .hero__logo:hover .hero__logo-text {
-    color: var(--color-accent-secondary);
+  .hero__wrapper {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    align-items: start;
+    gap: 46px;
   }
 
-  .hero__logo-mark {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
+  .hero__content {
+    position: relative;
+    z-index: var(--z-raised);
   }
 
-  /* Dark-mode logo variant */
-  .hero__logo-mark--dark { display: none; }
-  :global([data-theme="dark"]) .hero__logo-mark--light { display: none; }
-  :global([data-theme="dark"]) .hero__logo-mark--dark { display: block; }
-
-  .hero__logo-text {
-    /* Brand wordmark keeps the existing logo font - NOT a design-system font */
-    font-family: var(--font-logo);
-    font-size: clamp(24px, 3.2vw, 30px);
-    font-weight: var(--font-semibold);
-    letter-spacing: var(--tracking-tight);
-    white-space: nowrap;
-  }
-
-  /* Hidden state for hero logo when scrolled */
-  .hero__logo--hidden {
-    opacity: 0;
-    transform: translateY(-60px) scale(0.5);
-    pointer-events: none;
-  }
-
-  /* Hero meta row (status + location) */
+  /* Status + location row */
   .hero__meta {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    margin-bottom: var(--space-4);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .hero__meta--hidden {
-    opacity: 0;
-    transform: translateY(-20px);
-    pointer-events: none;
-  }
-
-  .hero__divider {
-    color: var(--color-text-tertiary);
-    opacity: 0.4;
-    font-size: var(--text-lg);
+    gap: 14px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
   }
 
   .hero__location {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    font-size: var(--text-xs);
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-text-tertiary);
+    gap: 6px;
     font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--smoke);
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: color var(--transition-fast);
   }
 
   .hero__location:hover {
-    color: var(--color-accent-primary);
+    color: var(--accent-text);
   }
 
   .hero__location svg {
@@ -225,283 +119,147 @@ import LabStatusIndicator from '../layout/LabStatusIndicator.vue';
     height: 12px;
   }
 
-  /* Mobile adjustments for hero logo */
-  @media (max-width: 900px) {
-    .hero__logo {
-      justify-content: center;
-    }
-
-    .hero__meta {
-      justify-content: center;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .hero__logo {
-      display: none;
-    }
-
-    .hero__meta {
-      justify-content: center;
-    }
-  }
-
-  @media (max-width: 600px) {
-    .hero__logo-mark {
-      width: 56px;
-      height: 56px;
-    }
-
-    .hero__logo-text {
-      font-size: 28px;
-    }
-  }
-
-  .hero {
-    padding: var(--space-12) 0 var(--space-16);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    background: var(--color-bg-primary);
-    border-bottom: 6px solid var(--orange);
-    transition: background-color var(--transition-base);
-  }
-
-  /* Diagonal hatch across the whole hero — dark mode only, matching the bottom
-     (support) section. It sits behind everything; the opaque carousel frame
-     covers it within the carousel's bounds. */
-  :global([data-theme="dark"]) .hero::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background-image:
-      repeating-linear-gradient(45deg, transparent 0 18px, rgba(224, 120, 32, 0.05) 18px 19px);
-  }
-
-  .hero .container {
-    position: relative;
-    z-index: var(--z-raised);
-  }
-
-  .hero__wrapper {
-    display: grid;
-    grid-template-columns: 1fr 1.1fr;
-    align-items: center;
-    gap: var(--space-8);
-  }
-
-  .hero__content {
-    max-width: 520px;
-    position: relative;
-    z-index: var(--z-raised);
-  }
-
   .hero__headline {
-    font-size: clamp(26px, 3.6vw, 42px);
-    font-weight: 400;
-    line-height: 1;
-    margin-bottom: var(--space-5);
-    letter-spacing: 0;
-    /* Permanent Marker display title - NO orange dropshadow */
     font-family: var(--font-display);
-    text-shadow: none;
+    font-weight: 900;
+    text-transform: none;
+    font-size: clamp(34px, 5vw, 58px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0 0 20px;
+    max-width: 16ch;
   }
 
-  .hero__headline strong {
-    font-weight: 400;
-    color: var(--color-accent-secondary);
-    position: relative;
-    display: inline-block;
-  }
-  :global([data-theme="dark"]) .hero__headline strong {
-    color: var(--orange);
-  }
-
-  .hero__subtitle {
-    font-size: var(--text-base);
-    color: var(--color-text-secondary);
-    font-weight: var(--font-normal);
-    margin-bottom: var(--space-3);
-    line-height: 1.4;
-    font-family: var(--font-body);
+  .hero__accent {
+    color: var(--accent-text);
   }
 
   .hero__body {
-    font-size: var(--text-sm);
-    line-height: var(--leading-relaxed);
-    color: var(--color-text-tertiary);
-    margin-bottom: var(--space-3);
     font-family: var(--font-body);
-    max-width: 460px;
+    font-size: 17px;
+    line-height: var(--leading-relaxed);
+    color: var(--ash);
+    max-width: 50ch;
+    margin: 0 0 18px;
+  }
+
+  .hero__doo {
+    color: var(--accent-text);
+    font-weight: 600;
+    border-bottom: 2px solid var(--hazard);
   }
 
   .hero__welcome {
-    font-size: var(--text-base);
-    font-weight: var(--font-normal);
-    color: var(--color-accent-secondary);
-    margin-bottom: var(--space-6);
-    font-family: var(--font-body);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 26px;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--accent-text);
+    border-bottom: 2px solid var(--hazard);
+    padding-bottom: 2px;
+    text-decoration: none;
   }
-  :global([data-theme="dark"]) .hero__welcome { color: var(--orange); }
 
   .heart-icon {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     display: inline-block;
     vertical-align: middle;
-    margin-left: 4px;
-    /* cycles through the day rainbow */
+    color: var(--rust);
     animation: hsl-rainbow-heart 4.2s linear infinite;
-  }
-
-  .hero__link {
-    color: var(--color-accent-secondary);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    font-weight: var(--font-bold);
-    transition: opacity 0.2s ease;
-  }
-  :global([data-theme="dark"]) .hero__link { color: var(--orange); }
-
-  .hero__link:hover {
-    opacity: 0.75;
   }
 
   .hero__actions {
     display: flex;
-    gap: var(--space-3);
+    gap: 14px;
     flex-wrap: wrap;
     align-items: center;
-    margin-bottom: var(--space-4);
+    margin-top: 26px;
   }
 
   /* Stats row */
   .stats-row {
-    display: flex;
-    gap: var(--space-5);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--color-border-light);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: var(--bd-2);
+    margin-top: 34px;
   }
 
   .stat {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    padding: 22px 18px;
+    border-right: var(--bd);
+  }
+
+  .stat:last-child {
+    border-right: 0;
   }
 
   .stat-value {
-    font-family: var(--font-ui);
-    font-size: 30px;
-    font-weight: 700;
-    color: var(--color-text-primary);
+    font-family: var(--font-display);
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--accent-text);
     line-height: 1;
   }
 
   .stat-label {
-    font-size: 11px;
-    color: var(--color-accent-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-weight: 700;
     font-family: var(--font-ui);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--smoke);
+    font-weight: 500;
+    margin-top: 8px;
   }
 
   /* Carousel wrapper */
   .carousel-wrapper {
     position: relative;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: var(--space-3) var(--space-6) var(--space-8) var(--space-3);
   }
 
   /* Responsive */
-  @media (max-width: 1100px) {
-    .hero__wrapper {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  @media (max-width: 900px) {
-    .hero {
-      padding: var(--space-8) 0 var(--space-12);
-      min-height: auto;
-    }
-
+  @media (max-width: 880px) {
     .hero__wrapper {
       grid-template-columns: 1fr;
-      grid-template-rows: auto auto;
-      gap: var(--space-10);
+      gap: 36px;
     }
 
     .hero__content {
       order: 2;
-      max-width: 100%;
-      text-align: center;
-    }
-
-    .hero__body {
-      max-width: 100%;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .hero__actions {
-      justify-content: center;
-    }
-
-    .stats-row {
-      justify-content: center;
     }
 
     .carousel-wrapper {
       order: 1;
-      padding: var(--space-4) var(--space-5) var(--space-10);
+    }
+
+    .stats-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat:nth-child(2) {
+      border-right: 0;
+    }
+
+    .stat:nth-child(-n+2) {
+      border-bottom: var(--bd);
     }
   }
 
   @media (max-width: 600px) {
     .hero {
-      padding: var(--space-6) 0 var(--space-10);
-    }
-
-    .hero__wrapper {
-      gap: var(--space-8);
-    }
-
-    .hero__subtitle {
-      font-size: var(--text-base);
-    }
-
-    .hero__body {
-      font-size: var(--text-base);
-    }
-
-    .hero__welcome {
-      font-size: var(--text-base);
-      margin-bottom: var(--space-6);
-    }
-
-    .hero__actions {
-      margin-bottom: var(--space-6);
-    }
-
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-4);
-      row-gap: var(--space-6);
+      padding: 40px 0 36px;
     }
 
     .stat-value {
-      font-size: 26px;
-    }
-
-    .stat-label {
-      font-size: 10px;
+      font-size: 28px;
     }
   }
 </style>

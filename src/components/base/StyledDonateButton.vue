@@ -19,41 +19,43 @@
 .donate-btn {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  background: var(--orange);
-  color: var(--ink);
-  border: 3px solid var(--ink);
-  padding: var(--space-4) var(--space-10);
-  font-size: var(--text-2xl);
-  font-weight: 400;
+  gap: 8px;
+  background: var(--hazard);
+  color: var(--tape-dark);
+  border: 2px solid var(--tape-dark);
+  padding: 18px 30px;
   font-family: var(--font-ui);
-  letter-spacing: var(--tracking-wider);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 .donate-btn:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 8px 8px 0 var(--paper);
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow);
 }
 
 .donate-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 var(--paper);
+  transform: translate(0, 0);
+  box-shadow: var(--shadow-sm);
 }
 
 .donate-btn__icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
+  color: var(--rust);
 }
 
 @media (max-width: 768px) {
   .donate-btn {
-    font-size: var(--text-base);
-    padding: var(--space-3) var(--space-6);
+    font-size: 13px;
+    padding: 14px 22px;
   }
 }
 </style>

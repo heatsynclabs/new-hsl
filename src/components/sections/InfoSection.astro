@@ -19,10 +19,14 @@ const infoItems = [
 
 <section class="info-section">
   <BaseContainer>
-    <h2 class="section-header display-title">About Us</h2>
+    <div class="info-section__head">
+      <span class="info-section__num">02</span>
+      <span class="eyebrow">Who we are</span>
+    </div>
+    <h2 class="info-section__title sec-title">About Us</h2>
     <div class="rules-row">
       {infoItems.map((item, i) => (
-        <div class:list={['rule-card', { 'rule-card--dark': i === 1 }]}>
+        <div class:list={['rule-card', { 'rule-card--feature': i === 1 }]}>
           <span class="rule-card__num">{String(i + 1).padStart(2, '0')}</span>
           <h3 class="rule-card__title">{item.title}</h3>
           <p class="rule-card__desc">{item.description}</p>
@@ -34,97 +38,84 @@ const infoItems = [
 
 <style>
   .info-section {
-    padding: var(--space-12) 0;
+    padding: 60px 0;
+    border-top: 2px solid var(--steel-hi);
   }
 
-  .section-eyebrow {
+  .info-section__head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+
+  .info-section__num {
     font-family: var(--font-ui);
-    color: var(--color-accent-secondary);
-    font-size: var(--text-xl);
-    letter-spacing: var(--tracking-ui);
-    text-align: center;
-    margin-bottom: var(--space-1);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--accent-text);
   }
 
-  .section-header {
-    font-size: var(--text-5xl);
-    margin-bottom: var(--space-12);
-    text-align: center;
-    color: var(--color-text-primary);
+  .info-section__title {
+    margin-bottom: 36px;
+    font-size: clamp(36px, 6vw, 64px);
   }
 
-  /* Design-system rule cards (3-up). Flat & bordered; the numbered tag and the
-     odd-one-out dark card carry the identity - no resting shadow. */
+  /* About cards — 3-up, feature variant on middle */
   .rules-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-8);
-    margin-top: var(--space-5);
+    gap: 26px;
   }
 
   .rule-card {
     position: relative;
-    border: var(--color-border-thick);
-    background: var(--color-bg-secondary);
-    padding: var(--space-8) var(--space-6) var(--space-6);
-    transition: transform var(--transition-base), border-color var(--transition-base);
+    background: var(--slab);
+    border: var(--bd);
+    box-shadow: var(--shadow);
+    padding: 32px 26px;
   }
 
-  .rule-card:hover {
-    transform: translateY(-3px);
-    border-color: var(--color-accent-primary);
-  }
-
-  /* the middle card flips tone - ink on paper (and paper on ink in dark mode) */
-  .rule-card--dark {
-    background: var(--ink-panel);
-    color: var(--paper);
-    border-color: var(--ink);
-  }
-  :global([data-theme="dark"]) .rule-card--dark {
-    background: var(--paper);
-    color: var(--ink);
-    border-color: var(--paper);
+  .rule-card--feature {
+    background: var(--char);
+    border-color: var(--hazard);
+    border-left: 3px solid var(--hazard);
   }
 
   .rule-card__num {
     position: absolute;
-    top: -17px;
-    left: 16px;
-    background: var(--orange);
-    color: var(--ink);
-    border: 2px solid var(--ink);
-    padding: 2px 10px;
+    top: -14px;
+    left: 20px;
+    background: var(--hazard);
+    color: var(--tape-dark);
     font-family: var(--font-ui);
-    font-size: var(--text-lg);
-    letter-spacing: 1px;
-    line-height: 1.2;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    padding: 4px 9px;
   }
 
   .rule-card__title {
     font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    font-weight: 400;
-    color: var(--color-accent-secondary);
-    margin: var(--space-3) 0 var(--space-2);
-    line-height: 1;
-    text-shadow: none;
+    font-weight: 800;
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    color: var(--accent-text);
+    margin: 12px 0 14px;
+    line-height: 1.05;
   }
-  .rule-card--dark .rule-card__title { color: var(--orange); }
-  :global([data-theme="dark"]) .rule-card--dark .rule-card__title { color: var(--orange-d); }
 
   .rule-card__desc {
     font-family: var(--font-body);
-    font-size: var(--text-base);
+    font-size: 15px;
     line-height: var(--leading-relaxed);
-    color: var(--color-text-secondary);
+    color: var(--ash);
   }
-  .rule-card--dark .rule-card__desc { color: var(--paper-d); }
-  :global([data-theme="dark"]) .rule-card--dark .rule-card__desc { color: var(--ink-soft); }
 
-  @media (max-width: 768px) {
-    .info-section { padding: var(--space-10) 0; }
-    .section-header { font-size: var(--text-4xl); }
-    .rules-row { grid-template-columns: 1fr; gap: var(--space-10); }
+  @media (max-width: 820px) {
+    .info-section { padding: 48px 0; }
+    .rules-row { grid-template-columns: 1fr; gap: 22px; }
   }
 </style>

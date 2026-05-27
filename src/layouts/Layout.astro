@@ -4,6 +4,8 @@ import '../styles/base.css';
 import '../styles/utilities.css';
 import AppHeader from '../components/layout/AppHeader.astro';
 import AppFooter from '../components/layout/AppFooter.astro';
+import CautionRibbon from '../components/graphics/CautionRibbon.astro';
+import LabStatusIndicator from '../components/layout/LabStatusIndicator.vue';
 
 interface Props {
   title?: string;
@@ -23,7 +25,6 @@ const { title = 'HeatSync Labs' } = Astro.props;
     <!-- Theme detection (runs before CSS to prevent flash) -->
     <script is:inline>
       (function() {
-        // Default to light on first visit; only an explicit toggle changes it.
         const stored = localStorage.getItem('theme-preference');
         const theme = stored === 'dark' || stored === 'light' ? stored : 'light';
         document.documentElement.setAttribute('data-theme', theme);
@@ -31,7 +32,7 @@ const { title = 'HeatSync Labs' } = Astro.props;
     </script>
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Fonts are imported in tokens.css (Permanent Marker / Instrument Sans / Space Mono / Courier Prime / Charis SIL) -->
+    <!-- Fonts are imported in tokens.css (Archivo / Instrument Sans / IBM Plex Mono / JetBrains Mono / Charis SIL) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
@@ -40,6 +41,9 @@ const { title = 'HeatSync Labs' } = Astro.props;
   <body>
     <div id="app">
       <AppHeader />
+      <CautionRibbon>
+        <LabStatusIndicator client:load />
+      </CautionRibbon>
       <main class="main">
         <slot />
       </main>
@@ -61,38 +65,21 @@ const { title = 'HeatSync Labs' } = Astro.props;
     flex-direction: column;
     background-color: var(--color-bg-primary);
     color: var(--color-text-primary);
-    line-height: 1.62;
+    line-height: var(--leading-relaxed);
     position: relative;
     transition: background-color var(--transition-base), color var(--transition-base);
   }
 
-  /* Paper grain - layered radial-gradient noise (design system body texture) */
-  body::before {
+  /* Gantry grain — fractal-noise SVG overlay; multiply on light, normal on dark */
+  body::after {
     content: '';
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 1;
-    z-index: -1;
-    background-image:
-      radial-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
-      radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
-    background-size: 3px 3px, 7px 7px;
-    background-position: 0 0, 1px 2px;
+    inset: 0;
+    z-index: 9999;
     pointer-events: none;
-    transition: opacity var(--transition-base);
-  }
-
-  /* Paper grain - dark mode (lighter speckle on ink) */
-  :global([data-theme="dark"]) body::before {
-    background-image:
-      radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-      radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-    background-size: 3px 3px, 7px 7px;
-    background-position: 0 0, 1px 2px;
-    opacity: 1;
+    opacity: var(--grain-op);
+    mix-blend-mode: var(--grain-blend);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   #app {

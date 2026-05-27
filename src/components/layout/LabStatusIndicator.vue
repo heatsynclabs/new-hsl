@@ -105,100 +105,66 @@ onUnmounted(() => {
 .status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 0;
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  gap: 9px;
+  padding: 7px 13px;
   font-family: var(--font-ui);
-  transition: color var(--transition-fast);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  border: 0;
+  border: 2px solid currentColor;
   background: transparent;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+  cursor: default;
 }
 
 .status-badge.status-badge--loading {
-  color: var(--color-text-tertiary);
+  color: var(--smoke);
 }
 
 .status-dot {
-  width: 9px;
-  height: 9px;
-  border: 2px solid var(--color-text-primary);
-  transition: background-color var(--transition-base);
+  width: 10px;
+  height: 10px;
+  background: currentColor;
+  flex: none;
 }
 
 .status-dot--loading {
-  background: var(--color-text-tertiary);
-  border-color: var(--color-text-tertiary);
-  animation: pulse 2s ease-in-out infinite;
+  animation: pulse 2.4s ease-in-out infinite;
 }
 
 .status-dot--open {
-  background: var(--newbie-green);
-  border-color: var(--newbie-green);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.status-dot--closed {
-  background: var(--red);
-  border-color: var(--red);
+  animation: pulse 2.4s ease-in-out infinite;
 }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  50% { opacity: 0.35; }
 }
 
 .status-text {
   font-family: var(--font-ui);
-  font-size: var(--text-xs);
+  font-size: 12px;
+  line-height: 1;
 }
 
-/* Open state - text colored, no box */
+/* Open state — green border + text */
 .status-badge.status-badge--open {
-  color: var(--newbie-green);
-}
-:global([data-theme="dark"]) .status-badge.status-badge--open {
-  color: #3fa37e;
+  color: var(--live);
 }
 
-.status-badge.status-badge--open .status-dot {
-  background: var(--newbie-green);
-}
-
-/* Closed state - text colored, no box */
+/* Closed state — red border + text */
 .status-badge.status-badge--closed {
-  color: var(--red);
-}
-:global([data-theme="dark"]) .status-badge.status-badge--closed {
-  color: #f0736a;
-}
-:global([data-theme="dark"]) .status-dot--closed { background: #f0736a; border-color: #f0736a; }
-
-.status-badge.status-badge--closed .status-dot {
-  background: var(--red);
+  color: var(--fault);
 }
 
-/* Hover effect */
-.status-badge:hover {
-  cursor: default;
-  opacity: 0.9;
-}
-
-/* Mobile adjustments */
+/* Mobile */
 @media (max-width: 768px) {
   .status-badge {
-    font-size: var(--text-xs);
+    padding: 6px 11px;
+    gap: 7px;
   }
-
-  .status-dot {
-    width: 8px;
-    height: 8px;
-  }
-
-  .status-text {
-    font-size: var(--text-xs);
-  }
+  .status-text { font-size: 11px; }
+  .status-dot { width: 9px; height: 9px; }
 }
 </style>

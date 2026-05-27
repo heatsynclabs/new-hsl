@@ -28,7 +28,10 @@
           <span v-if="!event.isAllDay" class="upcoming__time">{{ formatTime(event.start) }}</span>
           <span v-else class="upcoming__time">All day</span>
         </div>
-        <div class="upcoming__title-cell">{{ event.displayTitle || event.title }}</div>
+        <div class="upcoming__body">
+          <div class="upcoming__title-cell">{{ event.displayTitle || event.title }}</div>
+          <p v-if="event.description" class="upcoming__desc">{{ shortDesc(event.description) }}</p>
+        </div>
       </li>
     </ul>
 
@@ -73,6 +76,13 @@ const calendarService = new CalendarService()
 const formatDate = (d: Date) => format(d, 'EEE MMM d')
 const formatTime = (d: Date) => format(d, 'h:mm a').toLowerCase()
 
+const shortDesc = (html: string): string => {
+  if (!html) return ''
+  const plain = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+  if (plain.length <= 90) return plain
+  return plain.substring(0, 87).trim() + '…'
+}
+
 const openEventModal = (event: CalendarEvent) => {
   selectedEvent.value = event
   modalVisible.value = true
@@ -97,97 +107,125 @@ onMounted(async () => {
 
 <style scoped>
 .upcoming__header {
-  margin-bottom: var(--space-5);
+  margin-bottom: 20px;
 }
 
 .upcoming__title {
-  font-size: var(--text-3xl);
-  font-weight: 400;
   font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 32px;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1;
   color: var(--color-text-primary);
   margin: 0;
-  line-height: 0.95;
-  text-shadow: none;
 }
 
 .upcoming__state {
   padding: var(--space-8) 0;
   text-align: center;
-  color: var(--color-text-tertiary);
-  font-family: var(--font-body);
+  color: var(--smoke);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .upcoming__list {
   list-style: none;
   padding: 0;
   margin: 0;
-  border-top: 2px solid var(--color-border);
+  border-top: var(--bd);
 }
 
 .upcoming__row {
   display: grid;
   grid-template-columns: 130px 1fr;
-  gap: var(--space-4);
+  gap: 16px;
   align-items: baseline;
-  padding: var(--space-3) var(--space-1);
-  border-bottom: 1px solid var(--color-border-light);
+  padding: 14px 4px;
+  border-bottom: var(--bd);
   cursor: pointer;
   transition: background-color var(--transition-fast);
 }
 
 .upcoming__row:hover {
-  background-color: var(--orange-dim2);
+  background-color: var(--hazard-dim);
 }
 
 .upcoming__when {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .upcoming__date {
   font-family: var(--font-ui);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-accent-secondary);
+  color: var(--accent-text);
   white-space: nowrap;
 }
 
 .upcoming__time {
   font-family: var(--font-ui);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--ash);
+}
+
+.upcoming__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
 .upcoming__title-cell {
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
   color: var(--color-text-primary);
-  line-height: 1.3;
+  line-height: 1.2;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.upcoming__desc {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: var(--leading-relaxed);
+  color: var(--ash);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .upcoming__footer {
-  margin-top: var(--space-5);
+  margin-top: 26px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 :global(.card.upcoming) {
+  background: transparent;
   border: none;
   box-shadow: none;
+  padding: 0;
 }
 
 @media (max-width: 768px) {
   .upcoming__row {
     grid-template-columns: 110px 1fr;
-    gap: var(--space-3);
+    gap: 12px;
   }
   .upcoming__title-cell {
-    font-size: var(--text-sm);
+    font-size: 15px;
   }
 }
 </style>

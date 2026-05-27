@@ -48,103 +48,88 @@ const buttonClasses = computed(() => [
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
+  gap: 8px;
   font-family: var(--font-ui);
-  font-weight: var(--font-normal);
-  letter-spacing: var(--tracking-wider);
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   text-decoration: none;
-  border: var(--border-thick);
+  border: 2px solid var(--tape-dark);
   cursor: pointer;
-  transition: transform var(--transition-base), box-shadow var(--transition-base), background-color var(--transition-base), color var(--transition-base);
-  position: relative;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color var(--transition-fast), color var(--transition-fast);
   white-space: nowrap;
   line-height: 1;
 }
 
 .btn:focus-visible {
-  outline: 3px solid var(--color-accent-primary);
-  outline-offset: 2px;
+  outline: 2px solid var(--hazard);
+  outline-offset: 3px;
 }
 
-/* Sizes */
 .btn--sm {
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--text-base);
+  padding: 9px 16px;
+  font-size: 11px;
   min-height: 34px;
 }
 
 .btn--md {
-  padding: var(--space-2) var(--space-6);
-  font-size: var(--text-lg);
+  padding: 12px 20px;
+  font-size: 12px;
   min-height: 42px;
 }
 
 .btn--lg {
-  padding: var(--space-3) var(--space-8);
-  font-size: var(--text-xl);
-  min-height: var(--button-height);
+  padding: 18px 30px;
+  font-size: 15px;
+  min-height: 56px;
 }
 
-/* PRIMARY - filled & flat at rest; the block shadow is the hover reward */
 .btn--primary {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
-}
-
-:global([data-theme="dark"]) .btn--primary {
-  background: var(--orange);
-  color: var(--ink);
-  border-color: var(--orange);
+  background: var(--hazard);
+  color: var(--tape-dark);
+  border-color: var(--tape-dark);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn--primary:hover:not(.btn--disabled) {
   transform: translate(-2px, -2px);
-  box-shadow: 8px 8px 0 var(--orange);
-}
-
-:global([data-theme="dark"]) .btn--primary:hover:not(.btn--disabled) {
-  box-shadow: 8px 8px 0 var(--paper-d);
+  box-shadow: var(--shadow);
 }
 
 .btn--primary:active:not(.btn--disabled) {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--orange);
+  transform: translate(0, 0);
+  box-shadow: var(--shadow-sm);
 }
 
-/* SECONDARY - flat, bordered. No shadow. */
 .btn--secondary {
   background: transparent;
   color: var(--color-text-primary);
-  border-color: var(--color-text-primary);
+  border-color: var(--steel-hi);
+  box-shadow: none;
 }
 
 .btn--secondary:hover:not(.btn--disabled) {
-  background: var(--color-text-primary);
-  color: var(--color-bg-primary);
+  border-color: var(--hazard);
+  color: var(--accent-text);
+  transform: translateY(-2px);
 }
 
-/* OUTLINE - flat, orange border. No shadow. */
 .btn--outline {
   background: transparent;
-  color: var(--color-accent-secondary);
-  border-color: var(--color-accent-primary);
+  color: var(--accent-text);
+  border-color: var(--hazard);
+  box-shadow: none;
 }
 
 .btn--outline:hover:not(.btn--disabled) {
-  background: var(--color-accent-primary);
-  color: var(--ink);
+  background: var(--hazard);
+  color: var(--tape-dark);
+  transform: translateY(-2px);
 }
 
-/* Disabled state */
 .btn--disabled {
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
-}
-
-.btn:active:not(.btn--disabled) {
-  transform: translate(1px, 1px);
 }
 </style>

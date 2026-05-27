@@ -6,6 +6,10 @@ import UpcomingEventsList from '../events/UpcomingEventsList.vue';
 
 <section class="community-section">
   <BaseContainer>
+    <div class="community-section__head">
+      <span class="community-section__num">01</span>
+      <span class="eyebrow">This week at the lab</span>
+    </div>
     <div class="community-grid">
       <div class="community-grid__col community-grid__col--hours">
         <OpenHours client:load forceCompact hideDescription />
@@ -19,21 +23,37 @@ import UpcomingEventsList from '../events/UpcomingEventsList.vue';
 
 <style>
   .community-section {
-    padding: var(--space-12) 0;
-    background: var(--color-bg-primary);
+    padding: 60px 0;
+    border-top: 2px solid var(--steel-hi);
+  }
+
+  .community-section__head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+
+  .community-section__num {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--accent-text);
   }
 
   .community-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-8);
+    gap: 36px;
     align-items: start;
   }
 
   @media (max-width: 960px) {
     .community-grid {
       grid-template-columns: 1fr;
-      gap: var(--space-8);
+      gap: 36px;
     }
+    .community-section { padding: 48px 0; }
   }
 </style>

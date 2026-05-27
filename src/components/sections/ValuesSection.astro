@@ -27,13 +27,16 @@ const values = [
 
 <section class="values">
   <BaseContainer>
-    <h2 class="values__title display-title">Our Values</h2>
-    <div class="values__rule"></div>
+    <div class="values__head">
+      <span class="values__num">03</span>
+      <span class="eyebrow">How we operate</span>
+    </div>
+    <h2 class="values__title sec-title">Our Values</h2>
 
     <ul class="values__list">
       {values.map((v) => (
         <li class="value-row">
-          <h3 class="value-row__title">{v.title}</h3>
+          <h4 class="value-row__title">{v.title}</h4>
           <p class="value-row__body">{v.body}</p>
         </li>
       ))}
@@ -43,27 +46,28 @@ const values = [
 
 <style>
   .values {
-    padding: var(--space-12) 0;
+    padding: 60px 0;
+    border-top: 2px solid var(--steel-hi);
   }
 
-  .section-eyebrow {
+  .values__head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+
+  .values__num {
     font-family: var(--font-ui);
-    color: var(--color-accent-secondary);
-    font-size: var(--text-xl);
-    letter-spacing: var(--tracking-ui);
-    margin-bottom: var(--space-1);
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--accent-text);
   }
 
   .values__title {
-    font-size: var(--text-5xl);
-    color: var(--color-text-primary);
-    margin-bottom: var(--space-4);
-  }
-
-  .values__rule {
-    height: 4px;
-    background: var(--orange);
-    margin-bottom: var(--space-8);
+    margin-bottom: 34px;
+    font-size: clamp(36px, 6vw, 64px);
   }
 
   .values__list {
@@ -72,57 +76,44 @@ const values = [
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--space-5);
+    gap: 14px;
   }
 
-  /* Each value is a colored band - flat, left-border accent + faint tint.
-     Color is decorative; the title text carries the meaning (color-blind safe). */
+  /* Each value is a colored bar — left-border accent + faint gradient tint.
+     Color is decorative; the title carries the meaning. */
   .value-row {
-    --vc: var(--orange-d);
-    border-left: 6px solid var(--vc);
-    background: color-mix(in srgb, var(--vc) 9%, var(--color-bg-primary));
-    padding: var(--space-4) var(--space-6);
-    transition: transform var(--transition-base);
+    --vc: var(--hazard);
+    border: var(--bd);
+    border-left: 4px solid var(--vc);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--vc) 16%, transparent), transparent 55%);
+    padding: 18px 22px;
   }
-  .value-row:hover { transform: translateX(4px); }
 
-  .value-row:nth-child(1) { --vc: var(--builder); }
-  .value-row:nth-child(2) { --vc: var(--talker); }
-  .value-row:nth-child(3) { --vc: var(--newbie); }
-  .value-row:nth-child(4) { --vc: var(--red); }
-  .value-row:nth-child(5) { --vc: var(--blue); }
-
-  /* Dark mode: brighten each value's own accent so it reads on ink */
-  :global([data-theme="dark"]) .value-row:nth-child(1) { --vc: #d98b3a; } /* builder */
-  :global([data-theme="dark"]) .value-row:nth-child(2) { --vc: #a78bfa; } /* talker */
-  :global([data-theme="dark"]) .value-row:nth-child(3) { --vc: #3fa37e; } /* newbie */
-  :global([data-theme="dark"]) .value-row:nth-child(4) { --vc: #f0736a; } /* red */
-  :global([data-theme="dark"]) .value-row:nth-child(5) { --vc: #6aa9e0; } /* blue */
-  :global([data-theme="dark"]) .value-row {
-    background: color-mix(in srgb, var(--vc) 14%, var(--color-bg-primary));
-  }
+  .value-row:nth-child(1) { --vc: var(--hazard); }
+  .value-row:nth-child(2) { --vc: var(--violet); }
+  .value-row:nth-child(3) { --vc: var(--live); }
+  .value-row:nth-child(4) { --vc: var(--fault); }
+  .value-row:nth-child(5) { --vc: var(--info); }
 
   .value-row__title {
-    font-family: var(--font-mono);
-    font-weight: var(--font-bold);
-    font-size: var(--text-lg);
-    letter-spacing: 1px;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--vc);
-    margin: 0 0 var(--space-1);
+    margin: 0 0 6px;
   }
 
   .value-row__body {
     font-family: var(--font-body);
-    font-size: var(--text-base);
+    font-size: 15px;
     line-height: var(--leading-relaxed);
-    color: var(--color-text-secondary);
+    color: var(--ash);
     margin: 0;
   }
 
-  @media (max-width: 768px) {
-    .values { padding: var(--space-10) 0; }
-    .values__title { font-size: var(--text-4xl); }
-    .value-row { padding: var(--space-3) var(--space-4); }
+  @media (max-width: 820px) {
+    .values { padding: 48px 0; }
   }
 </style>

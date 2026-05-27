@@ -139,9 +139,8 @@ onUnmounted(stop)
 .carousel {
   position: relative;
   width: 100%;
-  height: 100%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 
@@ -149,14 +148,10 @@ onUnmounted(stop)
   position: relative;
   width: 100%;
   max-width: 560px;
-  background: var(--paper-c);
-  border: var(--border-thick);
-  padding: 14px 14px 0;
-}
-
-:global([data-theme="dark"]) .carousel__frame {
-  background: var(--ink);
-  border-color: var(--paper-d);
+  background: var(--grime);
+  border: 2px solid var(--steel-hi);
+  box-shadow: var(--shadow);
+  padding: 10px;
 }
 
 .carousel__stage {
@@ -164,10 +159,9 @@ onUnmounted(stop)
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  background: var(--ink-panel);
-  border: 2px solid var(--ink);
+  background: var(--slab);
+  border: 1px solid var(--steel);
 }
-:global([data-theme="dark"]) .carousel__stage { border-color: var(--ink-soft); }
 
 .carousel__img {
   position: absolute;
@@ -175,7 +169,6 @@ onUnmounted(stop)
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(0.92) contrast(1.03);
   opacity: 0;
   transition: opacity 0.7s ease;
 }
@@ -184,14 +177,13 @@ onUnmounted(stop)
 /* Auto-advance progress bar */
 .carousel__progress {
   height: 4px;
-  background: var(--paper-d);
+  background: var(--steel);
   margin-top: 8px;
 }
-:global([data-theme="dark"]) .carousel__progress { background: var(--ink-soft); }
 .carousel__progress-fill {
   height: 100%;
   width: 0;
-  background: var(--orange);
+  background: var(--hazard);
   animation: carousel-progress 5s linear forwards;
 }
 .carousel.is-paused .carousel__progress-fill { animation-play-state: paused; }
@@ -204,16 +196,16 @@ onUnmounted(stop)
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3);
-  height: 42px;
-  padding: 0 4px;
+  gap: 8px;
+  margin-top: 8px;
   font-family: var(--font-ui);
 }
 
 .carousel__eyebrow {
-  font-size: var(--text-base);
-  letter-spacing: 1px;
-  color: var(--orange-d);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--accent-text);
   text-transform: uppercase;
   min-width: 0;
   flex: 1 1 auto;
@@ -221,47 +213,46 @@ onUnmounted(stop)
   overflow: hidden;
   text-overflow: ellipsis;
 }
-:global([data-theme="dark"]) .carousel__eyebrow { color: var(--orange); }
 
 .carousel__count {
   flex: 0 0 auto;
-  font-size: var(--text-lg);
-  letter-spacing: 2px;
-  color: var(--ink);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--smoke);
+  text-transform: uppercase;
 }
-:global([data-theme="dark"]) .carousel__count { color: var(--paper-d); }
 
-/* Prev / next - flat ink squares, thick border, no shadow */
+/* Prev / next — flat tape-dark squares (constant in both themes) with paper glyph */
 .carousel__btn {
   position: absolute;
-  top: 42%;
-  width: 44px;
-  height: 44px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ink);
-  color: var(--paper);
-  border: 3px solid var(--ink);
+  background: var(--tape-dark);
+  color: var(--on-dark);
+  border: 1px solid var(--on-dark-line);
   cursor: pointer;
   z-index: 7;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  transition: color var(--transition-fast), border-color var(--transition-fast);
 }
-:global([data-theme="dark"]) .carousel__btn { background: var(--paper); color: var(--ink); border-color: var(--paper); }
-.carousel__btn svg { width: 22px; height: 22px; }
-.carousel__btn:hover { background: var(--orange); color: var(--ink); border-color: var(--ink); }
-.carousel__btn--prev { left: -14px; }
-.carousel__btn--next { right: -14px; }
+.carousel__btn svg { width: 18px; height: 18px; }
+.carousel__btn:hover {
+  color: var(--hazard);
+  border-color: var(--hazard);
+}
+.carousel__btn--prev { left: 6px; }
+.carousel__btn--next { right: 6px; }
 
 @media (max-width: 900px) {
   .carousel__frame { max-width: 460px; }
 }
 
 @media (max-width: 600px) {
-  .carousel__btn { width: 38px; height: 38px; }
-  .carousel__btn--prev { left: -8px; }
-  .carousel__btn--next { right: -8px; }
-  .carousel__eyebrow { font-size: var(--text-sm); letter-spacing: 1px; }
-  .carousel__count { font-size: var(--text-base); }
+  .carousel__btn { width: 34px; height: 40px; }
 }
 </style>

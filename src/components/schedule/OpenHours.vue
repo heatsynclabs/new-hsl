@@ -157,184 +157,186 @@ onMounted(() => {
 .schedule__header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--space-8);
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
 }
 
 .schedule__header-content {
   flex: 1;
-  max-width: 70%;
+  min-width: 0;
 }
 
 .schedule__title {
-  font-size: var(--text-4xl);
-  font-weight: 400;
   font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(30px, 4vw, 44px);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1;
   color: var(--color-text-primary);
   margin: 0;
-  line-height: 0.95;
-  text-shadow: none;
 }
 
 .schedule__description {
   font-family: var(--font-body);
-  font-size: var(--text-base);
-  color: var(--color-text-secondary);
+  font-size: 15px;
+  color: var(--ash);
   line-height: var(--leading-relaxed);
-  margin: var(--space-4) 0 0 0;
-  text-align: left;
+  margin: 14px 0 0 0;
+  max-width: 660px;
 }
 
 .schedule__loading {
-  text-align: center;
   padding: var(--space-8);
-  color: var(--color-text-tertiary);
-  font-family: var(--font-body);
+  color: var(--smoke);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-/* The Open Hours card itself has no outer "white rectangle" border or shadow;
-   its padding stays, and the 7-day grid border is the single container. */
+/* The Open Hours card itself has no outer border/shadow — the week grid carries the container. */
 :global(.card.schedule) {
+  background: transparent;
   border: none;
   box-shadow: none;
+  padding: 0;
 }
 
+/* Default — Gantry 7-col week grid */
 .schedule__grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-  background: var(--color-text-primary);
-  padding: 2px;
-  border: var(--color-border-thick);
-  overflow: hidden;
+  border: var(--bd);
+  background: transparent;
 }
 
 .schedule__day {
-  background: var(--color-bg-secondary);
-  padding: var(--space-4) var(--space-3);
+  border-right: var(--bd);
+  border-top: 4px solid var(--day-color, var(--hazard));
+  padding: 16px 12px;
   text-align: center;
-  min-height: 110px;
+  min-height: 150px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: var(--space-2);
-  border-top: 5px solid var(--day-color, var(--orange));
+  align-items: center;
+  gap: 12px;
 }
 
-/* Day-of-week rainbow - color is decorative; the day name + hours carry the meaning */
-.schedule__day:nth-child(1) { --day-color: var(--day-sun); }
-.schedule__day:nth-child(2) { --day-color: var(--day-mon); }
-.schedule__day:nth-child(3) { --day-color: var(--day-tue); }
-.schedule__day:nth-child(4) { --day-color: var(--day-wed); }
-.schedule__day:nth-child(5) { --day-color: var(--day-thu); }
-.schedule__day:nth-child(6) { --day-color: var(--day-fri); }
-.schedule__day:nth-child(7) { --day-color: var(--day-sat); }
+.schedule__day:last-child {
+  border-right: 0;
+}
+
+/* Day-of-week rainbow — pulls Gantry palette */
+.schedule__day:nth-child(1) { --day-color: var(--hazard); }
+.schedule__day:nth-child(2) { --day-color: var(--violet); }
+.schedule__day:nth-child(3) { --day-color: var(--live); }
+.schedule__day:nth-child(4) { --day-color: var(--info); }
+.schedule__day:nth-child(5) { --day-color: var(--rust); }
+.schedule__day:nth-child(6) { --day-color: var(--hazard-deep); }
+.schedule__day:nth-child(7) { --day-color: var(--accent-text); }
 
 .schedule__day-name {
-  font-weight: 400;
-  font-size: var(--text-lg);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--day-color, var(--color-text-secondary));
   font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--smoke);
+  margin-bottom: 0;
 }
 
 .schedule__day-hours {
-  font-size: var(--text-sm);
-  color: var(--color-text-primary);
   font-family: var(--font-body);
-  font-weight: var(--font-normal);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.45;
   white-space: pre-line;
 }
 
 .schedule__day--open .schedule__day-hours {
   color: var(--color-text-primary);
-  font-weight: var(--font-bold);
+  font-weight: 600;
 }
 
-/* Compact (forced vertical list) — used when this card sits inside a narrow column */
+/* Compact mode — used when sitting in a narrow column. Vertical list. */
 .schedule--compact .schedule__header {
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
   align-items: flex-start;
+  margin-bottom: 20px;
 }
-.schedule--compact .schedule__header-content { max-width: 100%; }
-.schedule--compact .schedule__title { font-size: var(--text-3xl); }
+.schedule--compact .schedule__title { font-size: 32px; }
 .schedule--compact .schedule__grid {
   grid-template-columns: 1fr;
-  border: none;
-  background: transparent;
-  gap: 0;
-  padding: 0;
+  border: var(--bd);
 }
 .schedule--compact .schedule__day {
-  min-height: 52px;
+  min-height: 48px;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
   text-align: left;
-  border-top: 4px solid var(--day-color, var(--orange));
-  padding: var(--space-3) var(--space-4);
+  border-right: 0;
+  border-bottom: var(--bd);
+  border-top: 0;
+  border-left: 4px solid var(--day-color, var(--hazard));
+  padding: 12px 16px;
+  gap: 12px;
 }
 .schedule--compact .schedule__day:last-child {
-  border-bottom: 4px solid var(--day-color, var(--orange));
+  border-bottom: 0;
 }
 .schedule--compact .schedule__day-name {
-  font-size: var(--text-xs);
-  letter-spacing: 0.08em;
+  font-size: 11px;
+  letter-spacing: 0.12em;
 }
 .schedule--compact .schedule__day-hours {
   font-family: var(--font-ui);
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Responsive — collapse 7-col grid at 820 to 2-col, then to vertical list pattern at 600 */
+@media (max-width: 820px) {
   .schedule__header {
     flex-direction: column;
-    gap: var(--space-4);
-    align-items: center;
+    gap: var(--space-3);
+    align-items: flex-start;
   }
-
-  .schedule__header-content {
-    max-width: 100%;
+  .schedule__title { font-size: 30px; }
+  .schedule__grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-
-  .schedule__title {
-    font-size: var(--text-2xl);
+  .schedule__day {
+    border-right: var(--bd);
+    border-bottom: var(--bd);
+    min-height: 110px;
   }
-
-  .schedule__description {
-    text-align: center;
+  .schedule__day:nth-child(2n) {
+    border-right: 0;
   }
+}
 
-  /* Mobile: render the days as a clean padded list (card padding stays;
-     just the grid box/gaps go), with the colored day bars as separators. */
+@media (max-width: 480px) {
   .schedule__grid {
     grid-template-columns: 1fr;
-    border: none;
-    background: transparent;
-    gap: 0;
-    padding: 0;
   }
-
   .schedule__day {
-    min-height: 60px;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     text-align: left;
-    border-top: 4px solid var(--day-color, var(--orange));
-  }
-
-  .schedule__day:last-child {
-    border-bottom: 4px solid var(--day-color, var(--orange));
-  }
-
-  .schedule__day-name {
-    font-size: var(--text-base);
+    min-height: 56px;
+    padding: 14px 16px;
+    border-right: 0;
+    border-top: 0;
+    border-left: 4px solid var(--day-color, var(--hazard));
+    border-bottom: var(--bd);
   }
 }
 </style>
