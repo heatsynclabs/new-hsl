@@ -713,21 +713,18 @@ onMounted(() => {
 /* ---------- SECTIONS ----------
    Padding split into longhand top/bottom so .content-constrained's horizontal
    padding (`0 26px`) isn't clobbered by a `padding: Yx 0` shorthand on the
-   same element — both classes apply to the same node. */
+   same element — both classes apply to the same node.
+   Desktop = restrained; mobile (see @media below) = generous. */
 .cal-section,
 .calendar-header {
-  padding-top: 64px;
-  padding-bottom: 72px;
+  padding-top: 56px;
+  padding-bottom: 56px;
   border-top: 2px solid var(--steel-hi);
 }
 
-/* The Calendar header isn't really a "new section" — it's the calendar's own
-   chrome. Don't draw a divider line between Upcoming and it; the generous
-   padding alone marks the transition. Borders are reserved for real
-   between-content breaks (Recurring, Upcoming → grid). */
 .calendar-header {
   border-top: none;
-  padding-top: 32px;
+  padding-top: 40px;
 }
 
 .cal-section:first-child,
@@ -1608,12 +1605,12 @@ onMounted(() => {
 
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 820px) {
-  /* Longhand so horizontal padding from .content-constrained still applies. */
+  /* Mobile section spacing — ~44px total gap between Upcoming and the
+     Month/Day toggle. (Was being silently zeroed by the @media 600
+     .content-constrained shorthand below until it was switched to longhand.) */
   .cal-section,
-  .calendar-header { padding-top: 44px; padding-bottom: 56px; }
-  /* Calendar header doesn't draw a divider above it (see base rule) — so its
-     top padding is the only gap between Upcoming and the toggle row. */
-  .calendar-header { padding-top: 24px; }
+  .calendar-header { padding-top: 28px; padding-bottom: 24px; }
+  .calendar-header { padding-top: 20px; }
 
   .cal-section__title { font-size: clamp(22px, 5vw, 30px); }
 
@@ -1637,7 +1634,11 @@ onMounted(() => {
    and the day-view companion becomes the primary read-the-events surface.
    The desktop chip layout would be unreadable at this scale. */
 @media (max-width: 600px) {
-  .content-constrained { padding: 0 16px; }
+  /* Longhand left/right ONLY. A shorthand `padding: 0 16px` here would
+     ALSO zero out the vertical padding-top/padding-bottom set by the
+     .cal-section + .calendar-header rules above — which is the exact bug
+     that kept eating the mobile gap between Upcoming and the calendar. */
+  .content-constrained { padding-left: 16px; padding-right: 16px; }
 
   /* Restructure the calendar header into a 2-row grid on mobile:
      Row 1: [Month/Day toggle]   [search]
