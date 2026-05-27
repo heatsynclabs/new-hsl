@@ -1,29 +1,10 @@
 ---
 export const prerender = true;
 import Layout from '../layouts/Layout.astro';
-import BaseContainer from '../components/base/BaseContainer.astro';
-import BaseButton from '../components/base/BaseButton.astro';
 import FullCalendar from '../components/calendar/FullCalendar.vue';
 ---
 
 <Layout title="Calendar - HeatSync Labs">
-  <div class="calendar-page">
-    <BaseContainer size="full">
-      <FullCalendar client:load />
-    </BaseContainer>
-  </div>
+  <FullCalendar client:load />
 </Layout>
-
-<style>
-  .calendar-page {
-    flex: 1;
-    padding: var(--space-8) 0;
-  }
-
-  @media (max-width: 768px) {
-    .calendar-page {
-      padding: var(--space-4) 0;
-    }
-  }
-</style>
 

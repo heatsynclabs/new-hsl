@@ -1,189 +1,281 @@
 <template>
   <div class="full-calendar">
-    <!-- Recurring Events section -->
-    <div v-if="!loading && recurringEvents.length > 0" class="events-list recurring-section content-constrained">
-      <h3 class="events-title">Recurring Events</h3>
-      <div class="recurring-events-carousel">
-        <div
-          v-for="recurring in recurringEvents"
-          :key="recurring.title"
-          class="recurring-event-item"
-          @click="openEventModal(recurring.event!)"
+    <!-- Upcoming Events — side-scroll cards, no descriptions, top of page -->
+    <section v-if="!loading && upcomingEntries.length > 0" class="cal-section content-constrained">
+      <div class="cal-section__head">
+        <h2 class="cal-section__title">Upcoming Events</h2>
+      </div>
+      <EventCarousel :entries="upcomingEntries" @select="openEventModal" />
+    </section>
+
+    <!-- Calendar header: view toggle + month nav + search, all one row -->
+    <div class="calendar-header content-constrained">
+      <div class="view-toggle" role="tablist">
+        <button
+          :class="['view-toggle-btn', { active: viewMode === 'month' }]"
+          role="tab"
+          :aria-selected="viewMode === 'month'"
+          @click="viewMode = 'month'"
+        >Month</button>
+        <button
+          :class="['view-toggle-btn', { active: viewMode === 'day' }]"
+          role="tab"
+          :aria-selected="viewMode === 'day'"
+          @click="switchToDayView()"
+        >Day</button>
+      </div>
+
+      <div class="monthnav">
+        <button
+          class="nav-button"
+          :aria-label="viewMode === 'day' ? 'Previous day' : 'Previous month'"
+          @click="viewMode === 'day' ? previousDay() : previousMonth()"
+        >←</button>
+        <h2 class="month-year">
+          {{ viewMode === 'day' && selectedDay
+            ? format(selectedDay, 'EEE, MMM d')
+            : format(currentDate, 'MMMM') }}
+        </h2>
+        <button
+          class="nav-button"
+          :aria-label="viewMode === 'day' ? 'Next day' : 'Next month'"
+          @click="viewMode === 'day' ? nextDay() : nextMonth()"
+        >→</button>
+      </div>
+
+      <div class="header-search" :class="{ 'header-search--open': searchOpen }">
+        <button
+          type="button"
+          class="search-toggle"
+          :aria-label="searchOpen ? 'Close search' : 'Search this month'"
+          :aria-expanded="searchOpen"
+          @click="toggleSearch"
         >
-          <div class="recurring-event-content">
-            <h4 class="recurring-event-title">{{ recurring.title }}</h4>
-            <div class="recurring-event-next">
-              <svg class="calendar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 4H5C3.89543 4 3 4.89543 3 6V20C3 21.1046 3.89543 22 5 22H19C20.1046 22 21 21.1046 21 20V6C21 4.89543 20.1046 4 19 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M16 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M8 2V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M3 10H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              Next: {{ format(recurring.nextDate, 'MMM d, yyyy') }}
-            </div>
-          </div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </button>
+        <input
+          v-if="searchOpen"
+          ref="searchInputRef"
+          v-model="searchQuery"
+          type="text"
+          class="search-input"
+          :placeholder="`Search ${format(currentDate, 'MMMM yyyy')}`"
+          @keydown.escape="closeSearch"
+        />
+        <div v-if="searchOpen && searchQuery" class="search-panel">
+          <ul v-if="searchResults.length" class="search-results">
+            <li
+              v-for="result in searchResults"
+              :key="result.id"
+              class="search-result"
+              @click="onSearchSelect(result)"
+            >
+              <div class="search-result__title">{{ result.displayTitle || result.title }}</div>
+              <div class="search-result__meta">
+                {{ format(result.start, 'EEE MMM d') }}<span v-if="!result.isAllDay"> · {{ formatEventTimeShort(result) }}</span>
+              </div>
+            </li>
+          </ul>
+          <div v-else class="search-empty">No matches in {{ format(currentDate, 'MMMM') }}</div>
         </div>
       </div>
     </div>
 
-    <div class="calendar-header content-constrained">
-      <div class="header-top-row">
-        <div class="view-toggle">
-          <button
-            :class="['view-toggle-btn', { active: viewMode === 'month' }]"
-            @click="viewMode = 'month'"
-          >Month</button>
-          <button
-            :class="['view-toggle-btn', { active: viewMode === 'day' }]"
-            @click="switchToDayView()"
-          >Day</button>
-        </div>
-      </div>
-      <div class="header-nav-row">
-        <button @click="viewMode === 'day' ? previousDay() : previousMonth()" class="nav-button">
-          ←
-        </button>
-        <h2 class="month-year">
-          {{ viewMode === 'day' && selectedDay ? format(selectedDay, 'EEEE, MMMM d, yyyy') : formatMonthYear(currentDate) }}
-        </h2>
-        <button @click="viewMode === 'day' ? nextDay() : nextMonth()" class="nav-button">
-          →
-        </button>
-      </div>
+    <!-- Legend — Recurring, Open Hours, Hack, Registration. -->
+    <div v-if="viewMode === 'month' && !loading && !error" class="cal-legend content-constrained">
+      <span class="cal-legend__item cal-legend__item--recurring">
+        <span class="cal-legend__sw"></span>
+        Recurring
+      </span>
+      <span class="cal-legend__item cal-legend__item--group">
+        <span class="cal-legend__sw"></span>
+        Group
+      </span>
+      <span class="cal-legend__item cal-legend__item--hack">
+        <span class="cal-legend__sw"></span>
+        HYH
+      </span>
+      <span class="cal-legend__item cal-legend__item--open">
+        <span class="cal-legend__sw cal-legend__sw--ghost"></span>
+        Open Hours
+      </span>
+      <span class="cal-legend__item cal-legend__item--reg">
+        <span class="cal-legend__sw cal-legend__sw--reg">REG</span>
+        Registration required
+      </span>
     </div>
 
     <div v-if="error" class="calendar-error content-constrained">
       <p>Unable to load calendar events. Please try again later.</p>
-      <button @click="loadEvents" class="nav-button">Retry</button>
+      <button class="nav-button" @click="loadEvents">Retry</button>
     </div>
 
     <div v-else-if="loading" class="calendar-loading content-constrained">
       <p>Loading calendar...</p>
     </div>
 
-    <!-- Day View -->
-    <div v-else-if="viewMode === 'day'" class="day-view content-constrained">
-      <div v-if="selectedDayEvents.length === 0" class="day-view-empty">
-        No events on this day.
-      </div>
-      <div
-        v-for="event in selectedDayEvents"
-        :key="event.id"
-        class="day-view-event"
-        @click="openEventModal(event)"
-      >
-        <div class="day-view-event-time">{{ formatEventTime(event) }}</div>
-        <div class="day-view-event-body">
-          <div class="day-view-event-title">{{ event.displayTitle }}</div>
-          <div v-if="event.requiresRegistration" class="day-view-event-registration">
-            <svg class="registration-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M16 21V19C16 17.9391 15.5786 16.9217 14.8284 16.1716C14.0783 15.4214 13.0609 15 12 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="8.5" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <line x1="20" y1="8" x2="20" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              <line x1="23" y1="11" x2="17" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Registration required<span v-if="event.registrationCost"> · {{ event.registrationCost }}</span>
+    <!-- Month view: grid (chips on desktop, dots on mobile) -->
+    <div v-else-if="viewMode === 'month'" class="month-view content-constrained">
+      <div class="calendar-grid">
+        <div v-for="day in dayHeaders" :key="day" class="day-header">{{ day }}</div>
+
+        <div
+          v-for="day in calendarDays"
+          :key="day.date.getTime()"
+          :class="[
+            'calendar-day',
+            {
+              'other-month': !day.isCurrentMonth,
+              'today': day.isToday,
+              'selected': selectedDay && isSameDay(day.date, selectedDay),
+            },
+          ]"
+          @click="onDayClick(day)"
+        >
+          <div class="day-number">{{ day.date.getDate() }}</div>
+
+          <!-- Desktop chips: title + time -->
+          <div v-if="day.events.length > 0" class="day-events day-events--chips">
+            <div
+              v-for="event in day.events.slice(0, 3)"
+              :key="event.id"
+              :class="[
+                'event-dot',
+                `event-dot--${getEventCategory(event)}`,
+                { 'event-dot--all-day': event.isAllDay },
+              ]"
+              :title="`${event.title} - ${formatEventTime(event)}`"
+              @click.stop="openEventModal(event)"
+            >
+              <span v-if="event.requiresRegistration" class="event-dot__reg">REG</span>
+              <span class="event-time-inline">{{ formatEventTimeShort(event) }}</span>
+              <span class="event-title">{{ event.displayTitle || event.title }}</span>
+            </div>
+            <div
+              v-if="day.events.length > 3"
+              class="more-events"
+              @click.stop="onDayClick(day)"
+            >+{{ day.events.length - 3 }} more</div>
           </div>
-          <div v-if="event.location" class="day-view-event-location">
-            <svg class="location-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-            {{ event.location }}
+
+          <!-- Mobile icons: one tiny category-tinted icon per event -->
+          <div v-if="day.events.length > 0" class="day-events day-events--icons">
+            <EventIcon
+              v-for="event in day.events.slice(0, 6)"
+              :key="`d-${event.id}`"
+              :name="iconForEvent(event)"
+              :class="['day-glyph', `day-glyph--${getEventCategory(event)}`]"
+              :aria-label="event.displayTitle || event.title"
+            />
           </div>
-          <div v-if="event.description" class="day-view-event-desc" v-html="event.description"></div>
         </div>
       </div>
     </div>
 
-    <!-- Month View -->
+    <!-- Day view / companion agenda. Always renders the selected day's events.
+         In month mode this acts as a companion list below the grid
+         (essential on mobile where cells only show dots). In day mode it's
+         the only thing on screen. -->
     <div
-      v-else
-      class="calendar-grid"
+      v-if="!loading && selectedDay"
+      :class="[
+        'day-view content-constrained',
+        { 'day-view--companion': viewMode === 'month' },
+      ]"
     >
-      <!-- Day headers -->
-      <div
-        v-for="day in dayHeaders"
-        :key="day"
-        class="day-header"
-      >
-        {{ day }}
+      <div class="day-view__head">
+        <span class="day-view__date">{{ format(selectedDay, 'EEE · MMM d') }}</span>
+        <span class="day-view__count">
+          {{ selectedDayEvents.length }} event{{ selectedDayEvents.length === 1 ? '' : 's' }}
+        </span>
       </div>
-
-      <!-- Calendar days -->
-      <div
-        v-for="(day, index) in calendarDays"
-        :key="`${day.date.getTime()}`"
-        :class="[
-          'calendar-day',
-          {
-            'other-month': !day.isCurrentMonth,
-            'today': day.isToday,
-            'has-events': day.events.length > 0
-          }
-        ]"
-        @click="onDayClick(day)"
-      >
-        <div class="day-number">{{ day.date.getDate() }}</div>
-        <div v-if="day.events.length > 0" class="day-events">
-          <div
-            v-for="event in day.events.slice(0, 3)"
-            :key="event.id"
-            :class="[
-              'event-dot',
-              { 'all-day': event.isAllDay }
-            ]"
-            :title="`${event.title} - ${formatEventTime(event)}`"
-            @click.stop="openEventModal(event)"
-          >
-            <span class="event-time-inline">{{ formatEventTimeShort(event) }}</span>
-            <span class="event-title">{{ event.title }}</span>
+      <p v-if="selectedDayEvents.length === 0" class="day-view-empty">
+        No events on this day.
+      </p>
+      <ul v-else class="rlist">
+        <li
+          v-for="event in selectedDayEvents"
+          :key="event.id"
+          :class="['rlist-item', `rlist-item--${getEventCategory(event)}`]"
+          @click="openEventModal(event)"
+        >
+          <div class="rlist-item__head">
+            <h4 class="rlist-item__title">{{ event.displayTitle }}</h4>
+            <div class="rlist-item__when">
+              <span class="rlist-item__time">{{ formatEventTime(event) }}</span>
+            </div>
           </div>
-          <div v-if="day.events.length > 3" class="more-events" @click.stop="onDayClick(day)">
-            +{{ day.events.length - 3 }} more
+          <span class="rlist-item__tag">{{ categoryLabel(getEventCategory(event)) }}</span>
+          <p
+            v-if="event.description"
+            class="rlist-item__desc"
+            v-html="cleanDescription(event.description)"
+          ></p>
+          <div v-if="event.location || event.requiresRegistration" class="rlist-item__meta">
+            <span v-if="event.location" class="rlist-item__loc">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              {{ event.location }}
+            </span>
+            <a
+              v-if="event.requiresRegistration && event.registrationUrl"
+              :href="event.registrationUrl"
+              target="_blank"
+              rel="noopener"
+              class="rlist-item__register"
+              @click.stop
+            >
+              Register{{ event.registrationCost ? ' · ' + event.registrationCost : '' }} →
+            </a>
+            <span
+              v-else-if="event.requiresRegistration"
+              class="rlist-item__register rlist-item__register--info"
+            >
+              Registration required{{ event.registrationCost ? ' · ' + event.registrationCost : '' }}
+            </span>
           </div>
-        </div>
-      </div>
+        </li>
+      </ul>
     </div>
 
+    <!-- Recurring Events — side-scroll cards, after the calendar -->
+    <section v-if="!loading && recurringEntries.length > 0" class="cal-section content-constrained">
+      <div class="cal-section__head">
+        <h2 class="cal-section__title">Recurring Events</h2>
+      </div>
+      <EventCarousel
+        :entries="recurringEntries"
+        layout="grid"
+        hide-tag
+        @select="openEventModal"
+      />
+    </section>
+
+    <!-- Calendar export — two-button hierarchy: primary (Google) + secondary (iCal).
+         The standalone "Open in Google Calendar" link was dropped since the
+         primary "Add" action already takes you to Google Calendar to confirm. -->
     <div v-if="!loading" class="subscribe-links content-constrained">
-      <a :href="icalUrl" class="subscribe-link" title="Subscribe via iCal">
-        <svg class="subscribe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-          <line x1="16" y1="2" x2="16" y2="6"></line>
-          <line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="3" y1="10" x2="21" y2="10"></line>
-        </svg>
-        Add to iCal
-      </a>
-      <a :href="googleCalendarUrl" target="_blank" rel="noopener noreferrer" class="subscribe-link" title="Add to Google Calendar">
-        <svg class="subscribe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-          <line x1="16" y1="2" x2="16" y2="6"></line>
-          <line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="3" y1="10" x2="21" y2="10"></line>
-          <text x="12" y="18" text-anchor="middle" font-size="7" fill="currentColor" stroke="none" font-weight="bold">G</text>
+      <a
+        :href="googleCalendarUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="subscribe-link subscribe-link--primary"
+      >
+        <svg class="subscribe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="17" rx="2" />
+          <path d="M3 9h18M8 2v4M16 2v4" />
         </svg>
         Add to Google Calendar
       </a>
-      <a :href="googleCalendarEmbedUrl" target="_blank" rel="noopener noreferrer" class="subscribe-link" title="Open in Google Calendar">
-        <svg class="subscribe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-          <polyline points="15 3 21 3 21 9"></polyline>
-          <line x1="10" y1="14" x2="21" y2="3"></line>
+      <a :href="icalUrl" class="subscribe-link subscribe-link--secondary">
+        <svg class="subscribe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="17" rx="2" />
+          <path d="M3 9h18M8 2v4M16 2v4" />
         </svg>
-        Open in Google Calendar
+        Subscribe via iCal
       </a>
-    </div>
-
-    <!-- One-time Events section -->
-    <div v-if="!loading && oneTimeEvents.length > 0" class="events-list content-constrained">
-      <h3 class="events-title">Upcoming Events</h3>
-      <div class="events-grid">
-        <EventCard
-          v-for="event in oneTimeEvents"
-          :key="event.id"
-          :event="event"
-          @click="(e: CalendarEvent) => openEventModal(e)"
-        />
-      </div>
     </div>
 
     <EventModal
@@ -195,28 +287,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted, watch } from 'vue'
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths, addDays, subDays, isToday, startOfDay, endOfDay } from 'date-fns'
-import EventCard from '../events/EventCard.vue'
 import EventModal from '../events/EventModal.vue'
+import EventCarousel, { type CarouselEntry } from '../events/EventCarousel.vue'
+import EventIcon from '../events/EventIcon.vue'
+import { categorize, categoryLabel, categoryIcon, type EventCategory } from '../../utils/eventCategory'
+import { findKnownEvent } from '../../utils/knownEvents'
 import { CalendarService, type CalendarEvent } from '../../services/calendarService'
 import { config } from '../../config'
 
 const encodedCalendarId = encodeURIComponent(config.calendarId)
 const icalUrl = `https://calendar.google.com/calendar/ical/${encodedCalendarId}/public/basic.ics`
 const googleCalendarUrl = `https://calendar.google.com/calendar/render?cid=${encodedCalendarId}`
-const googleCalendarEmbedUrl = `https://calendar.google.com/calendar/embed?src=${encodedCalendarId}`
 
-// Start with current month, but if we're in the last week, show next month
-const getInitialDate = () => {
-  const today = new Date()
-  if (today.getDate() > 23) {
-    return addMonths(today, 1)
-  }
-  return today
-}
-
-const currentDate = ref(getInitialDate())
+// Always start at the current month. Every mainstream calendar (Google,
+// Apple, Outlook, FullCalendar.js) does this — users expect today to be
+// visible and highlighted. The "what's next" surface is the Upcoming Events
+// carousel above; the calendar itself is for orienting around today.
+const currentDate = ref(new Date())
 const allEvents = ref<CalendarEvent[]>([])
 const futureEvents = ref<CalendarEvent[]>([])
 const loading = ref(true)
@@ -255,7 +344,15 @@ const calendarDays = computed(() => {
 
 const onDayClick = (day: { date: Date; events: CalendarEvent[] }) => {
   selectedDay.value = day.date
-  viewMode.value = 'day'
+  // If user clicked a leading/trailing day (visible in this grid but from
+  // an adjacent month), navigate the view to that month. Matches Google
+  // Calendar / Apple Calendar / etc. — clicking is also a navigation gesture.
+  if (!isSameMonth(day.date, currentDate.value)) {
+    currentDate.value = day.date
+    loadEvents()
+  }
+  // Otherwise stay in month mode; the day-view companion list below the
+  // grid updates. Use the Day toggle for the focused day-only view.
 }
 
 // Day view events
@@ -331,6 +428,18 @@ const recurringEvents = computed(() => {
   return recurring.sort((a, b) => a.nextDate.getTime() - b.nextDate.getTime())
 })
 
+// Set of recurring titles (lowercase) for fast category lookup against any event
+// shown in the month grid. Built from futureEvents so it follows recurrence
+// over a wider horizon than just the visible month.
+const recurringTitles = computed(() => new Set(
+  recurringEvents.value.map(r => r.title.toLowerCase())
+))
+
+// Category lookup uses the shared util in src/utils/eventCategory.ts.
+// Wrapped here so call sites don't have to pass recurringTitles every time.
+const getEventCategory = (event: CalendarEvent): EventCategory =>
+  categorize(event, recurringTitles.value)
+
 const oneTimeEvents = computed(() => {
   const eventGroups = futureEvents.value.reduce((groups, event) => {
     const key = event.title.toLowerCase()
@@ -346,6 +455,103 @@ const oneTimeEvents = computed(() => {
     .map(([_, events]) => events[0]!)
 
   return oneTime.sort((a, b) => a!.start.getTime() - b!.start.getTime())
+})
+
+// Pick the icon for an event: known-events registry first, then the
+// category's fallback icon. Used by carousels, day-view list, and mobile dots.
+const iconForEvent = (event: CalendarEvent): string => {
+  const known = findKnownEvent(event.title)
+  return known?.icon ?? categoryIcon(getEventCategory(event))
+}
+
+// Build a CarouselEntry from an event. Color comes from category; the icon
+// (from the known-events registry, falling back to the category icon) is what
+// visually distinguishes one event from another within the same category.
+const buildEntry = (
+  event: CalendarEvent,
+  options: { key: string; dateLabel: string }
+): CarouselEntry => ({
+  key: options.key,
+  title: event.displayTitle || event.title,
+  dateLabel: options.dateLabel,
+  timeLabel: event.isAllDay ? 'All day' : formatEventTimeShort(event),
+  category: getEventCategory(event),
+  event,
+  icon: iconForEvent(event),
+})
+
+// Entries for the side-scroll carousels — derived once from the existing lists.
+// Limited to 8 each so the rails feel scannable, not overwhelming.
+const upcomingEntries = computed<CarouselEntry[]>(() =>
+  oneTimeEvents.value.slice(0, 8).map(event =>
+    buildEntry(event, {
+      key: event.id,
+      dateLabel: format(event.start, 'EEE MMM d'),
+    })
+  )
+)
+
+const recurringEntries = computed<CarouselEntry[]>(() =>
+  recurringEvents.value.map(rec =>
+    buildEntry(rec.event, {
+      key: rec.title,
+      dateLabel: `Next · ${format(rec.nextDate, 'MMM d')}`,
+    })
+  )
+)
+
+// ---------- Search (current month) ----------
+const searchOpen = ref(false)
+const searchQuery = ref('')
+const searchInputRef = ref<HTMLInputElement | null>(null)
+
+const searchResults = computed<CalendarEvent[]>(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  if (!q) return []
+  // Dedupe by id and limit to a reasonable dropdown size.
+  const seen = new Set<string>()
+  const out: CalendarEvent[] = []
+  for (const event of allEvents.value) {
+    if (seen.has(event.id)) continue
+    const hay = `${event.title} ${event.description || ''}`.toLowerCase()
+    if (hay.includes(q)) {
+      seen.add(event.id)
+      out.push(event)
+      if (out.length >= 8) break
+    }
+  }
+  return out
+})
+
+const toggleSearch = async () => {
+  searchOpen.value = !searchOpen.value
+  if (searchOpen.value) {
+    await nextTick()
+    searchInputRef.value?.focus()
+  } else {
+    searchQuery.value = ''
+  }
+}
+
+const closeSearch = () => {
+  searchOpen.value = false
+  searchQuery.value = ''
+}
+
+const onSearchSelect = (event: CalendarEvent) => {
+  // Jump the calendar to the event's month if needed, then open the modal.
+  if (!isSameMonth(event.start, currentDate.value)) {
+    currentDate.value = event.start
+    loadEvents()
+  }
+  selectedDay.value = startOfDay(event.start)
+  closeSearch()
+  openEventModal(event)
+}
+
+// Clear search when navigating months — results were keyed to that month's data.
+watch(currentDate, () => {
+  if (searchQuery.value) searchQuery.value = ''
 })
 
 const formatMonthYear = (date: Date) => {
@@ -373,6 +579,20 @@ const getTruncatedTitle = (title: string) => {
 const truncateDescription = (desc: string) => {
   if (desc.length <= 120) return desc
   return desc.substring(0, 117).trim() + '...'
+}
+
+const stripHtml = (html: string): string => {
+  if (!html) return ''
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+// Description has already been sanitized by parseGoogleCalendarEvent (removes
+// guestlist URLs, registration text, cost, and converts \n → <br>). We just
+// ensure any anchor tags in user descriptions open in a new tab so they don't
+// hijack the page.
+const cleanDescription = (description: string): string => {
+  if (!description) return ''
+  return description.replace(/<a (?![^>]*target=)/gi, '<a target="_blank" rel="noopener" ')
 }
 
 const formatEventTime = (event: CalendarEvent) => {
@@ -435,823 +655,1033 @@ const closeEventModal = () => {
   selectedEvent.value = null
 }
 
+// Selected day defaults to today so the day-agenda below the grid always has
+// something to show on mobile; on desktop the agenda is hidden via CSS in
+// month mode (see .day-view--companion).
+const ensureSelectedDay = () => {
+  const today = new Date()
+  if (isSameMonth(today, currentDate.value)) {
+    selectedDay.value = startOfDay(today)
+  } else {
+    selectedDay.value = startOfDay(startOfMonth(currentDate.value))
+  }
+}
+
+watch(currentDate, () => {
+  if (!selectedDay.value || !isSameMonth(selectedDay.value, currentDate.value)) {
+    ensureSelectedDay()
+  }
+})
+
 onMounted(() => {
+  ensureSelectedDay()
   loadEvents()
 })
 </script>
 
 <style scoped>
+/* ============================================================
+   FULL CALENDAR — GANTRY STYLES
+   3 event categories detectable from data:
+     • open      → title contains "open hours" / "member hours"
+     • recurring → title appears in another future occurrence
+     • other     → everything else (one-off events)
+   REG badge overlay on any event with requiresRegistration.
+   All colors flow through theme tokens (light + dark).
+   ============================================================ */
+
 .full-calendar {
   max-width: 100%;
   margin: 0 auto;
 }
 
 .content-constrained {
-  max-width: var(--container-xl);
+  max-width: var(--maxw);
   margin-left: auto;
   margin-right: auto;
+  padding: 0 26px;
 }
 
+/* ---------- SECTIONS ---------- */
+.cal-section,
 .calendar-header {
+  padding: 56px 0;
+  border-top: 2px solid var(--steel-hi);
+}
+
+/* Calendar header gets extra top padding to clearly separate from the
+   Upcoming Events carousel above it. */
+.calendar-header { padding-top: 64px; }
+
+.cal-section:first-child,
+.calendar-header:first-child {
+  border-top: none;
+}
+
+.cal-section__head {
+  margin-bottom: 22px;
+}
+
+.cal-section__title,
+.events-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(26px, 3.8vw, 40px);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.95;
+  margin: 8px 0 0;
+  color: var(--color-text-primary);
+  text-align: left;
+}
+
+.cal-eyebrow {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+/* ---------- DAY-VIEW LIST (rlist) ----------
+   Per-row category accents (border-left + tag color) carry the meaning so
+   sections built from this list (just day view now; recurring moved to a
+   carousel) don't need bespoke modifier classes. */
+.rlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rlist-item {
+  padding: 16px 0 16px 14px;
+  border-left: 4px solid var(--cat, var(--smoke));
+  border-bottom: 1px dashed var(--steel);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-6);
-  padding: var(--space-6) 0 var(--space-4);
+  gap: 6px;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
 }
 
-.header-top-row {
+.rlist-item:last-child { border-bottom: none; }
+
+.rlist-item:hover {
+  background: color-mix(in srgb, var(--cat, var(--smoke)) 8%, transparent);
+}
+
+/* Category accents — mirror the EventCarousel mapping */
+.rlist-item--class     { --cat: var(--hazard-deep); }
+.rlist-item--open      { --cat: var(--hazard); }
+.rlist-item--hack      { --cat: var(--rust); }
+.rlist-item--group     { --cat: var(--info); }
+.rlist-item--recurring { --cat: var(--live); }
+.rlist-item--default   { --cat: var(--smoke); }
+
+.rlist-item__head {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 16px;
 }
 
-.subscribe-links {
+.rlist-item__title {
+  font-family: var(--font-ui);
+  font-weight: 500;
+  font-size: 15px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-text-primary);
+  line-height: 1.25;
+  margin: 0;
+}
+
+.rlist-item__tag {
+  align-self: flex-start;
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 6px;
+  border: 1px solid var(--cat, var(--smoke));
+  color: var(--cat, var(--smoke));
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.rlist-item--class .rlist-item__tag {
+  background: var(--hazard);
+  color: var(--tape-dark);
+  border-color: var(--hazard);
+}
+
+.rlist-item__when {
   display: flex;
-  justify-content: center;
-  gap: var(--space-1);
-  padding: var(--space-1) 0;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
 }
 
-.subscribe-link {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-3);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--color-text-secondary);
-  text-decoration: none;
-  border: 1px solid var(--color-text-tertiary);
-  border-radius: var(--radius-base);
-  background: var(--color-bg-secondary);
-  transition: all var(--transition-base);
+.rlist-item__time {
+  color: var(--smoke);
 }
 
-.subscribe-link:hover {
-  background: var(--color-accent-primary);
-  color: var(--color-bg-primary);
-  border-color: var(--color-accent-primary);
-}
-
-.subscribe-icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
-.header-nav-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  width: 100%;
-  justify-content: center;
-}
-
-.view-toggle {
-  display: flex;
-  gap: 0;
-  border: 2px solid var(--color-text-primary);
+.rlist-item__desc {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: var(--leading-relaxed);
+  color: var(--ash);
+  margin: 0;
+  max-width: 80ch;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.rlist-item__desc :deep(a) {
+  color: var(--accent-text);
+  border-bottom: 1px solid var(--hazard);
+}
+
+.rlist-item__desc :deep(a:hover) {
+  color: var(--color-text-primary);
+}
+
+.rlist-item__desc :deep(br) {
+  display: block;
+  margin: 4px 0;
+}
+
+.rlist-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.rlist-item__loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--smoke);
+}
+
+.rlist-item__loc svg {
+  width: 11px;
+  height: 11px;
+  flex: none;
+}
+
+.rlist-item__register {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  border: 1px solid var(--hazard);
+  padding: 6px 11px;
+  text-decoration: none;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.rlist-item__register:hover {
+  background: var(--hazard);
+  color: var(--tape-dark);
+}
+
+.rlist-item__register--info {
+  cursor: default;
+  color: var(--ash);
+  border-color: var(--steel-hi);
+}
+
+/* ---------- CALENDAR HEADER + CONTROLS ----------
+   Single row layout: [Month/Day toggle] [← month →] [search]
+   Wraps on narrow viewports. */
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.monthnav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* ---------- HEADER SEARCH ----------
+   Icon button. Clicking expands an inline input + dropdown results panel
+   that filters the current month's events live. */
+.header-search {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-toggle {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 2px solid var(--steel-hi);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.search-toggle:hover {
+  border-color: var(--hazard);
+  color: var(--accent-text);
+}
+
+.header-search--open .search-toggle {
+  border-color: var(--hazard);
+  color: var(--accent-text);
+}
+
+.search-toggle svg { width: 16px; height: 16px; }
+
+.search-input {
+  width: 220px;
+  height: 40px;
+  padding: 0 12px;
+  background: var(--slab);
+  border: 2px solid var(--steel-hi);
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--hazard);
+}
+
+.search-input::placeholder {
+  color: var(--smoke);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+}
+
+.search-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  background: var(--slab);
+  border: 2px solid var(--steel-hi);
+  box-shadow: var(--shadow);
+  z-index: 20;
+}
+
+.search-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.search-result {
+  padding: 10px 14px;
+  border-bottom: 1px dashed var(--steel);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.search-result:last-child { border-bottom: none; }
+
+.search-result:hover {
+  background: color-mix(in srgb, var(--hazard) 12%, transparent);
+}
+
+.search-result__title {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-result__meta {
+  margin-top: 3px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.search-empty {
+  padding: 16px 14px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--smoke);
+  text-align: center;
+}
+
+/* Segmented Month/Day toggle */
+.view-toggle {
+  display: inline-flex;
+  border: 2px solid var(--steel-hi);
+  background: transparent;
 }
 
 .view-toggle-btn {
-  padding: var(--space-1) var(--space-4);
-  background: var(--color-bg-secondary);
-  border: none;
-  color: var(--color-text-secondary);
   font-family: var(--font-ui);
-  font-size: var(--text-base);
-  letter-spacing: var(--tracking-wide);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  padding: 9px 22px;
+  background: transparent;
+  color: var(--ash);
+  border: none;
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.view-toggle-btn:hover {
+  color: var(--accent-text);
 }
 
 .view-toggle-btn.active {
-  background: var(--color-accent-primary);
-  color: var(--color-bg-primary);
+  background: var(--hazard);
+  color: var(--tape-dark);
 }
 
 .month-year {
-  font-size: var(--text-4xl);
-  font-weight: 400;
   font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(22px, 2.8vw, 30px);
+  letter-spacing: -0.01em;
+  line-height: 1;
   color: var(--color-text-primary);
   text-align: center;
-  line-height: 0.95;
+  text-transform: none;
   text-shadow: none;
+  margin: 0;
+  white-space: nowrap;
 }
 
 .nav-button {
-  padding: var(--space-2) var(--space-4);
-  background: var(--color-bg-secondary);
-  border: 2px solid var(--color-text-primary);
-  color: var(--color-text-secondary);
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 2px solid var(--steel-hi);
+  color: var(--color-text-primary);
   font-family: var(--font-ui);
-  font-size: var(--text-lg);
+  font-size: 18px;
   cursor: pointer;
-  transition: all var(--transition-base);
-  flex-shrink: 0;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .nav-button:hover {
-  background: var(--color-accent-primary);
-  color: var(--color-bg-secondary);
-  border-color: var(--color-accent-primary);
+  border-color: var(--hazard);
+  color: var(--accent-text);
 }
 
-.calendar-loading {
-  text-align: center;
-  padding: var(--space-16);
-  color: var(--color-text-tertiary);
+/* ---------- LEGEND ---------- */
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  justify-content: center;
+  padding: 0 26px 22px;
 }
 
+.cal-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--smoke);
+}
+
+.cal-legend__sw {
+  display: inline-block;
+  width: 18px;
+  height: 12px;
+  border-left: 3px solid var(--cev-accent, var(--hazard));
+  background: color-mix(in srgb, var(--cev-accent, var(--hazard)) 16%, transparent);
+}
+
+.cal-legend__item--recurring .cal-legend__sw { --cev-accent: var(--live); }
+.cal-legend__item--group     .cal-legend__sw { --cev-accent: var(--info); }
+.cal-legend__item--hack      .cal-legend__sw { --cev-accent: var(--rust); }
+.cal-legend__sw--ghost {
+  border-left: 3px solid var(--hazard);
+  background: transparent;
+}
+.cal-legend__sw--reg {
+  width: auto;
+  height: auto;
+  border-left: none;
+  background: var(--hazard);
+  color: var(--tape-dark);
+  font-family: var(--font-ui);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 1px 4px;
+  border: 1px solid var(--tape-dark);
+}
+
+/* ---------- LOADING + ERROR ---------- */
+.calendar-loading,
 .calendar-error {
   text-align: center;
-  padding: var(--space-16);
-  color: var(--color-accent-primary);
+  padding: 64px 26px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--smoke);
 }
 
-/* Month view grid */
+.calendar-error p {
+  color: var(--fault);
+  margin-bottom: 16px;
+}
+
+/* ---------- MONTH GRID ---------- */
+/* .month-view wraps the grid in content-constrained so the calendar aligns
+   with all the section content (eyebrow / title / legend / rail) above and
+   below it. */
+.month-view {
+  padding-bottom: 26px;
+}
+
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 1px;
-  background: var(--color-text-tertiary);
-  border-radius: var(--radius-base);
-  overflow: hidden;
-  margin-bottom: var(--space-2);
+  /* minmax(0, 1fr) — CRUCIAL: forces columns to share viewport evenly even when
+     content min-content would otherwise push them wider. Without this, a long
+     nowrap event title makes one column overflow and the whole grid (and page)
+     gets a horizontal scrollbar. */
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border: 2px solid var(--steel-hi);
+  border-bottom: none;
+  /* NB: do not set width: 100% — block default fills the parent content area,
+     and the mobile @media negative-margin trick (below) extends it edge-to-edge
+     properly. A fixed width:100% would pin the box to the parent's content
+     width and create a visible right-side gap when negative margins shift it. */
 }
 
 .day-header {
-  background: var(--color-text-primary);
-  color: var(--color-bg-primary);
-  padding: var(--space-3);
+  background: var(--tape-dark);
+  color: var(--on-dark);
+  padding: 11px 8px;
   text-align: center;
-  font-size: var(--text-base);
-  font-weight: 400;
   font-family: var(--font-ui);
-  letter-spacing: var(--tracking-wide);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  border-right: 1px solid rgba(236, 227, 211, 0.12);
+  /* allow narrow columns; ellipsis if needed */
+  min-width: 0;
+  overflow: hidden;
+}
+
+.day-header:nth-child(7) {
+  border-right: none;
 }
 
 .calendar-day {
-  background: var(--color-bg-primary);
-  min-height: 120px;
-  padding: var(--space-2);
+  background: var(--slab);
+  min-height: 110px;
+  padding: 6px 6px 8px;
+  /* Subtle inner grid lines — `--steel` (lighter than the outer `--steel-hi`
+     frame). The mockup uses this two-tier approach so the outer frame reads
+     as the calendar's containing edge and the inner lines just separate days
+     without dominating. */
+  border-right: 1px solid var(--steel);
+  border-bottom: 1px solid var(--steel);
   display: flex;
   flex-direction: column;
   position: relative;
   cursor: pointer;
+  transition: background-color var(--transition-fast);
+  /* Belt-and-suspenders for the minmax fix — keep any rogue content from
+     spilling outside the cell. */
+  min-width: 0;
   overflow: hidden;
 }
 
-/* Days from the prev/next month: not greyed out. Instead a single magenta
-   outline wraps each contiguous run (the leading strip and the trailing strip),
-   with no lines between adjacent out-of-month days. */
+.calendar-day:nth-child(7n + 7) {
+  border-right: none;
+}
+
+.calendar-day:hover {
+  background: var(--slab-hi);
+}
+
 .calendar-day.other-month {
-  background: var(--color-bg-primary);
-  opacity: 1;
-  border-top: 2px solid #9d174d;
-  border-bottom: 2px solid #9d174d;
+  background: var(--grime);
 }
-/* left cap of the leading run (first day cell, right after the weekday headers) */
-.day-header + .calendar-day.other-month {
-  border-left: 2px solid #9d174d;
-}
-/* left cap of the trailing run (first out-of-month day after an in-month day) */
-.calendar-day:not(.other-month) + .calendar-day.other-month {
-  border-left: 2px solid #9d174d;
-}
-/* right cap of the leading run (drawn on the first in-month day after the run) */
-.calendar-day.other-month + .calendar-day:not(.other-month) {
-  border-left: 2px solid #9d174d;
-}
-/* right cap of the trailing run (last cell in the grid) */
-.calendar-day.other-month:last-child {
-  border-right: 2px solid #9d174d;
+
+.calendar-day.other-month .day-number {
+  color: var(--smoke);
 }
 
 .calendar-day.today {
-  background: var(--orange-dim);
+  background: var(--hazard-dim);
+  border-top: 3px solid var(--hazard);
+  margin-top: -2px;
 }
 
 .calendar-day.today .day-number {
-  background: var(--orange);
-  color: var(--ink);
-  border-radius: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: var(--accent-text);
+}
+
+/* Selected day — drawn as a hazard inset border so it works on both today
+   and non-today cells without fighting the today bg. */
+.calendar-day.selected::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--hazard);
+  pointer-events: none;
+}
+.calendar-day.selected .day-number {
+  color: var(--accent-text);
 }
 
 .day-number {
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1;
   color: var(--color-text-primary);
-  margin-bottom: var(--space-1);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
 }
 
 .day-events {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  min-width: 0;
 }
 
+.day-events--chips {
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Mobile icons: small category-tinted glyphs in a wrapping flex row.
+   One per event; replaces the old plain colored-dot pattern. */
+.day-events--icons {
+  display: none; /* visible only on mobile via media query */
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-content: flex-start;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.day-glyph {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 11px;
+  color: var(--cev-accent, var(--smoke));
+}
+
+.day-glyph--class     { color: var(--hazard); }
+.day-glyph--open      { color: var(--hazard); opacity: 0.7; }
+.day-glyph--hack      { color: var(--rust); }
+.day-glyph--group     { color: var(--info); }
+.day-glyph--recurring { color: var(--live); }
+.day-glyph--default   { color: var(--smoke); }
+
+/* ---------- EVENT CHIPS ---------- */
 .event-dot {
-  background: var(--event-timed);
-  color: #fff;
-  padding: 2px var(--space-1);
-  border-radius: 0;
-  font-size: var(--text-xs);
-  line-height: 1.2;
+  position: relative;
+  display: block;
+  padding: 4px 6px;
+  border-left: 3px solid var(--cev-accent, var(--hazard));
+  background: color-mix(in srgb, var(--cev-accent, var(--hazard)) 22%, transparent);
   cursor: pointer;
   transition: transform var(--transition-fast);
+  /* Critical for cells with minmax(0, 1fr) — overflow:hidden on the chip
+     means its min-content size collapses to 0, so it never widens its cell. */
+  overflow: hidden;
+  min-width: 0;
 }
 
 .event-dot:hover {
   transform: translateX(2px);
 }
 
-/* all-day events read in a distinct hue (color-blind safe: time text differs too) */
-.event-dot.all-day {
-  background: var(--event-allday);
-  color: #fff;
+.event-dot .event-time-inline {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: var(--smoke);
+  line-height: 1.2;
 }
 
-.event-title {
-  display: block;
-  white-space: nowrap;
+.event-dot .event-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  /* readable sans for the tiny month-grid chips (VT323 is too small here on mobile) */
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-weight: 400;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  /* Break long unbreakable words (like URLs or run-on titles) instead of
+     overflowing the chip. */
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-.event-time-inline {
-  display: block;
-  font-size: 11px;
-  opacity: 0.9;
-  font-family: var(--font-mono);
+.event-dot__reg {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  font-family: var(--font-ui);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--tape-dark);
+  background: var(--hazard);
+  border: 1px solid var(--tape-dark);
+  padding: 0 3px;
+  line-height: 1.4;
+}
+
+/* Category accents */
+.event-dot--recurring { --cev-accent: var(--live); }
+.event-dot--hack      { --cev-accent: var(--rust); }
+.event-dot--group     { --cev-accent: var(--info); }
+
+/* Default (uncategorized) — quiet neutral chip. We don't label these as
+   "one-time" because we can't be sure: some may recur outside our 90-day
+   detection window. So they get a calm steel-toned treatment and recede
+   visually next to the colored categories. */
+.event-dot--default {
+  --cev-accent: var(--smoke);
+  background: color-mix(in srgb, var(--smoke) 14%, transparent);
+}
+.event-dot--default .event-title { color: var(--color-text-primary); }
+.event-dot--default .event-time-inline { color: var(--smoke); }
+
+/* Open Hours — outline only, low opacity (the ambient "background" presence) */
+.event-dot--open {
+  background: transparent;
+  border-left: 3px solid var(--hazard);
+  opacity: 0.6;
+}
+.event-dot--open .event-title { color: var(--ash); }
+.event-dot--open .event-time-inline { color: var(--smoke); }
+
+/* Class — solid hazard fill, dark text, REG badge. Most prominent. */
+.event-dot--class {
+  background: var(--hazard);
+  border-left: 3px solid var(--hazard-deep);
+  /* When the chip itself is solid hazard, the absolute REG badge has its own
+     border but blends in. Tweak the badge's background to give contrast. */
+  padding-right: 38px;
+}
+.event-dot--class .event-title {
+  color: var(--tape-dark);
+  font-weight: 600;
+}
+.event-dot--class .event-time-inline {
+  color: rgba(20, 17, 13, 0.7);
+}
+.event-dot--class .event-dot__reg {
+  background: var(--tape-dark);
+  color: var(--hazard);
+  border-color: var(--tape-dark);
+}
+
+/* All-day events: stronger fill */
+.event-dot--all-day {
+  background: color-mix(in srgb, var(--cev-accent, var(--hazard)) 35%, transparent);
 }
 
 .more-events {
-  font-size: var(--text-xs);
-  color: var(--color-text-tertiary);
-  text-align: center;
-  padding: var(--space-1);
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+  padding: 3px 7px;
   cursor: pointer;
+  display: inline-block;
+  margin-top: 2px;
 }
 
 .more-events:hover {
-  color: var(--color-accent-primary);
+  color: var(--color-text-primary);
 }
 
-/* Day View */
+/* ---------- DAY VIEW ---------- */
+/* Used in both modes:
+    • Day mode — the whole view; grid is hidden.
+    • Month mode — acts as a companion list under the grid (.--companion).
+   Reuses .rlist styles for items; only the wrapper + header are unique here. */
 .day-view {
-  margin-bottom: var(--space-2);
+  padding-bottom: 26px;
+}
+
+.day-view--companion {
+  padding-top: 18px;
+  padding-bottom: 48px;
+}
+
+.day-view__head {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--steel-hi);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  gap: 14px;
+}
+
+.day-view__date {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  color: var(--color-text-primary);
+}
+
+.day-view__count {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--smoke);
 }
 
 .day-view-empty {
   text-align: center;
-  padding: var(--space-16);
-  color: var(--color-text-tertiary);
-  font-family: var(--font-sans);
-}
-
-.day-view-event {
-  display: flex;
-  gap: var(--space-4);
-  background: var(--color-bg-secondary);
-  border: var(--color-border-thick);
-  border-left: 6px solid var(--color-accent-primary);
-  padding: var(--space-4);
-  cursor: pointer;
-  transition: transform var(--transition-base), border-color var(--transition-base);
-}
-
-.day-view-event:hover {
-  transform: translateX(3px);
-  border-color: var(--color-accent-primary);
-}
-
-.day-view-event-time {
-  color: var(--color-accent-primary);
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  min-width: 100px;
-  flex-shrink: 0;
-}
-
-.day-view-event-body {
-  flex: 1;
-  min-width: 0;
-}
-
-.day-view-event-title {
-  color: var(--color-text-primary);
-  font-size: var(--text-xl);
-  font-weight: 400;
+  padding: 24px 0;
+  color: var(--smoke);
   font-family: var(--font-ui);
-  letter-spacing: 0.5px;
-  line-height: 1.05;
-  margin-bottom: var(--space-2);
-}
-
-.day-view-event-registration {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-size: var(--text-sm);
-  color: var(--color-accent-secondary);
-  font-family: var(--font-ui);
-  letter-spacing: 0.5px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  font-weight: 400;
-  margin-bottom: var(--space-2);
-  padding: var(--space-1) var(--space-2);
-  background: var(--orange-dim);
-  border: 1px solid var(--color-accent-primary);
-  width: fit-content;
 }
 
-.day-view-event-registration .registration-icon {
-  width: 14px;
-  height: 14px;
-  color: var(--accent-sage);
-  flex-shrink: 0;
-}
-
-.day-view-event-location {
+/* ---------- CALENDAR EXPORT BUTTONS ----------
+   Two-button hierarchy: primary (Google, hazard fill) + secondary (iCal, outline).
+   Stack vertically on mobile (full-width per the mockup), inline on desktop.
+   Big top padding gives clear breathing room from the Recurring section above. */
+.subscribe-links {
   display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 56px 0 24px;
+}
+
+.subscribe-link {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-  font-family: var(--font-sans);
-  margin-bottom: var(--space-2);
-}
-
-.day-view-event-location .location-icon {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
-.day-view-event-desc {
-  color: var(--color-text-secondary);
-  font-size: var(--text-sm);
-  line-height: var(--leading-relaxed);
-  font-family: var(--font-sans);
-}
-
-.day-view-event-desc :deep(a) {
-  color: var(--color-accent-primary);
-  text-decoration: underline;
-}
-
-.day-view-event-desc :deep(br) {
-  display: block;
-  margin-top: var(--space-1);
-}
-
-/* Sections below calendar */
-.events-list {
-  margin-top: var(--space-12);
-}
-
-.events-title {
-  font-size: var(--text-4xl);
-  font-weight: 400;
-  font-family: var(--font-display);
-  margin-bottom: var(--space-6);
-  color: var(--color-text-primary);
-  text-align: center;
-  line-height: 0.95;
-  text-shadow: none;
-}
-
-.events-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--space-4);
-}
-
-.recurring-section {
-  margin-bottom: var(--space-6);
-}
-
-.recurring-events-carousel {
-  display: flex;
-  gap: var(--space-4);
-  overflow-x: auto;
-  padding: var(--space-2) 0 var(--space-4) 0;
-  scroll-behavior: smooth;
-}
-
-.recurring-events-carousel::-webkit-scrollbar {
-  height: 8px;
-}
-
-.recurring-events-carousel::-webkit-scrollbar-track {
-  background: var(--color-bg-tertiary);
-  border-radius: 0;
-}
-
-.recurring-events-carousel::-webkit-scrollbar-thumb {
-  background: var(--orange);
-  border-radius: 0;
-  border: 2px solid var(--color-bg-primary);
-}
-
-.recurring-events-carousel::-webkit-scrollbar-thumb:hover {
-  background: var(--orange-d);
-}
-
-.recurring-event-item {
-  background: var(--color-bg-secondary);
-  border: var(--color-border-thick);
-  padding: var(--space-4);
-  cursor: pointer;
-  transition: transform var(--transition-base), border-color var(--transition-base);
-  position: relative;
-  flex: 0 0 320px;
-  min-height: 120px;
-}
-
-.recurring-event-item:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-accent-primary);
-}
-
-.recurring-event-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.recurring-event-title {
-  font-size: var(--text-xl);
-  font-weight: 400;
-  color: var(--color-text-primary);
+  justify-content: center;
+  gap: 10px;
   font-family: var(--font-ui);
-  letter-spacing: 0.5px;
-  line-height: 1.05;
-  margin: 0;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 13px 22px;
+  border: 2px solid var(--tape-dark);
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
-.recurring-event-next {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  color: var(--color-accent-primary);
-  font-family: var(--font-mono);
-  font-weight: var(--font-medium);
+.subscribe-link--primary {
+  background: var(--hazard);
+  color: var(--tape-dark);
+  box-shadow: var(--shadow-sm);
 }
 
-.recurring-event-next .calendar-icon {
-  width: 16px;
-  height: 16px;
-  color: var(--color-accent-primary);
+.subscribe-link--primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow);
 }
 
-
-/* Responsive */
-@media (max-width: 1024px) {
-  .full-calendar {
-    padding: 0 var(--space-4);
-  }
-
-  .month-year {
-    font-size: var(--text-2xl);
-  }
-
-  .calendar-day {
-    min-height: 100px;
-  }
-
-  .recurring-event-item {
-    flex: 0 0 280px;
-  }
+.subscribe-link--primary:active {
+  transform: translate(0, 0);
+  box-shadow: var(--shadow-sm);
 }
 
-@media (max-width: 768px) {
-  .full-calendar {
-    padding: 0 var(--space-2);
-  }
+.subscribe-link--secondary {
+  background: transparent;
+  color: var(--color-text-primary);
+  border-color: var(--steel-hi);
+  box-shadow: none;
+}
 
-  .month-year {
-    font-size: var(--text-lg);
-  }
+.subscribe-link--secondary:hover {
+  border-color: var(--hazard);
+  color: var(--accent-text);
+  transform: translateY(-2px);
+}
 
-  .calendar-grid {
-    font-size: var(--text-xs);
-    margin-bottom: var(--space-8);
-  }
+.subscribe-icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
 
-  .day-header {
-    padding: var(--space-2);
-    font-size: var(--text-xs);
-  }
-
-  .calendar-day {
-    min-height: 70px;
-    padding: var(--space-1);
-  }
-
-  .day-number {
-    font-size: var(--text-xs);
-    margin-bottom: 2px;
-  }
-
-  .event-dot {
-    padding: 1px var(--space-1);
-    font-size: 10px;
-  }
-
-  .event-time-inline {
-    display: none;
-  }
-
-  .event-title {
-    line-height: 1.1;
-  }
-
-  .more-events {
-    font-size: 10px;
-    padding: 1px;
-  }
-
-  .events-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-3);
-  }
-
-  .recurring-event-item {
-    flex: 0 0 260px;
-    min-height: 100px;
-    padding: var(--space-3);
-  }
-
-  .recurring-event-title {
-    font-size: var(--text-base);
-    line-height: 1.3;
-  }
-
-  .recurring-event-next {
-    font-size: var(--text-xs);
-  }
-
-  .events-list {
-    margin-top: var(--space-8);
-  }
-
-  .events-title {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-4);
-  }
-
-  /* Day view mobile: stack time above title */
-  .day-view-event {
+@media (max-width: 600px) {
+  .subscribe-links {
     flex-direction: column;
-    gap: var(--space-1);
+    padding: 24px 0 20px;
   }
-
-  .day-view-event-time {
-    min-width: unset;
-  }
-
-  .day-view-event-title {
-    font-size: var(--text-base);
-  }
-}
-
-@media (max-width: 480px) {
-  .full-calendar {
-    padding: 0;
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
-  }
-
-  .calendar-header {
-    padding: 0 var(--space-2);
-    gap: var(--space-1);
-  }
-
-  .month-year {
-    font-size: var(--text-base);
-  }
-
-  .nav-button {
-    padding: var(--space-1) var(--space-3);
-    font-size: var(--text-sm);
-  }
-
-  .view-toggle-btn {
-    padding: var(--space-1) var(--space-2);
-    font-size: 10px;
-  }
-
   .subscribe-link {
-    font-size: 10px;
-    padding: var(--space-1) var(--space-2);
-  }
-
-  .calendar-grid {
-    border-radius: 0;
-    margin-bottom: var(--space-6);
     width: 100%;
-    max-width: 100vw;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-
-  .day-header {
-    padding: var(--space-1);
-    font-size: 9px;
-    text-align: center;
-    overflow: hidden;
-  }
-
-  .calendar-day {
-    min-height: 50px;
-    padding: 1px;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-
-  .day-number {
-    font-size: 10px;
-    margin-bottom: 1px;
-    text-align: center;
-  }
-
-  .calendar-day.today .day-number {
-    width: 16px;
-    height: 16px;
-    font-size: 9px;
-  }
-
-  .day-events {
-    gap: 1px;
-  }
-
-  .event-dot {
-    padding: 1px;
-    font-size: 8px;
-    border-radius: 1px;
-    margin-bottom: 1px;
-    overflow: hidden;
-  }
-
-  .event-title {
-    line-height: 1;
-    font-size: 8px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .more-events {
-    font-size: 7px;
-    margin-top: 1px;
-    text-align: center;
-  }
-
-  .recurring-events-carousel {
-    padding: 0 var(--space-2);
-    gap: var(--space-2);
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .recurring-event-item {
-    flex: 0 0 220px;
-    min-height: 80px;
-    padding: var(--space-2);
-  }
-
-  .recurring-event-title {
-    font-size: var(--text-sm);
-    line-height: 1.2;
-  }
-
-  .recurring-event-next {
-    font-size: 10px;
-    gap: var(--space-1);
-  }
-
-  .recurring-event-next .calendar-icon {
-    width: 10px;
-    height: 10px;
-  }
-
-  .events-list {
-    margin-top: var(--space-4);
-    padding: 0 var(--space-2);
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .events-title {
-    font-size: var(--text-lg);
-    margin-bottom: var(--space-3);
-  }
-
-  .day-view {
-    padding: 0 var(--space-2);
-  }
-
-  .day-view-event {
-    padding: var(--space-3);
-  }
-
-  .day-view-event-title {
-    font-size: var(--text-sm);
-  }
-
-  .day-view-event-desc {
-    font-size: var(--text-xs);
+    padding: 14px 16px;
   }
 }
 
-/* Ultra small screens */
-@media (max-width: 360px) {
-  .month-year {
-    font-size: var(--text-sm);
-  }
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 820px) {
+  .cal-section,
+  .calendar-header { padding: 36px 0 44px; }
 
+  .cal-section__title { font-size: clamp(22px, 5vw, 30px); }
+
+  .monthnav { gap: 10px; }
+  .nav-button { width: 40px; height: 40px; font-size: 16px; }
+  .month-year { font-size: clamp(20px, 4vw, 26px); }
+
+  .calendar-day { min-height: 92px; padding: 5px; }
+  .day-header { font-size: 10px; letter-spacing: 0.12em; padding: 9px 2px; }
+  .day-number { font-size: 13px; }
+  .event-dot { padding: 3px 5px; }
+  .event-dot .event-title { font-size: 11px; -webkit-line-clamp: 2; }
+  .event-dot .event-time-inline { font-size: 9px; }
+  .event-dot--class { padding-right: 30px; }
+  .event-dot__reg { font-size: 7px; padding: 0 2px; top: 2px; right: 3px; }
+
+}
+
+/* ---------- MOBILE ----------
+   At ≤600px the grid switches to dots-only cells with a square aspect ratio,
+   and the day-view companion becomes the primary read-the-events surface.
+   The desktop chip layout would be unreadable at this scale. */
+@media (max-width: 600px) {
+  .content-constrained { padding: 0 16px; }
+
+  /* Header search becomes compact-icon-only until expanded */
+  .search-input { width: 100%; }
+  .header-search--open { flex: 1; min-width: 0; }
+  .search-panel { left: 0; right: auto; width: 100%; }
+
+  /* Hide the chip layout, show the icon row */
+  .day-events--chips { display: none; }
+  .day-events--icons { display: flex; }
+
+  /* Square cells with day number top-center + dots below */
   .calendar-day {
-    min-height: 45px;
-    padding: 1px;
+    aspect-ratio: 1 / 1;
+    min-height: 0;
+    padding: 5px 4px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .day-header { font-size: 9px; padding: 7px 1px; letter-spacing: 0.08em; }
+  .day-number { font-size: 13px; margin-bottom: 0; text-align: center; }
+
+  .calendar-day.today { margin-top: 0; }
+
+  /* Grid extends edge-to-edge on narrow screens */
+  .calendar-grid {
+    margin-left: -16px;
+    margin-right: -16px;
+    border-left: none;
+    border-right: none;
   }
 
-  .day-header {
-    padding: 2px;
-    font-size: 8px;
-  }
+  /* In month mode, the companion day-view list IS the event-detail surface.
+     Bigger bottom padding makes a clear visual break before the Recurring
+     Events section that follows. */
+  .day-view--companion { padding-top: 22px; padding-bottom: 64px; }
 
-  .day-number {
-    font-size: 9px;
-  }
+  /* RList item tweaks */
+  .rlist-item { padding: 14px 0 14px 12px; gap: 4px; }
+  .rlist-item__title { font-size: 14px; }
+  .rlist-item__desc { font-size: 13px; -webkit-line-clamp: 3; }
+  .rlist-item__when { gap: 8px; font-size: 10px; }
 
-  .calendar-day.today .day-number {
-    width: 14px;
-    height: 14px;
-    font-size: 8px;
-  }
+  .nav-button { width: 36px; height: 36px; font-size: 14px; }
+  .search-toggle { width: 36px; height: 36px; }
+  .monthnav { gap: 8px; }
+}
 
-  .event-dot {
-    font-size: 7px;
-    padding: 1px;
-  }
+@media (max-width: 380px) {
+  .day-header { font-size: 8px; padding: 6px 1px; letter-spacing: 0.06em; }
+  .day-number { font-size: 11px; }
+  .day-dot { width: 5px; height: 5px; flex-basis: 5px; }
 
-  .event-title {
-    font-size: 7px;
-  }
+  .rlist-item { padding: 12px 0 12px 10px; }
+  .rlist-item__title { font-size: 13px; }
+}
 
-  .more-events {
-    font-size: 6px;
-  }
-
-  .recurring-event-item {
-    flex: 0 0 180px;
-    min-height: 70px;
-    padding: var(--space-1);
-  }
-
-  .recurring-event-title {
-    font-size: var(--text-xs);
-    line-height: 1.1;
-  }
-
-  .recurring-event-next {
-    font-size: 9px;
-  }
-
-  .recurring-event-next .calendar-icon {
-    width: 8px;
-    height: 8px;
-  }
-
-  .events-list {
-    padding: 0 var(--space-1);
-  }
-
-  .events-title {
-    font-size: var(--text-base);
+/* Desktop-only: hide the day-view companion below the grid (in month mode).
+   On desktop the chips in the grid carry enough info; the companion would
+   be redundant. Day mode still shows the full day-view since
+   .day-view--companion isn't applied there. */
+@media (min-width: 601px) {
+  .day-view--companion {
+    /* Show as a slim "today's events" summary on tablet+. Hide entirely on wide
+       desktops where the chip grid is dense enough. */
+    max-width: var(--maxw);
   }
 }
 </style>
