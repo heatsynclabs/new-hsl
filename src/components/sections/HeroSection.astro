@@ -8,12 +8,13 @@ import PhotoCarousel from '../graphics/PhotoCarousel.vue';
   <BaseContainer>
     <div class="hero__wrapper">
       <div class="hero__content">
-        <!-- Location row (status indicator lives in the caution ribbon above) -->
+        <!-- Location + founding-year row (status indicator lives in the caution ribbon above) -->
         <div class="hero__meta">
           <a href="https://maps.app.goo.gl/Qh3wZuQuik4U7niE6" target="_blank" rel="noopener" class="hero__location">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
             Mesa, AZ
           </a>
+          <span class="hero__est">// Est. 2009</span>
         </div>
 
         <h1 class="hero__headline">
@@ -33,28 +34,12 @@ import PhotoCarousel from '../graphics/PhotoCarousel.vue';
           <BaseButton variant="primary" size="md" href="/community">
             Join the Community
           </BaseButton>
+          <BaseButton variant="secondary" size="md" href="/calendar">
+            View Calendar
+          </BaseButton>
           <BaseButton variant="secondary" size="md" href="/about#visit-us">
             Visit Us
           </BaseButton>
-        </div>
-
-        <div class="stats-row">
-          <div class="stat">
-            <div class="stat-value">16+</div>
-            <div class="stat-label">Years Running</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">100+</div>
-            <div class="stat-label">Active Members</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">6,811</div>
-            <div class="stat-label">Total Events</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">25,177</div>
-            <div class="stat-label">Hours Open</div>
-          </div>
         </div>
       </div>
 
@@ -181,40 +166,14 @@ import PhotoCarousel from '../graphics/PhotoCarousel.vue';
     margin-top: 26px;
   }
 
-  /* Stats row */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0;
-    border-top: var(--bd-2);
-    margin-top: 34px;
-  }
-
-  .stat {
-    padding: 22px 18px;
-    border-right: var(--bd);
-  }
-
-  .stat:last-child {
-    border-right: 0;
-  }
-
-  .stat-value {
-    font-family: var(--font-display);
-    font-size: 34px;
-    font-weight: 800;
-    color: var(--accent-text);
-    line-height: 1;
-  }
-
-  .stat-label {
+  /* Quiet "// Est. 2009" tag riding alongside the Mesa, AZ location label. */
+  .hero__est {
     font-family: var(--font-ui);
-    font-size: 10px;
-    letter-spacing: 0.14em;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--smoke);
-    font-weight: 500;
-    margin-top: 8px;
   }
 
   /* Carousel wrapper */
@@ -239,27 +198,11 @@ import PhotoCarousel from '../graphics/PhotoCarousel.vue';
     .carousel-wrapper {
       order: 1;
     }
-
-    .stats-row {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .stat:nth-child(2) {
-      border-right: 0;
-    }
-
-    .stat:nth-child(-n+2) {
-      border-bottom: var(--bd);
-    }
   }
 
   @media (max-width: 600px) {
     .hero {
       padding: 40px 0 36px;
-    }
-
-    .stat-value {
-      font-size: 28px;
     }
   }
 </style>

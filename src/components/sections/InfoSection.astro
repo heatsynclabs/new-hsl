@@ -20,7 +20,6 @@ const infoItems = [
 <section class="info-section">
   <BaseContainer>
     <div class="info-section__head">
-      <span class="info-section__num">02</span>
       <span class="eyebrow">Who we are</span>
     </div>
     <h2 class="info-section__title sec-title">About Us</h2>
@@ -33,6 +32,17 @@ const infoItems = [
         </div>
       ))}
     </div>
+
+    <!-- Quiet stats line — the highlights without the four-panel chest-pound -->
+    <p class="info-section__stats">
+      <span><strong>16+</strong> years</span>
+      <span class="info-section__stats-sep">·</span>
+      <span><strong>100+</strong> active members</span>
+      <span class="info-section__stats-sep">·</span>
+      <span><strong>6,811</strong> events hosted</span>
+      <span class="info-section__stats-sep">·</span>
+      <span><strong>25,177</strong> hours open</span>
+    </p>
   </BaseContainer>
 </section>
 
@@ -48,13 +58,6 @@ const infoItems = [
     gap: 14px;
     margin-bottom: 6px;
     flex-wrap: wrap;
-  }
-
-  .info-section__num {
-    font-family: var(--font-ui);
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--accent-text);
   }
 
   .info-section__title {
@@ -114,8 +117,42 @@ const infoItems = [
     color: var(--ash);
   }
 
+  /* Inline stats — quiet, one-line mention. Numbers in accent-text, labels in ash. */
+  .info-section__stats {
+    margin: 32px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    align-items: baseline;
+    font-family: var(--font-ui);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ash);
+  }
+
+  .info-section__stats strong {
+    color: var(--accent-text);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    margin-right: 4px;
+  }
+
+  .info-section__stats-sep {
+    color: var(--smoke);
+    opacity: 0.6;
+  }
+
   @media (max-width: 820px) {
     .info-section { padding: 48px 0; }
     .rules-row { grid-template-columns: 1fr; gap: 22px; }
+    .info-section__stats { font-size: 11px; }
+    .info-section__stats strong { font-size: 13px; }
+  }
+
+  @media (max-width: 480px) {
+    /* Hide separators on very narrow viewports so chips wrap cleanly */
+    .info-section__stats-sep { display: none; }
   }
 </style>

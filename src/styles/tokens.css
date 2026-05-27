@@ -35,7 +35,9 @@
   /* SECONDARY ACCENTS + STATUS */
   --rust:        #c2542c;
   --rust-deep:   #9a3f20;
-  --live:        #5fa872;
+  /* --live shifted toward teal so it reads as obviously green (not olive)
+     and is distinguishable from --rust for red-green color vision deficiency. */
+  --live:        #5fb892;
   --fault:       #d24f3a;
   --idle:        #f2ab1e;
   --violet:      #9b7fd0;
@@ -78,7 +80,8 @@
 
   --rust:        #c2542c;
   --rust-deep:   #9a3f20;
-  --live:        #3f8d57;
+  /* Teal-shifted green; see dark-theme note above. */
+  --live:        #3f9d77;
   --fault:       #c43d28;
   --idle:        #b9740f;
   --violet:      #7a5fb0;

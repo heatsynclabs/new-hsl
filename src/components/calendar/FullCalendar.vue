@@ -342,6 +342,13 @@ const calendarDays = computed(() => {
   }))
 })
 
+// Mobile/desktop click behavior differs:
+//   • Desktop — click a day → switch to focused Day mode (grid hides).
+//   • Mobile  — click a day → stay in Month mode; the day-agenda companion
+//                below the grid updates. (Hitting the Day toggle still
+//                switches to the focused view.)
+// We sample window width at click time; no reactive listener needed since
+// the user explicitly triggers this gesture.
 const onDayClick = (day: { date: Date; events: CalendarEvent[] }) => {
   selectedDay.value = day.date
   // If user clicked a leading/trailing day (visible in this grid but from
@@ -351,8 +358,9 @@ const onDayClick = (day: { date: Date; events: CalendarEvent[] }) => {
     currentDate.value = day.date
     loadEvents()
   }
-  // Otherwise stay in month mode; the day-view companion list below the
-  // grid updates. Use the Day toggle for the focused day-only view.
+  if (typeof window !== 'undefined' && window.innerWidth > 600) {
+    viewMode.value = 'day'
+  }
 }
 
 // Day view events
@@ -702,16 +710,25 @@ onMounted(() => {
   padding: 0 26px;
 }
 
-/* ---------- SECTIONS ---------- */
+/* ---------- SECTIONS ----------
+   Padding split into longhand top/bottom so .content-constrained's horizontal
+   padding (`0 26px`) isn't clobbered by a `padding: Yx 0` shorthand on the
+   same element — both classes apply to the same node. */
 .cal-section,
 .calendar-header {
-  padding: 56px 0;
+  padding-top: 64px;
+  padding-bottom: 72px;
   border-top: 2px solid var(--steel-hi);
 }
 
-/* Calendar header gets extra top padding to clearly separate from the
-   Upcoming Events carousel above it. */
-.calendar-header { padding-top: 64px; }
+/* The Calendar header isn't really a "new section" — it's the calendar's own
+   chrome. Don't draw a divider line between Upcoming and it; the generous
+   padding alone marks the transition. Borders are reserved for real
+   between-content breaks (Recurring, Upcoming → grid). */
+.calendar-header {
+  border-top: none;
+  padding-top: 32px;
+}
 
 .cal-section:first-child,
 .calendar-header:first-child {
@@ -1591,8 +1608,12 @@ onMounted(() => {
 
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 820px) {
+  /* Longhand so horizontal padding from .content-constrained still applies. */
   .cal-section,
-  .calendar-header { padding: 36px 0 44px; }
+  .calendar-header { padding-top: 44px; padding-bottom: 56px; }
+  /* Calendar header doesn't draw a divider above it (see base rule) — so its
+     top padding is the only gap between Upcoming and the toggle row. */
+  .calendar-header { padding-top: 24px; }
 
   .cal-section__title { font-size: clamp(22px, 5vw, 30px); }
 
@@ -1618,9 +1639,33 @@ onMounted(() => {
 @media (max-width: 600px) {
   .content-constrained { padding: 0 16px; }
 
+  /* Restructure the calendar header into a 2-row grid on mobile:
+     Row 1: [Month/Day toggle]   [search]
+     Row 2: [← month-name →    full width, arrows pushed to the edges]
+     Keeps the long date label ("Tue, May 5" in day mode) from getting
+     squeezed up against the arrow buttons. */
+  .calendar-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "toggle . search"
+      "nav    nav nav";
+    row-gap: 14px;
+    align-items: center;
+  }
+  .calendar-header .view-toggle { grid-area: toggle; }
+  .calendar-header .header-search { grid-area: search; justify-self: end; }
+  .calendar-header .monthnav {
+    grid-area: nav;
+    justify-content: space-between;
+    width: 100%;
+    flex: initial;
+    gap: 12px;
+  }
+
   /* Header search becomes compact-icon-only until expanded */
   .search-input { width: 100%; }
-  .header-search--open { flex: 1; min-width: 0; }
+  .header-search--open { flex: 1; min-width: 0; justify-self: stretch; }
   .search-panel { left: 0; right: auto; width: 100%; }
 
   /* Hide the chip layout, show the icon row */
@@ -1673,15 +1718,10 @@ onMounted(() => {
   .rlist-item__title { font-size: 13px; }
 }
 
-/* Desktop-only: hide the day-view companion below the grid (in month mode).
-   On desktop the chips in the grid carry enough info; the companion would
-   be redundant. Day mode still shows the full day-view since
-   .day-view--companion isn't applied there. */
+/* Desktop: the day-view companion below the grid is mobile-only. On desktop
+   the calendar grid carries enough info, and clicking a day switches to
+   focused Day mode (see onDayClick) where .day-view--companion isn't set. */
 @media (min-width: 601px) {
-  .day-view--companion {
-    /* Show as a slim "today's events" summary on tablet+. Hide entirely on wide
-       desktops where the chip grid is dense enough. */
-    max-width: var(--maxw);
-  }
+  .day-view--companion { display: none; }
 }
 </style>

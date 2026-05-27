@@ -23,7 +23,7 @@ const CATEGORY_LABELS: Record<EventCategory, string> = {
 /** Fallback icon (name into eventIcons.ts) per category when no known event matches. */
 const CATEGORY_ICONS: Record<EventCategory, string> = {
   class: 'graduation',
-  open: 'door',
+  open: 'clock',
   hack: 'wrench',
   group: 'users',
   recurring: 'repeat',
