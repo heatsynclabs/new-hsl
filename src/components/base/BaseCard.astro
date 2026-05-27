@@ -34,83 +34,54 @@ const cardClasses = [
 
 <style>
   .card {
-    background: var(--color-bg-secondary);
+    background: var(--slab);
     position: relative;
-    border: var(--color-border-thick);
-    transition: transform var(--transition-base), box-shadow var(--transition-base), background-color var(--transition-base);
-    border-radius: 0;
+    border: var(--bd-2);
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   }
 
-  /* Variants - flat & bordered by default; block shadow only when elevated */
-  .card--default {
-    box-shadow: none;
-  }
+  .card--default { /* default block shadow */ }
+  .card--elevated { box-shadow: var(--shadow); }
+  .card--bordered { box-shadow: none; }
 
-  .card--elevated {
-    box-shadow: var(--color-shadow-block-orange);
-  }
-
-  .card--bordered {
-    border: var(--color-border-thick);
-  }
-
-  /* Padding variants */
-  .card--padding-none .card__content {
-    padding: 0;
-  }
-
-  .card--padding-sm .card__content {
-    padding: var(--space-4);
-  }
-
-  .card--padding-md .card__content {
-    padding: var(--space-8);
-  }
-
-  .card--padding-lg .card__content {
-    padding: var(--space-12);
-  }
+  .card--padding-none .card__content { padding: 0; }
+  .card--padding-sm   .card__content { padding: var(--space-4); }
+  .card--padding-md   .card__content { padding: var(--space-6); }
+  .card--padding-lg   .card__content { padding: var(--space-8); }
 
   .card--padding-sm .card__header,
-  .card--padding-sm .card__footer {
-    padding: var(--space-4) var(--space-4) 0;
-  }
+  .card--padding-sm .card__footer { padding: var(--space-4) var(--space-4) 0; }
 
   .card--padding-md .card__header,
-  .card--padding-md .card__footer {
-    padding: var(--space-8) var(--space-8) 0;
-  }
+  .card--padding-md .card__footer { padding: var(--space-6) var(--space-6) 0; }
 
   .card--padding-lg .card__header,
-  .card--padding-lg .card__footer {
-    padding: var(--space-12) var(--space-12) 0;
-  }
+  .card--padding-lg .card__footer { padding: var(--space-8) var(--space-8) 0; }
 
   .card__footer {
     padding-top: 0 !important;
     padding-bottom: var(--space-4) !important;
   }
 
-  /* Hoverable effect - quiet: orange edge, slight lift. No shadow bloom. */
   .card--hoverable {
-    transition: transform var(--transition-base), border-color var(--transition-base);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   }
   .card--hoverable:hover {
-    transform: translateY(-2px);
-    border-color: var(--color-accent-primary);
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow);
   }
 
-  /* Header and footer styling */
   .card__header {
-    border-bottom: 1px solid var(--color-border-light);
-    margin-bottom: var(--space-4);
-    padding-bottom: var(--space-4);
+    border-bottom: var(--bd);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
   }
 
   .card__footer {
-    border-top: 1px solid var(--color-border-light);
-    margin-top: var(--space-4);
-    padding-top: var(--space-4);
+    border-top: var(--bd);
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
   }
 </style>
 

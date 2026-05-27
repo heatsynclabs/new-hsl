@@ -9,8 +9,8 @@
     <svg
       v-if="currentTheme === 'dark'"
       class="theme-toggle__icon"
-      width="16"
-      height="16"
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -32,8 +32,8 @@
     <svg
       v-else
       class="theme-toggle__icon"
-      width="16"
-      height="16"
+      width="18"
+      height="18"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -86,29 +86,24 @@ onUnmounted(() => {})
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-1);
+  padding: 0;
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--color-text-secondary);
-  transition: color var(--transition-base), transform var(--transition-base);
+  color: var(--ash);
+  transition: color var(--transition-fast);
 }
 
 .theme-toggle:hover {
-  color: var(--color-accent-primary);
-}
-
-.theme-toggle:hover .theme-toggle__icon {
-  transform: scale(1.1);
+  color: var(--accent-text);
 }
 
 .theme-toggle:focus-visible {
-  outline: 2px solid var(--color-accent-primary);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
+  outline: 2px solid var(--hazard);
+  outline-offset: 3px;
 }
 
 .theme-toggle__icon {
-  transition: transform var(--transition-base);
+  display: block;
 }
 </style>

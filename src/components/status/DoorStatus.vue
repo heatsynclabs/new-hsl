@@ -44,51 +44,45 @@ onUnmounted(() => {
 .door-status {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  border: 2px solid var(--ink);
-  font-size: var(--text-lg);
+  gap: 9px;
+  padding: 10px 16px;
+  background: var(--tape-dark);
+  border: 2px solid var(--on-dark-line);
+  color: var(--on-dark);
   font-family: var(--font-ui);
-  font-weight: 400;
-  letter-spacing: var(--tracking-wide);
-  transition: all var(--transition-base);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: border-color var(--transition-fast);
 }
 
 .door-status--loading {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text-secondary);
-}
-
-.door-status--open {
-  background: var(--newbie-green);
-  color: var(--paper);
-}
-
-.door-status--closed {
-  background: var(--ink);
-  color: var(--paper);
-}
-
-.door-status__indicator {
-  width: 9px;
-  height: 9px;
-  background: currentColor;
+  border-color: var(--smoke);
 }
 
 .door-status--loading .door-status__indicator {
-  animation: pulse 2s ease-in-out infinite;
+  background: var(--smoke);
+  animation: pulse 2.4s ease-in-out infinite;
 }
 
-.door-status__text {
-  text-transform: uppercase;
+.door-status--open .door-status__indicator {
+  background: var(--live);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+.door-status--closed .door-status__indicator {
+  background: var(--fault);
+}
+
+.door-status__indicator {
+  width: 11px;
+  height: 11px;
+  flex: none;
 }
 
 @keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
 }
 </style>

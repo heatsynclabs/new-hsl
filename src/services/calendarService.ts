@@ -113,14 +113,18 @@ export class CalendarService {
     const cached = this.getCached(cacheKey)
     if (cached) return cached
 
-    // For month view, get events from a week before month start to end of month
-    // This ensures we capture events from the previous month that appear in the calendar grid
+    // The month-view grid renders a full 5- or 6-row block: it shows up to 6
+    // leading days from the previous month and up to 6 trailing days from the
+    // next month. Fetch ±7 days around the month so events landing on those
+    // visible "other-month" cells still render. Without the trailing buffer,
+    // events on the trailing days were silently missing.
     const monthStart = startOfDay(startOfMonth(monthDate))
-    const fetchStart = subDays(monthStart, 7) // Fetch from 7 days before month start
     const monthEnd = endOfMonth(monthDate)
+    const fetchStart = subDays(monthStart, 7)
+    const fetchEnd = addDays(monthEnd, 7)
 
     const timeMin = fetchStart.toISOString()
-    const timeMax = monthEnd.toISOString()
+    const timeMax = fetchEnd.toISOString()
 
     const data = await this.fetchFromAPI(timeMin, timeMax)
 

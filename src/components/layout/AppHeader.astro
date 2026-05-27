@@ -93,6 +93,7 @@ import ThemeToggle from './ThemeToggle.vue';
         <li><a href="/about" class="nav__mobile-link">About</a></li>
         <li><a href="/membership" class="nav__mobile-link">Membership</a></li>
         <li><a href="/calendar" class="nav__mobile-link">Events</a></li>
+        <li><a href="/calendar" class="nav__mobile-link nav__mobile-link--sub">Calendar</a></li>
         <li><a href="/classes" class="nav__mobile-link nav__mobile-link--sub">Classes</a></li>
         <li><a href="/community" class="nav__mobile-link">Community</a></li>
         <li><a href="/projects" class="nav__mobile-link nav__mobile-link--sub">Projects</a></li>
@@ -144,8 +145,10 @@ import ThemeToggle from './ThemeToggle.vue';
 
 <style>
   .header {
-    background: var(--color-bg-secondary);
-    border-bottom: 3px solid var(--color-text-primary);
+    background: var(--nav-bg);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border-bottom: 2px solid var(--steel-hi);
     position: sticky;
     top: 0;
     z-index: var(--z-overlay);
@@ -164,6 +167,7 @@ import ThemeToggle from './ThemeToggle.vue';
     display: flex;
     align-items: center;
     gap: var(--space-3);
+    margin-right: auto;
   }
 
   .nav__logo {
@@ -173,73 +177,56 @@ import ThemeToggle from './ThemeToggle.vue';
 
   .nav__links {
     display: flex;
-    gap: var(--space-4);
+    gap: var(--space-5);
     list-style: none;
     margin: 0;
     padding: 0;
-    margin-left: auto;
     align-items: center;
     flex-wrap: nowrap;
   }
 
   .nav__link {
-    color: var(--color-text-secondary);
+    color: var(--ash);
     text-decoration: none;
-    font-size: var(--text-lg);
     font-family: var(--font-ui);
-    letter-spacing: var(--tracking-wider);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    transition: color var(--transition-base);
-    position: relative;
+    transition: color var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     padding: var(--space-2) 0;
     white-space: nowrap;
   }
 
-  .nav__link::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 3px;
-    background: var(--color-accent-primary);
-    transition: width var(--transition-base);
-  }
-
   .nav__link:hover,
   .nav__link:global(.active) {
-    color: var(--color-accent-primary);
-  }
-
-  .nav__link:hover::after,
-  .nav__link:global(.active)::after {
-    width: 100%;
+    color: var(--accent-text);
   }
 
   .nav__icons {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-4);
   }
 
   .nav__link--icon {
     display: flex;
     align-items: center;
-    padding: var(--space-1);
-  }
-
-  .nav__link--icon::after {
-    display: none;
+    padding: 0;
+    color: var(--ash);
   }
 
   .nav__link--icon svg {
-    width: 16px;
-    height: 16px;
-    transition: transform var(--transition-base);
+    width: 18px;
+    height: 18px;
+    transition: color var(--transition-fast), transform var(--transition-fast);
   }
 
-  .nav__link--icon:hover svg {
-    transform: scale(1.1);
+  .nav__link--icon:hover {
+    color: var(--accent-text);
   }
 
   /* Dropdown styles */
@@ -248,8 +235,13 @@ import ThemeToggle from './ThemeToggle.vue';
   }
 
   .nav__dropdown-icon {
+    width: 0;
+    height: 0;
     margin-left: 4px;
-    transition: transform var(--transition-base);
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid currentColor;
+    transition: transform var(--transition-fast);
   }
 
   .nav__dropdown:hover .nav__dropdown-icon {
@@ -259,17 +251,18 @@ import ThemeToggle from './ThemeToggle.vue';
   .nav__dropdown-menu {
     position: absolute;
     top: 100%;
-    left: 0;
-    background: var(--color-bg-secondary);
-    border: var(--border-thick);
+    left: -12px;
+    background: var(--grime);
+    border: var(--bd);
+    box-shadow: var(--shadow-sm);
     list-style: none;
-    margin: var(--space-3) 0 0 0;
-    padding: var(--space-2) 0;
+    margin: var(--space-2) 0 0 0;
+    padding: 6px;
     min-width: 190px;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-8px);
-    transition: all var(--transition-base);
+    transform: translateY(-4px);
+    transition: all var(--transition-fast);
     z-index: var(--z-dropdown);
   }
 
@@ -281,20 +274,21 @@ import ThemeToggle from './ThemeToggle.vue';
 
   .nav__dropdown-link {
     display: block;
-    color: var(--color-text-secondary);
+    color: var(--ash);
     text-decoration: none;
-    font-size: var(--text-base);
     font-family: var(--font-ui);
-    letter-spacing: var(--tracking-wide);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    padding: var(--space-2) var(--space-4);
-    transition: all var(--transition-base);
+    padding: var(--space-2) var(--space-3);
+    transition: all var(--transition-fast);
     white-space: nowrap;
   }
 
   .nav__dropdown-link:hover {
-    color: var(--color-accent-primary);
-    background: var(--color-bg-primary);
+    color: var(--accent-text);
+    background: var(--slab);
   }
 
   /* Mobile toggle button */
@@ -311,65 +305,59 @@ import ThemeToggle from './ThemeToggle.vue';
   .nav__mobile-toggle-line {
     width: 20px;
     height: 2px;
-    background: var(--color-text-secondary);
+    background: var(--ash);
     transition: all var(--transition-base);
   }
 
   /* Mobile menu */
   .nav__mobile-menu {
     display: none;
-    background: var(--color-bg-secondary);
-    border-top: 3px solid var(--color-text-primary);
+    background: var(--grime);
+    border-top: 2px solid var(--steel-hi);
     padding: var(--space-4) 0;
   }
 
   .nav__mobile-links {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
+    gap: var(--space-2);
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
   .nav__mobile-link {
-    color: var(--color-text-secondary);
+    color: var(--ash);
     text-decoration: none;
-    font-size: var(--text-xl);
     font-family: var(--font-ui);
-    letter-spacing: var(--tracking-wide);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     padding: var(--space-3) 0;
-    border-bottom: 2px solid transparent;
-    transition: all var(--transition-base);
+    border-bottom: 1px dashed var(--steel);
+    transition: color var(--transition-fast);
   }
 
   .nav__mobile-link:hover,
   .nav__mobile-link:global(.active) {
-    color: var(--color-accent-primary);
-    border-bottom-color: var(--color-accent-primary);
+    color: var(--accent-text);
   }
 
   .nav__mobile-link--sub {
     padding-left: var(--space-4);
-    font-size: var(--text-lg);
-    opacity: 0.8;
+    font-size: 12px;
+    opacity: 0.85;
   }
 
   .nav__mobile-link--sub::before {
     content: '→ ';
-    margin-right: var(--space-2);
-    color: var(--color-accent-secondary);
+    margin-right: var(--space-1);
+    color: var(--accent-text);
   }
 
-  /* Responsive */
-  @media (max-width: 768px) {
-    .nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
+  /* Responsive — collapse nav links at 960px, follow Gantry pattern */
+  @media (max-width: 960px) {
     .nav__links {
       display: none;
     }
@@ -379,18 +367,14 @@ import ThemeToggle from './ThemeToggle.vue';
     }
 
     .nav__icons {
-      gap: var(--space-2);
-      margin-left: auto;
-      margin-right: var(--space-3);
+      gap: var(--space-3);
+      margin-right: var(--space-2);
     }
 
     .nav__mobile-toggle {
       display: flex;
     }
-  }
 
-  /* Mobile toggle animation */
-  @media (max-width: 768px) {
     .nav__mobile-toggle[aria-expanded="true"] .nav__mobile-toggle-line:nth-child(1) {
       transform: rotate(45deg) translate(5px, 5px);
     }

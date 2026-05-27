@@ -1,0 +1,91 @@
+---
+interface Props {
+  label?: string;
+  variant?: 'labeled' | 'thin' | 'slot';
+}
+
+const hasSlotContent = Astro.slots.has('default');
+const { label, variant: variantProp } = Astro.props;
+const variant = variantProp ?? (hasSlotContent ? 'slot' : label ? 'labeled' : 'thin');
+---
+
+{variant === 'labeled' && (
+  <div class="ribbon">
+    <span class="ribbon__plate">{label}</span>
+  </div>
+)}
+{variant === 'slot' && (
+  <div class="ribbon ribbon--tall">
+    <div class="ribbon__plate-wrap">
+      <slot />
+    </div>
+  </div>
+)}
+{variant === 'thin' && <div class="ribbon-thin"></div>}
+
+<style>
+  .ribbon {
+    height: 34px;
+    position: relative;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--hazard) 0 24px,
+      var(--tape-dark) 24px 48px
+    );
+    border-bottom: 2px solid var(--tape-dark);
+  }
+
+  .ribbon--tall {
+    height: 46px;
+  }
+
+  .ribbon__plate {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--char);
+    border: 2px solid var(--hazard);
+    color: var(--accent-text);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 4px 16px;
+    white-space: nowrap;
+    max-width: calc(100% - 24px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* When the plate hosts a component, keep it as a clean char-colored frame
+     so the slotted element's own border carries the identity. */
+  .ribbon__plate-wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--char);
+    padding: 4px;
+    line-height: 0;
+    max-width: calc(100% - 24px);
+  }
+
+  .ribbon-thin {
+    height: 9px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--hazard) 0 9px,
+      var(--tape-dark) 9px 18px
+    );
+  }
+
+  @media (max-width: 600px) {
+    .ribbon__plate {
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      padding: 3px 12px;
+    }
+  }
+</style>

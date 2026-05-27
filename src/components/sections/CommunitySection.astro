@@ -1,0 +1,51 @@
+---
+import BaseContainer from '../base/BaseContainer.astro';
+import OpenHours from '../schedule/OpenHours.vue';
+import UpcomingEventsList from '../events/UpcomingEventsList.vue';
+---
+
+<section class="community-section">
+  <BaseContainer>
+    <div class="community-section__head">
+      <span class="eyebrow">This week at the lab</span>
+    </div>
+    <div class="community-grid">
+      <div class="community-grid__col community-grid__col--hours">
+        <OpenHours client:load forceCompact hideDescription />
+      </div>
+      <div class="community-grid__col community-grid__col--events">
+        <UpcomingEventsList client:load />
+      </div>
+    </div>
+  </BaseContainer>
+</section>
+
+<style>
+  .community-section {
+    padding: 60px 0;
+    border-top: 2px solid var(--steel-hi);
+  }
+
+  .community-section__head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+
+  .community-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+    align-items: start;
+  }
+
+  @media (max-width: 960px) {
+    .community-grid {
+      grid-template-columns: 1fr;
+      gap: 36px;
+    }
+    .community-section { padding: 48px 0; }
+  }
+</style>

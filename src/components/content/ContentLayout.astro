@@ -36,23 +36,24 @@ const frontmatter = contentEntry.data;
   }
 
   .content-title {
+    font-family: var(--font-display);
+    font-weight: 900;
     font-size: clamp(34px, 6vw, 56px);
-    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.02em;
     margin-bottom: var(--space-4);
     color: var(--color-text-primary);
-    font-family: var(--font-display);
-    text-align: center;
-    line-height: 1;
-    text-shadow: none;
+    text-align: left;
+    text-transform: none;
   }
 
   .content-description {
-    font-size: var(--text-lg);
-    color: var(--color-text-tertiary);
+    font-size: 19px;
+    color: var(--ash);
     font-family: var(--font-body);
-    text-align: center;
+    text-align: left;
     max-width: 640px;
-    margin: 0 auto;
+    margin: 0;
     line-height: var(--leading-relaxed);
   }
 
@@ -62,36 +63,38 @@ const frontmatter = contentEntry.data;
   }
 
   .content-body :global(h2) {
-    font-size: var(--text-3xl);
-    font-weight: 400;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(26px, 3.4vw, 34px);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
     margin-top: var(--space-10);
     margin-bottom: var(--space-4);
     color: var(--color-text-primary);
-    font-family: var(--font-display);
-    border-bottom: 3px solid var(--color-accent-primary);
+    border-bottom: 2px solid var(--hazard);
     padding-bottom: var(--space-2);
     line-height: 1;
   }
 
   .content-body :global(h3) {
-    font-size: var(--text-xl);
-    font-weight: 400;
+    font-size: 22px;
+    font-weight: 800;
     margin-top: var(--space-6);
     margin-bottom: var(--space-3);
-    color: var(--color-accent-secondary);
-    font-family: var(--font-ui);
-    letter-spacing: var(--tracking-wider);
+    color: var(--accent-text);
+    font-family: var(--font-display);
     text-transform: uppercase;
+    letter-spacing: -0.005em;
   }
 
   .content-body :global(h4) {
-    font-size: var(--text-lg);
-    font-weight: 400;
+    font-size: 13px;
+    font-weight: 600;
     margin-top: var(--space-4);
     margin-bottom: var(--space-2);
-    color: var(--color-accent-secondary);
+    color: var(--accent-text);
     font-family: var(--font-ui);
-    letter-spacing: var(--tracking-wide);
+    letter-spacing: 0.18em;
     text-transform: uppercase;
   }
 
@@ -126,25 +129,24 @@ const frontmatter = contentEntry.data;
     content: '+';
     position: absolute;
     left: 0;
-    color: var(--color-accent-primary);
+    color: var(--accent-text);
     font-family: var(--font-ui);
-    font-size: var(--text-xl);
+    font-size: 17px;
+    font-weight: 700;
     line-height: 1;
   }
 
   .content-body :global(a) {
-    color: var(--color-accent-secondary);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    font-weight: var(--font-bold);
-    transition: color var(--transition-base);
-  }
-  :global([data-theme="dark"]) .content-body :global(a) {
-    color: var(--orange);
+    color: var(--accent-text);
+    text-decoration: none;
+    border-bottom: 2px solid var(--hazard);
+    font-weight: 600;
+    transition: color var(--transition-fast);
   }
 
   .content-body :global(a:hover) {
     color: var(--color-text-primary);
+    border-bottom-color: var(--color-text-primary);
   }
 
   .content-body :global(strong) {
@@ -180,26 +182,27 @@ const frontmatter = contentEntry.data;
   .content-body :global(.donate-cta) {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
-    background: var(--ink);
-    color: var(--paper);
-    padding: var(--space-3) var(--space-8);
-    border: var(--border-thick);
-    font-size: var(--text-xl);
-    font-weight: 400;
+    gap: 8px;
+    background: var(--hazard);
+    color: var(--tape-dark);
+    padding: 14px 24px;
+    border: 2px solid var(--tape-dark);
     font-family: var(--font-ui);
-    letter-spacing: var(--tracking-wider);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
     margin: var(--space-2) 0 var(--space-4);
   }
 
   .content-body :global(.donate-cta:hover) {
     transform: translate(-2px, -2px);
-    box-shadow: 8px 8px 0 var(--orange);
-    color: var(--paper);
-    text-decoration: none;
+    box-shadow: var(--shadow);
+    color: var(--tape-dark);
+    border-bottom-color: var(--tape-dark);
   }
 
   .content-body :global(blockquote) {

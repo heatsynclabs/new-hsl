@@ -2,20 +2,20 @@
 export const prerender = true;
 import Layout from '../layouts/Layout.astro';
 import HeroSection from '../components/sections/HeroSection.astro';
+import CommunitySection from '../components/sections/CommunitySection.astro';
 import InfoSection from '../components/sections/InfoSection.astro';
 import ValuesSection from '../components/sections/ValuesSection.astro';
-import ScheduleSection from '../components/sections/ScheduleSection.astro';
-import CalendarSection from '../components/sections/CalendarSection.astro';
 import SupportSection from '../components/sections/SupportSection.astro';
+import CautionRibbon from '../components/graphics/CautionRibbon.astro';
 ---
 
 <Layout title="HeatSync Labs - Arizona's Community Hackerspace">
   <div class="home">
     <HeroSection />
-    <CalendarSection />
+    <CommunitySection />
     <InfoSection />
     <ValuesSection />
-    <ScheduleSection />
+    <CautionRibbon />
     <SupportSection />
   </div>
 </Layout>

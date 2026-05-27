@@ -25,13 +25,13 @@ const logoClasses = [
   .logo {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    font-family: var(--font-mono);
-    font-weight: var(--font-semibold);
-    letter-spacing: var(--tracking-tight);
+    gap: 11px;
+    font-family: var(--font-logo);
+    font-weight: 700;
+    letter-spacing: 0;
     color: var(--color-text-primary);
     text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color var(--transition-fast);
   }
 
   .logo__mark {
@@ -46,34 +46,39 @@ const logoClasses = [
 
   .logo__text {
     white-space: nowrap;
-    /* Brand wordmark keeps the existing logo font - NOT a design-system font */
+    /* Brand wordmark keeps Charis SIL — the brand mark, not a design-system font */
     font-family: var(--font-logo);
-    font-weight: var(--font-semibold);
-    letter-spacing: var(--tracking-tight);
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
   }
 
   /* Sizes */
   .logo--sm .logo__mark {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
   }
 
   .logo--sm .logo__text {
-    font-size: var(--text-base);
+    font-size: 17px;
   }
 
   .logo--md .logo__mark {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
   }
 
   .logo--md .logo__text {
-    font-size: var(--text-xl);
+    font-size: 23px;
   }
 
   @media (max-width: 640px) {
     .logo--md .logo__text {
-      font-size: var(--text-base);
+      font-size: 18px;
+    }
+    .logo--md .logo__mark {
+      width: 30px;
+      height: 30px;
     }
   }
 
@@ -83,7 +88,7 @@ const logoClasses = [
   }
 
   .logo--lg .logo__text {
-    font-size: var(--text-2xl);
+    font-size: 30px;
   }
 
   /* Interactive state - no spin; quiet wordmark tint only */
@@ -98,27 +103,6 @@ const logoClasses = [
 
   .logo--text-only .logo__mark {
     display: none;
-  }
-
-  /* Scroll animation states */
-  .logo--hidden {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.8);
-    pointer-events: none;
-  }
-
-  .logo--visible {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-
-  /* On mobile, always show navbar logo */
-  @media (max-width: 768px) {
-    .logo--hidden {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      pointer-events: auto;
-    }
   }
 </style>
 
