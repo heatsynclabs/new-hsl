@@ -9,9 +9,12 @@ import BaseButton from '../components/base/BaseButton.astro';
   <div class="register-page">
     <BaseContainer>
       <div class="register-header">
-        <h1 class="register-title">Class Registration</h1>
+        <h1 class="register-title">Class Interest List</h1>
         <p class="register-subtitle">
-          Fill out the form below to register for classes at HeatSync Labs.
+          Tell us which classes you'd like to take and we'll notify you when new
+          sessions are scheduled. To sign up for a specific session that's
+          already on the books, use the register link on the
+          <a href="/classes">Classes page</a>.
         </p>
       </div>
 
@@ -66,6 +69,12 @@ import BaseButton from '../components/base/BaseButton.astro';
     max-width: 600px;
     margin: 0 auto;
     line-height: var(--leading-relaxed);
+  }
+
+  .register-subtitle a {
+    color: var(--accent-text);
+    border-bottom: 1px solid var(--hazard);
+    text-decoration: none;
   }
 
   .airtable-embed {

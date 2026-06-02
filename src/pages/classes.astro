@@ -3,35 +3,40 @@ export const prerender = true;
 import Layout from '../layouts/Layout.astro';
 import BaseContainer from '../components/base/BaseContainer.astro';
 import BaseButton from '../components/base/BaseButton.astro';
+import UpcomingClasses from '../components/classes/UpcomingClasses.vue';
+import ClassCatalog from '../components/classes/ClassCatalog.vue';
 ---
 
 <Layout title="Classes - HeatSync Labs">
   <div class="classes-page">
     <BaseContainer>
-      <div class="classes-header">
-        <h1 class="classes-title">Available Classes</h1>
+      <header class="classes-header">
+        <h1 class="classes-title">Classes &amp; Certifications</h1>
         <p class="classes-subtitle">
-          Learn new skills and get certified on our equipment. Browse our available classes and register to attend.
+          Learn new skills and get certified on our equipment. Sign up for an
+          upcoming session below, or browse everything we teach.
         </p>
-        <BaseButton
-          variant="primary"
-          href="/register"
-          class="register-button"
-        >
-          Register for Classes
-        </BaseButton>
-      </div>
+      </header>
 
-      <div class="airtable-embed">
-        <iframe
-          class="airtable-embed__iframe"
-          src="https://airtable.com/embed/appa4ZMOs3fcejTSw/shrCG4aqAtGZwVmbk/tblZDTb6sjSVFD724?viewControls=on"
-          frameborder="0"
-          width="100%"
-          height="533"
-          style="background: transparent; border: 1px solid #ccc;"
-        ></iframe>
-      </div>
+      <section class="classes-section">
+        <UpcomingClasses client:load />
+      </section>
+
+      <section class="classes-section classes-section--bordered">
+        <ClassCatalog client:load />
+      </section>
+
+      <section class="classes-cta">
+        <h2 class="classes-cta__title">Don't see a date that works?</h2>
+        <p class="classes-cta__text">
+          New classes are posted to the calendar regularly. Join the class
+          interest list and we'll notify you when sessions you care about get
+          scheduled.
+        </p>
+        <BaseButton variant="primary" href="/register">
+          Join the Class Interest List
+        </BaseButton>
+      </section>
     </BaseContainer>
   </div>
 </Layout>
@@ -39,20 +44,23 @@ import BaseButton from '../components/base/BaseButton.astro';
 <style>
   .classes-page {
     flex: 1;
-    padding: var(--space-8) 0;
+    padding: var(--space-8) 0 var(--space-16);
   }
 
   .classes-header {
     text-align: center;
-    margin-bottom: var(--space-8);
+    max-width: 720px;
+    margin: 0 auto var(--space-8);
   }
 
   .classes-title {
     font-size: clamp(34px, 6vw, 56px);
-    font-weight: 400;
+    font-weight: 800;
     margin-bottom: var(--space-4);
     color: var(--color-text-primary);
     font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
     line-height: 1;
     text-shadow: none;
   }
@@ -62,41 +70,72 @@ import BaseButton from '../components/base/BaseButton.astro';
     color: var(--color-text-tertiary);
     font-family: var(--font-body);
     max-width: 600px;
-    margin: 0 auto var(--space-6);
+    margin: 0 auto;
     line-height: var(--leading-relaxed);
   }
 
-  .register-button {
-    margin-bottom: var(--space-8);
+  .classes-section {
+    margin-top: var(--space-8);
   }
 
-  .airtable-embed {
-    background: var(--color-bg-secondary);
-    border: var(--color-border-thick);
-    overflow: hidden;
+  /* Divider rule between the live schedule and the evergreen catalog —
+     matches the calendar page's section-border treatment. */
+  .classes-section--bordered {
+    margin-top: var(--space-12);
+    padding-top: var(--space-12);
+    border-top: 2px solid var(--steel-hi);
   }
 
-  .airtable-embed__iframe {
-    display: block;
-    min-height: 600px;
+  .classes-cta {
+    margin-top: var(--space-12);
+    padding-top: var(--space-12);
+    border-top: 2px solid var(--steel-hi);
+    text-align: center;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .classes-cta__title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(24px, 3.6vw, 36px);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-4);
+  }
+
+  .classes-cta__text {
+    font-size: var(--text-base);
+    color: var(--ash);
+    font-family: var(--font-body);
+    line-height: var(--leading-relaxed);
+    margin: 0 auto var(--space-6);
   }
 
   @media (max-width: 768px) {
     .classes-page {
-      padding: var(--space-4) 0;
+      padding: var(--space-4) 0 var(--space-12);
     }
 
-    .classes-title {
-      font-size: var(--text-5xl);
+    .classes-header {
+      margin-bottom: var(--space-8);
     }
 
     .classes-subtitle {
       font-size: var(--text-base);
     }
 
-    .airtable-embed__iframe {
-      min-height: 500px;
+    .classes-section--bordered {
+      margin-top: var(--space-12);
+      padding-top: var(--space-12);
+    }
+
+    .classes-cta {
+      margin-top: var(--space-12);
+      padding-top: var(--space-12);
     }
   }
 </style>
-
