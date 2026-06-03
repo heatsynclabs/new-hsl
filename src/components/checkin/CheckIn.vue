@@ -9,8 +9,8 @@
         </span>
       </div>
       <p class="ci__sub">
-        Tap in to let the community know you're at the lab. Auto‑expires when your
-        time's up — so it's still right even if you close your laptop.
+        Tap in to let the community know you're at the lab. Auto-expires when your
+        time's up, so it's still right even if you close your laptop.
       </p>
     </header>
 
@@ -108,7 +108,7 @@
               {{ ready ? 'Check In' : 'Connecting…' }}
             </button>
             <p v-if="status === 'offline'" class="ci__error">
-              Live check‑in is offline right now — try again in a moment.
+              Live check-in is offline right now. Try again in a moment.
             </p>
           </form>
         </template>
@@ -151,7 +151,9 @@
 
     <p class="ci__dev">
       Building an integration? Subscribe to <code>{{ feedAddr }}</code> on
-      <code>relay.clasp.to</code> to get a CLASP event on every check‑in.
+      <code>relay.clasp.to</code> to get a
+      <a href="https://clasp.to" target="_blank" rel="noopener">CLASP</a>
+      event on every check-in.
     </p>
   </section>
 </template>
@@ -713,6 +715,12 @@ onBeforeUnmount(() => {
   padding: 1px 5px;
   border: 1px solid var(--steel);
 }
+.ci__dev a {
+  color: var(--accent-text);
+  border-bottom: 1px solid var(--hazard);
+  text-decoration: none;
+}
+.ci__dev a:hover { color: var(--color-text-primary); }
 
 @media (max-width: 800px) {
   .ci__grid { grid-template-columns: 1fr; }
