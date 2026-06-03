@@ -1,0 +1,27 @@
+---
+export const prerender = true;
+import Layout from '../layouts/Layout.astro';
+import BaseContainer from '../components/base/BaseContainer.astro';
+import CheckIn from '../components/checkin/CheckIn.vue';
+---
+
+<Layout title="Check In - HeatSync Labs">
+  <div class="checkin-page">
+    <BaseContainer>
+      <CheckIn client:load />
+    </BaseContainer>
+  </div>
+</Layout>
+
+<style>
+  .checkin-page {
+    flex: 1;
+    padding: var(--space-8) 0 var(--space-16);
+  }
+
+  @media (max-width: 768px) {
+    .checkin-page {
+      padding: var(--space-4) 0 var(--space-12);
+    }
+  }
+</style>
