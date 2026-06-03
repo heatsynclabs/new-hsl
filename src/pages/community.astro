@@ -447,7 +447,8 @@ import BaseContainer from '../components/base/BaseContainer.astro';
     font-weight: 400;
     letter-spacing: 0;
     margin: 0 0 var(--space-3);
-    color: var(--paper);
+    /* The card is a constant dark panel, so text stays light on both themes. */
+    color: var(--on-dark);
     line-height: 1;
     text-shadow: none;
   }
@@ -456,7 +457,7 @@ import BaseContainer from '../components/base/BaseContainer.astro';
     font-family: var(--font-body);
     font-size: var(--text-base);
     line-height: var(--leading-relaxed);
-    color: var(--paper-d);
+    color: color-mix(in srgb, var(--on-dark) 80%, transparent);
     margin: 0 0 var(--space-5);
   }
 
@@ -464,7 +465,7 @@ import BaseContainer from '../components/base/BaseContainer.astro';
     font-style: normal;
     font-family: var(--font-mono);
     font-size: var(--text-sm);
-    color: var(--paper-d);
+    color: color-mix(in srgb, var(--on-dark) 80%, transparent);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -491,30 +492,31 @@ import BaseContainer from '../components/base/BaseContainer.astro';
     letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
     padding: var(--space-3) var(--space-6);
-    border: 3px solid var(--ink);
+    border: 3px solid var(--on-dark);
     text-decoration: none;
     transition: transform var(--transition-base), box-shadow var(--transition-base);
   }
 
   .visit-card__btn--primary {
-    background: var(--orange);
-    color: var(--ink);
+    background: var(--hazard);
+    color: var(--tape-dark);
+    border-color: var(--tape-dark);
   }
 
   .visit-card__btn--primary:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 8px 8px 0 var(--paper-d);
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.45);
   }
 
   .visit-card__btn--secondary {
     background: transparent;
-    color: var(--paper);
-    border-color: var(--paper-d);
+    color: var(--on-dark);
+    border-color: color-mix(in srgb, var(--on-dark) 50%, transparent);
   }
 
   .visit-card__btn--secondary:hover {
-    background: var(--paper);
-    color: var(--ink);
+    background: var(--on-dark);
+    color: var(--tape-dark);
   }
 
   /* Responsive */

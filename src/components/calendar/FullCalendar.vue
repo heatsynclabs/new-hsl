@@ -1,5 +1,41 @@
 <template>
   <div class="full-calendar">
+    <!-- Category filter — governs the whole page (upcoming carousel, month grid,
+         day agenda, recurring rail). Always present so an empty result can still
+         be switched back. Compact dropdown, top-right. -->
+    <div class="cal-filterbar content-constrained">
+      <span class="cal-filterbar__label">Filter by type</span>
+      <div ref="filterRef" class="cat-filter" :class="{ 'cat-filter--open': filterOpen }">
+        <button
+          type="button"
+          class="cat-filter__btn"
+          :aria-expanded="filterOpen"
+          aria-haspopup="listbox"
+          @click="filterOpen = !filterOpen"
+        >
+          <EventIcon :name="activeFilterMeta.icon" :class="['cat-filter__btn-icon', `cat-filter__ic--${activeCategory}`]" />
+          <span class="cat-filter__btn-label">{{ activeFilterMeta.label }}</span>
+          <svg class="cat-filter__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+        </button>
+        <ul v-if="filterOpen" class="cat-filter__menu" role="listbox">
+          <li v-for="opt in CATEGORY_FILTERS" :key="opt.value">
+            <button
+              type="button"
+              class="cat-filter__opt"
+              :class="{ active: activeCategory === opt.value }"
+              role="option"
+              :aria-selected="activeCategory === opt.value"
+              @click="selectCategory(opt.value)"
+            >
+              <EventIcon :name="opt.icon" :class="['cat-filter__opt-icon', `cat-filter__ic--${opt.value}`]" />
+              <span class="cat-filter__opt-label">{{ opt.label }}</span>
+              <svg v-if="activeCategory === opt.value" class="cat-filter__opt-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <!-- Upcoming Events — side-scroll cards, no descriptions, top of page -->
     <section v-if="!loading && upcomingEntries.length > 0" class="cal-section content-constrained">
       <div class="cal-section__head">
@@ -208,7 +244,7 @@
               <span class="rlist-item__time">{{ formatEventTime(event) }}</span>
             </div>
           </div>
-          <span class="rlist-item__tag">{{ categoryLabel(getEventCategory(event)) }}</span>
+          <span class="rlist-item__tag">{{ typeLabel(event) }}</span>
           <p
             v-if="event.description"
             class="rlist-item__desc"
@@ -276,6 +312,13 @@
         </svg>
         Subscribe via iCal
       </a>
+      <a href="/kiosk" class="subscribe-link subscribe-link--secondary">
+        <svg class="subscribe-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M8 21h8M12 17v4" />
+        </svg>
+        Kiosk Calendar
+      </a>
     </div>
 
     <EventModal
@@ -287,12 +330,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted, watch } from 'vue'
+import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from 'vue'
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth, addMonths, subMonths, addDays, subDays, isToday, startOfDay, endOfDay } from 'date-fns'
 import EventModal from '../events/EventModal.vue'
 import EventCarousel, { type CarouselEntry } from '../events/EventCarousel.vue'
 import EventIcon from '../events/EventIcon.vue'
 import { categorize, categoryLabel, categoryIcon, type EventCategory } from '../../utils/eventCategory'
+import { classifyClass, classTypeLabel } from '../../utils/classType'
 import { findKnownEvent } from '../../utils/knownEvents'
 import { CalendarService, type CalendarEvent } from '../../services/calendarService'
 import { config } from '../../config'
@@ -334,6 +378,7 @@ const calendarDays = computed(() => {
     isCurrentMonth: isSameMonth(day, currentDate.value),
     isToday: isToday(day),
     events: allEvents.value.filter(event => {
+      if (!matchesFilter(event)) return false
       const dayStart = startOfDay(day)
       const eventStart = startOfDay(event.start)
       const eventEnd = startOfDay(event.end)
@@ -369,6 +414,7 @@ const selectedDayEvents = computed(() => {
   const dayStart = startOfDay(selectedDay.value)
   const dayEnd = endOfDay(selectedDay.value)
   return allEvents.value.filter(event => {
+    if (!matchesFilter(event)) return false
     const eventStart = startOfDay(event.start)
     const eventEnd = startOfDay(event.end)
     return dayStart >= eventStart && dayStart <= eventEnd
@@ -448,6 +494,62 @@ const recurringTitles = computed(() => new Set(
 const getEventCategory = (event: CalendarEvent): EventCategory =>
   categorize(event, recurringTitles.value)
 
+// ---------- Category filter ----------
+// One control that narrows every event surface on the page to a single type.
+// Registration-bearing "class" events are split further into Classes /
+// Workshops / Certifications (via classifyClass); the rest keep their calendar
+// category. Order: the educational types people come here for lead.
+type CategoryFilter = 'all' | EventCategory | 'workshop' | 'certification'
+const CATEGORY_FILTERS: { value: CategoryFilter; label: string; icon: string }[] = [
+  { value: 'all',           label: 'All events',     icon: 'calendar' },
+  { value: 'class',         label: 'Classes',        icon: 'book' },
+  { value: 'workshop',      label: 'Workshops',      icon: 'wrench' },
+  { value: 'certification', label: 'Certifications', icon: 'graduation' },
+  { value: 'group',         label: 'Groups',         icon: 'users' },
+  { value: 'hack',          label: 'HYH',            icon: 'wrench' },
+  { value: 'recurring',     label: 'Recurring',      icon: 'repeat' },
+  { value: 'open',          label: 'Open hours',     icon: 'clock' },
+  { value: 'default',       label: 'Other',          icon: 'calendar' },
+]
+
+const activeCategory = ref<CategoryFilter>('all')
+const filterOpen = ref(false)
+const filterRef = ref<HTMLElement | null>(null)
+
+const activeFilterMeta = computed(() =>
+  CATEGORY_FILTERS.find(f => f.value === activeCategory.value) ?? CATEGORY_FILTERS[0]!
+)
+
+// Fine-grained type: split the 'class' category into class/workshop/certification
+// so those filters work; every other category passes through unchanged.
+// "Classes" is the umbrella for every registration-bearing event (the whole
+// 'class' category — classes, workshops, AND certifications). "Workshops" and
+// "Certifications" are narrower refinements within it.
+const matchesFilter = (event: CalendarEvent): boolean => {
+  const active = activeCategory.value
+  if (active === 'all') return true
+  const cat = getEventCategory(event)
+  if (active === 'class') return cat === 'class'
+  if (active === 'workshop' || active === 'certification') {
+    return cat === 'class'
+      && classifyClass(event.displayTitle || event.title, event.description || '') === active
+  }
+  return cat === active
+}
+
+const selectCategory = (value: CategoryFilter) => {
+  activeCategory.value = value
+  filterOpen.value = false
+}
+
+// Close the dropdown on any click outside it (the toggle button lives inside
+// filterRef, so toggling never triggers this).
+const onDocClick = (e: MouseEvent) => {
+  if (filterOpen.value && filterRef.value && !filterRef.value.contains(e.target as Node)) {
+    filterOpen.value = false
+  }
+}
+
 const oneTimeEvents = computed(() => {
   const eventGroups = futureEvents.value.reduce((groups, event) => {
     const key = event.title.toLowerCase()
@@ -475,6 +577,16 @@ const iconForEvent = (event: CalendarEvent): string => {
 // Build a CarouselEntry from an event. Color comes from category; the icon
 // (from the known-events registry, falling back to the category icon) is what
 // visually distinguishes one event from another within the same category.
+// Tag label: registration "class" events are split into Class / Workshop /
+// Certification (the category-based label would call them all "Workshop").
+const typeLabel = (event: CalendarEvent): string => {
+  const cat = getEventCategory(event)
+  if (cat === 'class') {
+    return classTypeLabel(classifyClass(event.displayTitle || event.title, event.description || ''))
+  }
+  return categoryLabel(cat)
+}
+
 const buildEntry = (
   event: CalendarEvent,
   options: { key: string; dateLabel: string }
@@ -486,12 +598,13 @@ const buildEntry = (
   category: getEventCategory(event),
   event,
   icon: iconForEvent(event),
+  tag: typeLabel(event),
 })
 
 // Entries for the side-scroll carousels — derived once from the existing lists.
 // Limited to 8 each so the rails feel scannable, not overwhelming.
 const upcomingEntries = computed<CarouselEntry[]>(() =>
-  oneTimeEvents.value.slice(0, 8).map(event =>
+  oneTimeEvents.value.filter(matchesFilter).slice(0, 8).map(event =>
     buildEntry(event, {
       key: event.id,
       dateLabel: format(event.start, 'EEE MMM d'),
@@ -500,7 +613,7 @@ const upcomingEntries = computed<CarouselEntry[]>(() =>
 )
 
 const recurringEntries = computed<CarouselEntry[]>(() =>
-  recurringEvents.value.map(rec =>
+  recurringEvents.value.filter(rec => matchesFilter(rec.event)).map(rec =>
     buildEntry(rec.event, {
       key: rec.title,
       dateLabel: `Next · ${format(rec.nextDate, 'MMM d')}`,
@@ -684,6 +797,11 @@ watch(currentDate, () => {
 onMounted(() => {
   ensureSelectedDay()
   loadEvents()
+  document.addEventListener('click', onDocClick)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocClick)
 })
 </script>
 
@@ -756,6 +874,166 @@ onMounted(() => {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--accent-text);
+}
+
+/* ---------- CATEGORY FILTER BAR ----------
+   First element on the page; right-aligned compact dropdown. Because it now
+   precedes the Upcoming section, neutralize that section's top border so no
+   stray divider appears directly under the filter. */
+.cal-filterbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 28px;
+  padding-bottom: 0;
+}
+
+.cal-filterbar + .cal-section {
+  border-top: none;
+}
+
+.cal-filterbar__label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--smoke);
+}
+
+.cat-filter {
+  position: relative;
+}
+
+.cat-filter__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 12px;
+  background: var(--slab);
+  border: 2px solid var(--steel-hi);
+  color: var(--color-text-primary);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.cat-filter__btn:hover,
+.cat-filter--open .cat-filter__btn {
+  border-color: var(--hazard);
+}
+
+.cat-filter__btn-label {
+  white-space: nowrap;
+}
+
+.cat-filter__btn-icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.cat-filter__chev {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+  transition: transform var(--transition-fast);
+}
+
+.cat-filter--open .cat-filter__chev {
+  transform: rotate(180deg);
+}
+
+.cat-filter__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 210px;
+  max-width: calc(100vw - 32px);
+  max-height: min(70vh, 460px);
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  background: var(--slab);
+  border: 2px solid var(--steel-hi);
+  box-shadow: var(--shadow);
+  z-index: var(--z-dropdown);
+}
+
+.cat-filter__opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  transition: background-color var(--transition-fast);
+}
+
+.cat-filter__opt:hover {
+  background: color-mix(in srgb, var(--hazard) 12%, transparent);
+}
+
+.cat-filter__opt.active {
+  background: var(--hazard-dim);
+  color: var(--accent-text);
+}
+
+.cat-filter__opt-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--smoke);
+}
+
+.cat-filter__opt-label {
+  flex: 1;
+}
+
+.cat-filter__opt-check {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--accent-text);
+}
+
+/* Category-tinted icons — mirror the legend / EventCarousel color mapping */
+.cat-filter__ic--class         { color: var(--hazard); }
+.cat-filter__ic--workshop      { color: var(--hazard); }
+.cat-filter__ic--certification { color: var(--hazard-deep); }
+.cat-filter__ic--group     { color: var(--info); }
+.cat-filter__ic--hack      { color: var(--rust); }
+.cat-filter__ic--recurring { color: var(--live); }
+.cat-filter__ic--open      { color: var(--hazard); }
+.cat-filter__ic--default,
+.cat-filter__ic--all       { color: var(--smoke); }
+
+@media (max-width: 820px) {
+  .cal-filterbar { padding-top: 20px; }
+}
+
+@media (max-width: 420px) {
+  /* Keep the "Filter by type" label visible but tighten the row so the
+     control still fits comfortably on the smallest phones. */
+  .cal-filterbar { gap: 8px; }
+  .cal-filterbar__label { letter-spacing: 0.1em; }
+  .cat-filter__btn { padding: 0 10px; gap: 6px; }
 }
 
 /* ---------- DAY-VIEW LIST (rlist) ----------

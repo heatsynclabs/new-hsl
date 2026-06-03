@@ -1,0 +1,41 @@
+---
+export const prerender = true;
+import '../../styles/tokens.css';
+import '../../styles/base.css';
+import KioskDisplay from '../../components/kiosk/KioskDisplay.vue';
+
+export function getStaticPaths() {
+  return [{ params: { theme: 'light' } }, { params: { theme: 'dark' } }];
+}
+
+const { theme } = Astro.params;
+const safeTheme = theme === 'light' ? 'light' : 'dark';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" />
+    <script is:inline define:vars={{ safeTheme }}>
+      document.documentElement.setAttribute('data-theme', safeTheme);
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <title>Kiosk Calendar - HeatSync Labs</title>
+  </head>
+  <body>
+    <KioskDisplay client:load />
+  </body>
+</html>
+
+<style is:global>
+  html,
+  body {
+    margin: 0;
+    height: 100%;
+    background: var(--char);
+    overflow: hidden;
+  }
+</style>

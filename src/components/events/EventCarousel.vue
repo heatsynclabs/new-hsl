@@ -7,7 +7,7 @@
       :class="`ec__card--${entry.category}`"
       @click="$emit('select', entry.event)"
     >
-      <span v-if="!hideTag" class="ec__tag">{{ categoryLabel(entry.category) }}</span>
+      <span v-if="!hideTag" class="ec__tag">{{ entry.tag ?? categoryLabel(entry.category) }}</span>
       <h3 class="ec__title">
         <EventIcon v-if="entry.icon" :name="entry.icon" class="ec__icon" />
         <span class="ec__title-text">{{ entry.title }}</span>
@@ -38,6 +38,10 @@ export interface CarouselEntry {
   /** Optional icon name (key in eventIcons.ts) for the card. Color comes
       from category — the icon just identifies WHICH known event it is. */
   icon?: string
+  /** Optional override for the tag text. Color still comes from `category`;
+      this lets a registration "class" event read Class / Workshop /
+      Certification instead of the generic category label. */
+  tag?: string
 }
 
 withDefaults(defineProps<{
