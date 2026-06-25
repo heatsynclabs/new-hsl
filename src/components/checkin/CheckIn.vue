@@ -25,6 +25,10 @@
             <span v-if="myCheckin.host" class="ci__hosttag">Host</span>
           </p>
           <p class="ci__active-until">Here until <strong>{{ fmtTime(myCheckin.until) }}</strong></p>
+          <p v-if="expiringSoon" class="ci__nudge">
+            Still here? Your check-in ends at <strong>{{ fmtTime(myCheckin.until) }}</strong> —
+            tap to stay on the board.
+          </p>
           <div class="ci__active-actions">
             <button type="button" class="ci__btn ci__btn--ghost" @click="extend(1)">+1 hour</button>
             <button type="button" class="ci__btn ci__btn--ghost" @click="extend(2)">+2 hours</button>
@@ -211,6 +215,16 @@ const myCheckin = computed<PresenceValue | null>(() => {
   return v && v.until > nowTs.value ? v : null
 })
 
+// Nudge the user to extend before their TTL lapses, so people who are still at
+// the lab don't silently fall off the board. Only fires while they're checked
+// in with the page open (nowTs ticks every 20s); the wider drop-off is by
+// design — a closed laptop still expires on schedule.
+const NUDGE_WINDOW_MS = 15 * 60 * 1000
+const expiringSoon = computed(() => {
+  const v = myCheckin.value
+  return !!v && v.until - nowTs.value <= NUDGE_WINDOW_MS
+})
+
 const fmtTime = (ms: number) => format(new Date(ms), 'h:mm a')
 
 // ---- relay actions ----
@@ -246,7 +260,10 @@ const submitForm = () => doCheckIn(anon.value ? null : (name.value.trim() || nul
 const extend = async (addHours: number) => {
   const cur = present[deviceId.value]
   if (!cur) return
-  const value: PresenceValue = { ...cur, until: Date.now() + addHours * 3600000 }
+  // Add to whichever is later — the existing expiry or now — so "+1 hour" always
+  // lengthens the stay and can never shorten a check-in that still has time left.
+  const base = Math.max(cur.until, Date.now())
+  const value: PresenceValue = { ...cur, until: base + addHours * 3600000 }
   try { await writeCheckin(value, 'checkin') } catch (e) { console.error(e) }
 }
 
@@ -422,6 +439,18 @@ onBeforeUnmount(() => {
   margin: 0 0 var(--space-5);
 }
 .ci__active-until strong { color: var(--accent-text); }
+
+.ci__nudge {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--tape-dark);
+  background: var(--hazard);
+  border-left: 4px solid var(--tape-dark);
+  padding: var(--space-3) var(--space-4);
+  margin: 0 0 var(--space-5);
+}
+.ci__nudge strong { font-weight: 700; }
 
 .ci__active-actions {
   display: flex;
