@@ -174,7 +174,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   format, startOfMonth, endOfMonth, startOfWeek, endOfWeek,
-  eachDayOfInterval, isSameMonth, isToday, startOfDay,
+  eachDayOfInterval, isSameMonth, isSameDay, startOfDay,
 } from 'date-fns'
 import EventIcon from '../events/EventIcon.vue'
 import { categorize, categoryLabel, categoryIcon, type EventCategory } from '../../utils/eventCategory'
@@ -192,22 +192,28 @@ const ALL_SCENES = [
 ] as const
 
 const calendarService = new CalendarService()
-const now = new Date()
+// Reactive "now" so a kiosk left running for days/weeks stays current. It's
+// advanced on every clock tick (and a day rollover triggers a data reload),
+// so the month grid, the "today" highlight and the upcoming/recurring filters
+// all track real time instead of freezing at page-load. Without this the screen
+// drifts further behind every day it stays up.
+const now = ref(new Date())
 
 const monthEvents = ref<CalendarEvent[]>([])
 const futureEvents = ref<CalendarEvent[]>([])
 
 const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const monthLabel = format(now, 'MMMM yyyy')
+const monthLabel = computed(() => format(now.value, 'MMMM yyyy'))
 
 // ---- calendar grid ----
 const calendarDays = computed(() => {
-  const start = startOfWeek(startOfMonth(now))
-  const end = endOfWeek(endOfMonth(now))
+  const ref0 = now.value
+  const start = startOfWeek(startOfMonth(ref0))
+  const end = endOfWeek(endOfMonth(ref0))
   return eachDayOfInterval({ start, end }).map(date => ({
     date,
-    isCurrentMonth: isSameMonth(date, now),
-    isToday: isToday(date),
+    isCurrentMonth: isSameMonth(date, ref0),
+    isToday: isSameDay(date, ref0),
     events: monthEvents.value.filter(ev => {
       const ds = startOfDay(date)
       return ds >= startOfDay(ev.start) && ds <= startOfDay(ev.end)
@@ -216,8 +222,14 @@ const calendarDays = computed(() => {
 })
 const weekCount = computed(() => Math.max(1, calendarDays.value.length / 7))
 
+// An event is still "live" until it ends, so an in-progress event stays
+// listed but anything finished drops off — even if a data refetch hasn't run
+// yet. This is what stops the kiosk showing last week's events.
+const isFutureOrLive = (ev: CalendarEvent, liveNow: number) => ev.end.getTime() >= liveNow
+
 // ---- recurrence grouping (mirrors the calendar page) ----
 const recurringList = computed(() => {
+  const liveNow = now.value.getTime()
   const groups = futureEvents.value.reduce((acc, ev) => {
     const t = ev.title.toLowerCase()
     if (t.includes('open hours') || t.includes('member hours')) return acc
@@ -228,8 +240,12 @@ const recurringList = computed(() => {
     .filter(evs => evs.length > 1)
     .map(evs => {
       const sorted = evs.sort((a, b) => a.start.getTime() - b.start.getTime())
-      return { title: sorted[0]!.title, event: sorted[0]!, nextDate: sorted[0]!.start }
+      // Surface the next occurrence that hasn't ended yet, not the earliest in
+      // the (possibly stale) fetched window — otherwise "Next" shows a past date.
+      const next = sorted.find(ev => isFutureOrLive(ev, liveNow)) ?? sorted[sorted.length - 1]!
+      return { title: sorted[0]!.title, event: next, nextDate: next.start }
     })
+    .filter(r => isFutureOrLive(r.event, liveNow))
     .sort((a, b) => a.nextDate.getTime() - b.nextDate.getTime())
     .slice(0, 12)
 })
@@ -237,6 +253,7 @@ const recurringList = computed(() => {
 const recurringTitles = computed(() => new Set(recurringList.value.map(r => r.title.toLowerCase())))
 
 const upcomingList = computed(() => {
+  const liveNow = now.value.getTime()
   const groups = futureEvents.value.reduce((acc, ev) => {
     ;(acc[ev.title.toLowerCase()] ||= []).push(ev)
     return acc
@@ -244,6 +261,7 @@ const upcomingList = computed(() => {
   return Object.values(groups)
     .filter(evs => evs.length === 1)
     .map(evs => evs[0]!)
+    .filter(ev => isFutureOrLive(ev, liveNow))
     .sort((a, b) => a.start.getTime() - b.start.getTime())
     .slice(0, 7)
 })
@@ -323,6 +341,11 @@ const tick = () => {
   const d = new Date()
   clock.value = format(d, 'h:mm a')
   today.value = format(d, 'EEEE, MMMM d')
+  // Advance reactive "now" so the grid/filters stay current. On a day rollover,
+  // reload the month grid + events so the new day's data is fetched.
+  const rolledOver = !isSameDay(d, now.value)
+  now.value = d
+  if (rolledOver) loadCalendar()
 }
 
 // ---- fullscreen + idle controls ----
@@ -344,22 +367,13 @@ const revealControls = () => {
   idleTimer = setTimeout(() => { controlsVisible.value = false }, 3000)
 }
 
-onMounted(async () => {
-  // Sync the toggle to whatever theme the page bootstrapped with (set by the
-  // inline script per route: /kiosk/light, /kiosk/dark, or default dark).
-  theme.value = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
-  tick()
-  clockTimer = setInterval(tick, 10000)
-  photoTimer = setInterval(() => { photoIndex.value++ }, 7500)
-  document.addEventListener('fullscreenchange', onFsChange)
-  document.addEventListener('keydown', onKeydown)
-  window.addEventListener('mousemove', revealControls)
-  revealControls()
-  scheduleNext()
-
+// Fetch the month grid + upcoming/recurring events for the current "now".
+// Called on mount, on a day rollover, and on a periodic timer so a long-running
+// screen keeps pulling fresh data instead of showing the day it booted.
+const loadCalendar = async () => {
   try {
     const [month, future] = await Promise.all([
-      calendarService.getEventsForMonth(now),
+      calendarService.getEventsForMonth(now.value),
       calendarService.getRecurringEvents(120),
     ])
     monthEvents.value = month
@@ -367,6 +381,28 @@ onMounted(async () => {
   } catch (e) {
     console.error('Kiosk: failed to load calendar', e)
   }
+}
+
+// Re-pull calendar data periodically (well past the service's 5-min cache TTL)
+// so newly-added/edited events surface without a manual reload.
+const DATA_REFRESH_MS = 30 * 60 * 1000
+let dataTimer: ReturnType<typeof setInterval> | undefined
+
+onMounted(async () => {
+  // Sync the toggle to whatever theme the page bootstrapped with (set by the
+  // inline script per route: /kiosk/light, /kiosk/dark, or default dark).
+  theme.value = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
+  tick()
+  clockTimer = setInterval(tick, 10000)
+  photoTimer = setInterval(() => { photoIndex.value++ }, 7500)
+  dataTimer = setInterval(loadCalendar, DATA_REFRESH_MS)
+  document.addEventListener('fullscreenchange', onFsChange)
+  document.addEventListener('keydown', onKeydown)
+  window.addEventListener('mousemove', revealControls)
+  revealControls()
+  scheduleNext()
+
+  await loadCalendar()
 })
 
 onBeforeUnmount(() => {
@@ -374,6 +410,7 @@ onBeforeUnmount(() => {
   clearTimeout(idleTimer)
   clearInterval(clockTimer)
   clearInterval(photoTimer)
+  clearInterval(dataTimer)
   document.removeEventListener('fullscreenchange', onFsChange)
   document.removeEventListener('keydown', onKeydown)
   window.removeEventListener('mousemove', revealControls)
