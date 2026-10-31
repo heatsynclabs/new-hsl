@@ -1,0 +1,12 @@
+---
+// The lab calendar with no site chrome, for embedding in an iframe elsewhere
+// (the members site frames this at /calendar/embed). Same calendar component
+// and data as /calendar, so the two never drift apart.
+export const prerender = true;
+import EmbedLayout from '../../layouts/EmbedLayout.astro';
+import FullCalendar from '../../components/calendar/FullCalendar.vue';
+---
+
+<EmbedLayout title="Calendar - HeatSync Labs">
+  <FullCalendar client:load />
+</EmbedLayout>

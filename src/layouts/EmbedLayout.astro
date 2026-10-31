@@ -1,0 +1,96 @@
+---
+// A bare layout for pages meant to be shown inside an iframe on another site
+// (the members site embeds /calendar/embed). It carries the design tokens,
+// base and utility styles and the theme script, but no site header, caution
+// ribbon or footer, so the embedded page is just its own content.
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/utilities.css';
+
+interface Props {
+  title?: string;
+}
+
+const { title = 'HeatSync Labs' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="HeatSync Labs calendar" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" href="/favicon.ico" />
+
+    <!-- Theme: follow a ?theme=dark|light override if the embedder asks for one,
+         otherwise light (this origin's own stored preference is honoured too). -->
+    <script is:inline>
+      (function () {
+        const param = new URLSearchParams(location.search).get('theme');
+        const stored = localStorage.getItem('theme-preference');
+        const pick = param === 'dark' || param === 'light' ? param
+          : stored === 'dark' || stored === 'light' ? stored
+          : 'light';
+        document.documentElement.setAttribute('data-theme', pick);
+      })();
+    </script>
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <title>{title}</title>
+  </head>
+  <body>
+    <main class="embed-main">
+      <slot />
+    </main>
+
+    <!-- When framed, report our content height so the embedding page can size
+         its iframe to fit and avoid a scroll box inside a scroll box. The
+         calendar renders and changes height async (Vue, filter and month
+         changes), so we watch for size changes rather than post just once. -->
+    <script is:inline>
+      (function () {
+        if (window.parent === window) return;
+        var last = 0;
+        function postHeight() {
+          var h = Math.ceil(document.documentElement.scrollHeight);
+          if (h === last) return;
+          last = h;
+          window.parent.postMessage({ type: 'hsl-calendar-height', height: h }, '*');
+        }
+        window.addEventListener('load', postHeight);
+        window.addEventListener('resize', postHeight);
+        if (window.ResizeObserver) {
+          new ResizeObserver(postHeight).observe(document.documentElement);
+        }
+        // Belt and suspenders for the first few seconds while the calendar
+        // fetches and renders, in case a resize is missed.
+        var ticks = 0;
+        var timer = setInterval(function () {
+          postHeight();
+          if (++ticks > 20) clearInterval(timer);
+        }, 400);
+      })();
+    </script>
+  </body>
+</html>
+
+<style>
+  html {
+    font-family: var(--font-body);
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    line-height: var(--leading-relaxed);
+  }
+
+  /* A little breathing room so the calendar is not flush against the frame. */
+  .embed-main {
+    padding-block: var(--space-6, 1.5rem);
+  }
+</style>
