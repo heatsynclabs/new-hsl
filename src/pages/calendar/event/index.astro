@@ -1,0 +1,14 @@
+---
+// A single calendar event as its own page, reached from a shared link
+// (/calendar/event/?id=<google event id>). The id is read client-side and the
+// one event is fetched from the Google Calendar API, so this static shell works
+// for any event without prerendering every id. The modal and this page share
+// the same data and styling, so a shared link matches what the sharer saw.
+export const prerender = true;
+import Layout from '../../../layouts/Layout.astro';
+import EventPage from '../../../components/events/EventPage.vue';
+---
+
+<Layout title="Event - HeatSync Labs">
+  <EventPage client:load />
+</Layout>

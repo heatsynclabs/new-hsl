@@ -58,6 +58,17 @@
 
         </div>
 
+        <div class="event-actions">
+          <a
+            :href="eventSharePath(event.id)"
+            class="event-actions__open"
+            @click.stop
+          >
+            Open event page →
+          </a>
+          <ShareButton :event="event" />
+        </div>
+
         <div v-if="event.description" class="event-description">
           <h3>Details</h3>
           <div v-html="event.description"></div>
@@ -70,6 +81,8 @@
 <script setup lang="ts">
 import { format } from 'date-fns'
 import type { CalendarEvent } from '../../services/calendarService'
+import ShareButton from './ShareButton.vue'
+import { eventSharePath } from '../../utils/eventShare'
 
 interface Props {
   visible: boolean
@@ -226,6 +239,30 @@ const formatEventTime = (event: CalendarEvent): string => {
   height: 20px;
   color: var(--accent-rust);
   flex-shrink: 0;
+}
+
+.event-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.event-actions__open {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-accent-secondary);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color var(--transition-base), color var(--transition-base);
+}
+
+.event-actions__open:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-accent-primary);
 }
 
 .event-description {

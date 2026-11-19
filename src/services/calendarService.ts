@@ -69,6 +69,50 @@ export class CalendarService {
   }
 
   /**
+   * Fetch one event by its Google Calendar id (what CalendarEvent.id carries).
+   * The id may be a recurring-instance id (e.g. `<base>_20261102T020000Z`), in
+   * which case the API returns that specific occurrence with the right date and
+   * time. Returns null when the event is missing or cancelled, so a stale or
+   * mistyped share link shows a clean "not found" rather than an error.
+   */
+  async getEvent(eventId: string): Promise<CalendarEvent | null> {
+    const cacheKey = `event-${eventId}`
+    const cached = this.getCached(cacheKey)
+    if (cached !== null && cached !== undefined) return cached
+
+    const calendarId = encodeURIComponent(this.CALENDAR_ID)
+    const id = encodeURIComponent(eventId)
+    const params = new URLSearchParams({ key: this.GOOGLE_API_KEY })
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events/${id}?${params.toString()}`
+
+    const response = await fetch(url)
+
+    if (response.status === 404 || response.status === 410) {
+      this.setCache(cacheKey, null)
+      return null
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`API error: ${response.status} ${response.statusText} - ${errorText}`)
+    }
+
+    const data = await response.json()
+    if (data.error) {
+      throw new Error(`Google Calendar API error: ${data.error.message}`)
+    }
+    // Cancelled instances still return 200 with status "cancelled".
+    if (data.status === 'cancelled' || !data.start) {
+      this.setCache(cacheKey, null)
+      return null
+    }
+
+    const event = this.parseGoogleCalendarEvent(data)
+    this.setCache(cacheKey, event)
+    return event
+  }
+
+  /**
    * Fetch and parse calendar events for upcoming events
    */
   async getEvents(daysAhead: number = 30): Promise<CalendarEvent[]> {
